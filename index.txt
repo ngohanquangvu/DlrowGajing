@@ -87,9 +87,15 @@ if os.path.exists("./SaveData")==False: os.mkdir("./SaveData")
 if os.path.exists("./ImageData")==False: os.mkdir("./ImageData")  
 
 def get_content(ck_fb, page_username):
+    global list_cookie
     open(f"./SaveData/{page_username}.txt", "a")
     list_id_post = [i.strip("\n") for i in open(f"./SaveData/{page_username}.txt", "r").readlines()]
-    access_token = eaabw(ck_fb)
+    try:
+        access_token = eaabw(ck_fb)
+    except:
+        time.sleep(5)
+        ck = random.choice(list_cookie)
+        get_content(ck, page_username)
     url = f"https://graph.facebook.com/{page_username}?access_token={access_token}"
     response = requests.get(url)
     if response.status_code == 200:
