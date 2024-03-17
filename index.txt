@@ -1,0 +1,386 @@
+app = customtkinter.CTk()
+app.title("GanJingWorld")
+app.geometry("350x380")
+
+def stop():
+    pass
+
+def check_status():
+    d = 0
+    if len(list_page)==0:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file name page\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    if len(list_userpass)==0:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file account\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    try:
+        check = int(delay.get())
+    except:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của delay\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    try:
+        check = int(change_account.get())
+    except Exception as e:
+        print(str(e))
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số bài đăng\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    if d>0: return False
+    else: return True
+def eaabw(cookie):
+    head = {
+        "cookie":cookie,
+        "Host":"m.facebook.com",
+        "cache-control":"max-age=0",
+        "upgrade-insecure-requests":"1",
+        "origin":"https://mbasic.facebook.com",
+        "content-type":"application/x-www-form-urlencoded",
+        "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
+        "accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "x-requested-with":"mark.via.gp",
+        "sec-fetch-site":"same-origin",
+        "sec-fetch-mode":"navigate",
+        "sec-fetch-user":"?1",
+        "sec-fetch-dest":"document",
+        "referer":"https://mbasic.facebook.com/dialog/oauth?encrypted_query_string=AeC8BVQ7ctjgpS9OzeGcgZu8VAHuuYRJlLKyB5NEYWlKsjPkU7BA5r0pbsXZLqw7Nlde8AWnp3Sa1XIq20qnPoHpzNEgb4qLpydMqy6CixrSTHOGiMs1-5_3j9tIeUcCV7vBUm1y_IQjy1dmjzrWzmAhtgz7scvu2CFVtSD1irg8j_73c8N4Bvpr9KxEmPgyHAcZMhhZ6zkw8Sl64BXgD1Gn8n3kPuSjQWRdCpBjqJbZyHkJuuI_fUeWrYNc6QdkdZPos3MkYQlUuEoZhFnXH7s_OytvqmIbLSHBpoPRXLSmv3UX6LNfWZp7pv0ZoOQ8v3opxbOuse0J-LvThFlu-i4mGKHHqA9TdCq2TLcAAAQzOcASfjFbs_H4E66168gYBHylPtHjsjAzUAo1ILy5p5TQvbZxrk4kpdOjhOoKj-pmOASDwXS6VH7Isup9j4eW1lAjDg-V2zo60W7Woi-HqPeliE5BiEib7lp7PBC0njUNZP8TXTD2XWUMgyO2wpHk5GYd1x1J1fSEzRzvfvQ4b8pz6f9qRfN1wXJk6Ls9wJBStJQViipbU3QGoo9v2LwuCNM9k4NHtv-1o7kPqXX0v5Vuuwbx6tN112i9_zJVbr7NafaatOR0cPt0k09wfvXdcOWOdBeAho28-aqGrwrZhga80JYJ5u5Jwxoajquxb8kEDdUjO8STzMv_9dDNUMSFyxuE-KKHdaYbnQB2AGHYQF_TkOL6Ck545wft9_dG0lMv9-XY4TOmlymzIGAG_Mt0wXM4G4wHuJ6uGzH3B0sOs0e2aVyk-Wzf14eZMs0vLIBdGyrSyt04BFupFMFAMu3WpMNJJhg87xG6_p9esk8O9Yl0kVve8CYudg-ZMZ7cXJTyXG4myoC-mJNyecUYitOdOFtShfY_WOv5-luqmbAic3nN8pWKvUdApO7uxodX-0iT1yrO26zkvZ5dkBOLkQUfEsDM-56sdOLEmKAeJXpAzuTl9cIHIlDgWHtq0iuYV48uz0ejcVovPzznIo-IwX36CAyPnlF7VvtTDec_9O1VFvWl25V56DaEunKr8A5Tx4CZPw2Z-EsGkKsW9eaGpHBgjMUHvr30vEKC8ShxthHdHN9EQhPrPyIIVGtw",
+        "accept-encoding":"gzip, deflate",
+        "accept-language":"vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        }
+    get = requests.get("https://mbasic.facebook.com/dialog/oauth?encrypted_query_string=AeC8BVQ7ctjgpS9OzeGcgZu8VAHuuYRJlLKyB5NEYWlKsjPkU7BA5r0pbsXZLqw7Nlde8AWnp3Sa1XIq20qnPoHpzNEgb4qLpydMqy6CixrSTHOGiMs1-5_3j9tIeUcCV7vBUm1y_IQjy1dmjzrWzmAhtgz7scvu2CFVtSD1irg8j_73c8N4Bvpr9KxEmPgyHAcZMhhZ6zkw8Sl64BXgD1Gn8n3kPuSjQWRdCpBjqJbZyHkJuuI_fUeWrYNc6QdkdZPos3MkYQlUuEoZhFnXH7s_OytvqmIbLSHBpoPRXLSmv3UX6LNfWZp7pv0ZoOQ8v3opxbOuse0J-LvThFlu-i4mGKHHqA9TdCq2TLcAAAQzOcASfjFbs_H4E66168gYBHylPtHjsjAzUAo1ILy5p5TQvbZxrk4kpdOjhOoKj-pmOASDwXS6VH7Isup9j4eW1lAjDg-V2zo60W7Woi-HqPeliE5BiEib7lp7PBC0njUNZP8TXTD2XWUMgyO2wpHk5GYd1x1J1fSEzRzvfvQ4b8pz6f9qRfN1wXJk6Ls9wJBStJQViipbU3QGoo9v2LwuCNM9k4NHtv-1o7kPqXX0v5Vuuwbx6tN112i9_zJVbr7NafaatOR0cPt0k09wfvXdcOWOdBeAho28-aqGrwrZhga80JYJ5u5Jwxoajquxb8kEDdUjO8STzMv_9dDNUMSFyxuE-KKHdaYbnQB2AGHYQF_TkOL6Ck545wft9_dG0lMv9-XY4TOmlymzIGAG_Mt0wXM4G4wHuJ6uGzH3B0sOs0e2aVyk-Wzf14eZMs0vLIBdGyrSyt04BFupFMFAMu3WpMNJJhg87xG6_p9esk8O9Yl0kVve8CYudg-ZMZ7cXJTyXG4myoC-mJNyecUYitOdOFtShfY_WOv5-luqmbAic3nN8pWKvUdApO7uxodX-0iT1yrO26zkvZ5dkBOLkQUfEsDM-56sdOLEmKAeJXpAzuTl9cIHIlDgWHtq0iuYV48uz0ejcVovPzznIo-IwX36CAyPnlF7VvtTDec_9O1VFvWl25V56DaEunKr8A5Tx4CZPw2Z-EsGkKsW9eaGpHBgjMUHvr30vEKC8ShxthHdHN9EQhPrPyIIVGtw", headers=head).text
+    fb = get.split('name="fb_dtsg" value="')[1].split('"')[0]
+    scope = get.split('name="scope" value="')[1].split('"')[0]
+    logger_id = get.split('name="logger_id" value="')[1].split('"')[0]
+    encrypted_post_body = get.split('name="encrypted_post_body" value="')[1].split('"')[0]
+    data = {
+	"cookie":cookie,
+	"fb_dtsg": fb,
+	"jazoest":"25480",
+	"scope":scope,
+	"display":"touch",
+	"sdk":"",
+	"sdk_version":"",
+	"domain":"",
+	"sso_device":"ios",
+	"state":"",
+	"user_code":"",
+	"nonce":"",
+	"logger_id":logger_id,
+	"auth_type":"",
+	"auth_nonce":"",
+	"code_challenge":"",
+	"code_challenge_method":"",
+	"encrypted_post_body":encrypted_post_body,
+	"return_format[]":"access_token"
+	}
+    get = requests.post("https://m.facebook.com/dialog/oauth/skip/submit/?paipv=0&eav=Afa2uLWDW0GTp9dR1Q9kn2mF90FWnFS6bk2nYDeGhRY_vS_DZOkGVLsNRVEQUHAp9VU", headers=head, data=data).text
+    token = get.split("#access_token=")[1].split("&")[0]
+    return token
+
+if os.path.exists("./SaveData")==False: os.mkdir("./SaveData")  
+if os.path.exists("./ImageData")==False: os.mkdir("./ImageData")  
+
+def get_content(ck_fb, page_username):
+    open(f"./SaveData/{page_username}.txt", "a")
+    list_id_post = [i.strip("\n") for i in open(f"./SaveData/{page_username}.txt", "r").readlines()]
+    access_token = eaabw(ck_fb)
+    url = f"https://graph.facebook.com/{page_username}?access_token={access_token}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        print(data['id'])
+    else:
+        print(f"Request failed with status code {response.status_code}")
+
+    page_id = data['id']
+    url = f"https://graph.facebook.com/v11.0/{page_id}/posts?access_token={access_token}&fields=message,full_picture"
+    while True:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                for post in data['data']:
+                    if (post["id"] in  list_id_post) == False:
+                        open(f"./SaveData/{page_username}.txt", "a").write(f"{post['id']}\n")
+                        
+                        return (process_text(post['message']), save_image(post["full_picture"]))
+                    else:
+                        continue
+                url = data['paging']['next']
+            else:
+                print(f"Request failed with status code {response.status_code}")
+        except:
+            return "Page này đã đăng hết bài viết"
+
+
+def remove_links(text):
+    return re.sub(r'http\S+|www.\S+', '', text, flags=re.MULTILINE)
+
+def process_hashtags(text):
+    hashtags = re.findall(r'#\S+', text)
+    hashtags_lower = [tag.lower() for tag in hashtags]
+    unique_hashtags = list(set(hashtags_lower))
+
+    if len(unique_hashtags) > 10:
+        unique_hashtags = random.sample(unique_hashtags, 10)
+
+    for tag in hashtags:
+        if tag.lower() not in unique_hashtags:
+            text = text.replace(tag, '', 1)
+        else:
+            unique_hashtags.remove(tag.lower())
+
+    return text
+
+def process_text(text):
+    text = remove_links(text)
+    text = process_hashtags(text)
+
+    return text
+
+def save_image(url):
+    try:
+        response = requests.get(url, stream=True)
+
+        if response.status_code == 200:
+            aaa = f'./ImageData/{time.time()}.jpg'
+            with open(aaa, 'wb') as f:
+                f.write(response.content)
+            return aaa
+    except: return None
+
+def login_and_post(email, password, content, img=None):
+    h = {
+        'Accept-Encoding':'gzip, deflate, br',
+        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+        'Content-Length':'2',
+        'Content-Type':'application/json',
+        'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+        'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+        'Gjw-Ts':'1710510510579',
+        'Origin':'https://www.ganjingworld.com',
+        'Referer':'https://www.ganjingworld.com/',
+        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+        'Sec-Ch-Ua-Mobile':'?0',
+        'Sec-Ch-Ua-Platform':'"Windows"',
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+        'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+    }
+
+    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+
+    d = {"user_email":email,"client_type":3}
+
+    h = {
+        'Authorization':token,
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+        'Accept':'application/json, text/plain, */*',
+        'Accept-Encoding':'gzip, deflate, br',
+        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+        'Content-Length':'56',
+        'Origin':'https://www.ganjingworld.com',
+        'Referer':'https://www.ganjingworld.com/',
+        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+        'Sec-Ch-Ua-Mobile':'?0',
+        'Sec-Ch-Ua-Platform':'"Windows"',
+    }
+
+    a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
+    if "The user does not exist" in a.text:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}, thay account\n')
+        frame_text_box.configure(state = "disabled")
+        acc = random.choice(list_userpass)
+        login_and_post(acc[0], acc[1], content, img)
+    server_salt = a.json()["data"]["server_salt"]
+    client_salt = a.json()["data"]["client_salt"]
+    def hash_password(pss, client_salt, server_salt):
+        x = hashlib.sha256((pss + client_salt).encode()).digest()
+        x_base64 = base64.b64encode(x).decode()
+        S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
+        S_base64 = base64.b64encode(S).decode()
+        return S_base64
+
+    hashed_password = hash_password(password, client_salt, server_salt)
+    print(hashed_password)
+
+    d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
+
+    h = {
+        'Authorization':token,
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+        'Accept':'application/json, text/plain, */*',
+        'Accept-Encoding':'gzip, deflate, br',
+        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+        'Content-Length':'56',
+        'Origin':'https://www.ganjingworld.com',
+        'Referer':'https://www.ganjingworld.com/',
+        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+        'Sec-Ch-Ua-Mobile':'?0',
+        'Sec-Ch-Ua-Platform':'"Windows"',
+    }
+
+    a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
+    if "Password is incorrect" in a.text:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}, thay account\n')
+        frame_text_box.configure(state = "disabled")
+        acc = random.choice(list_userpass)
+        login_and_post(acc[0], acc[1], content, img)
+    access_token = a.json()["data"]["token"]
+    def get_webp_url(media_list):
+        for url in media_list:
+            if url.endswith('origin.webp'):
+                return url
+        return None
+
+    d = {
+        'allowGuest': "true",
+        'in_topic': "",
+        'lang': "vi-VN",
+        "media":[],
+        'mode': "ready",
+        'premium': 0,
+        'text': content,
+        'type': "Post",
+        'visibility': "public"
+    }
+
+    h = {
+        "Authorization":access_token
+    }
+    try:
+        a = requests.post("https://gw.ganjingworld.com/v1.0c/social-content/add-post", json=d, headers=h).json()
+        data_post = a["data"]
+        image_token = requests.get(f"https://gw.ganjingworld.com/v1.1/get-vod-token?content_id={data_post['id']}", headers=h).json()["data"]["token"]
+        if img!=None:
+            img_list = requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}).json()["body"]["image_url"]
+            print(img_list)
+            url = get_webp_url(img_list)
+            data_post["media"] = [{"url":url,"id":"01ec6abc-a96c-4bfd-841f-d0ac576d4f13","width":745,"height":656,"ratio":0.8805369127516779,"type":"Image","analyzed_result":"{\"process_time\":\"0.0752 seconds\",\"result\":\"Good\"}\n"}]
+            print(data_post)
+            post_image = requests.post("https://gw.ganjingworld.com/v1.0c/social-content/update-post", headers=h, json=data_post).json()
+            print(post_image)
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Đăng post thành công với account {email}:{password}\n')
+        frame_text_box.configure(state = "disabled")
+    except Exception as e:
+        print(str(e))
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Đăng post không thành công với account {email}:{password}, thay account\n')
+        frame_text_box.configure(state = "disabled")
+        acc = random.choice(list_userpass)
+        login_and_post(acc[0], acc[1], content, img)
+def start():
+    list_luong = [i for i in range(int(change_account.get()))]
+    print(list_luong)
+    def runn():
+        for i in range(0, len(list_luong), int(luong.get())):
+            threads = []
+            aaa = list_luong[i:i+int(luong.get())]
+            for j in range(len(aaa)):
+                acc = random.choice(list_userpass)
+                content, img = get_content(random.choice(list_cookie), random.choice(list_page))
+                threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], content, img)))
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+            time.sleep(int(delay.get()))
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ')
+        frame_text_box.configure(state = "disabled")
+    if check_status():
+        threading.Thread(target=runn).start()
+
+
+list_page = []
+
+def open_file_user():
+    global list_page
+    from tkinter import filedialog
+    file_text_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")], title="Choose Page Name file")
+    if file_text_path!="":
+        workbook = openpyxl.load_workbook(filename=file_text_path)
+        sheet = workbook.active
+        column = sheet["A"]
+        for cell in column:
+            if cell.value!="" and cell.value!=None:
+                print(cell.value)
+                list_page.append(cell.value)
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Import success {len(list_page)} Page\n')
+        frame_text_box.configure(state = "disabled")
+        print(list_page)
+
+list_userpass = []
+
+def open_file_userpass():
+    global list_userpass
+    from tkinter import filedialog
+    file_userpass = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")], title="Choose account file")
+    if file_userpass!="":
+        workbook_userpass = openpyxl.load_workbook(filename=file_userpass)
+        sheet_userpass = workbook_userpass.active
+        column = sheet_userpass["A"]
+        column2 = sheet_userpass["B"]
+        for cell1, cell2 in zip(column, column2):
+                list_userpass.append([cell1.value, cell2.value])
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Import success {len(list_userpass)} account\n')
+        frame_text_box.configure(state = "disabled")
+
+list_cookie = []
+
+def open_file_cookie():
+    global list_cookie
+    from tkinter import filedialog
+    file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose cookie file")
+    if file_text_path!="":
+        a = open(file_text_path, "r").readlines()
+        for cell in a:
+            list_cookie.append(cell.strip("\n"))
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Import success {len(list_cookie)} Cookie\n')
+        frame_text_box.configure(state = "disabled")
+
+infor_input = customtkinter.CTkFrame(app, width = 310)
+infor_input.grid(row = 0, column = 0, padx = 20, pady = (20, 10))
+delay = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Delay")
+delay.grid(row = 0, column = 0, padx = (0, 5))
+luong = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Luồng")
+luong.grid(row = 0, column = 1, padx = (0, 0))
+change_account = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Nhập số post")
+change_account.grid(row = 0, column = 2, padx = (5, 0))
+
+button_frame = customtkinter.CTkFrame(app, width = 260, height= 50)
+button_frame.grid(row = 2, column = 0, pady = 10)
+
+start_button = customtkinter.CTkButton(button_frame, width = 60, height = 50, text = 'Start', command=start)
+start_button.grid(row = 0, column = 1, padx = (0,0))
+
+stop_button = customtkinter.CTkButton(button_frame, width = 60, height = 50, text = 'Cookie', command=open_file_cookie)
+stop_button.grid(row = 0, column = 2, padx = (10,10))
+
+file_button = customtkinter.CTkButton(button_frame, width = 60, height = 50, text = 'Account', command=open_file_userpass)
+file_button.grid(row = 0, column = 3, padx = (0,0))
+
+file_text = customtkinter.CTkButton(button_frame, width = 70, height = 50, text = 'Pagename', command=open_file_user)
+file_text.grid(row = 0, column = 4, padx = (10,0))
+
+frame_text_box = customtkinter.CTkTextbox(app, width = 300, height= 220)
+frame_text_box.grid(row = 4, column = 0, pady = 10)
+frame_text_box.configure(state = "disabled")
+
+app.mainloop()
