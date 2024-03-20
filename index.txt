@@ -1,9 +1,11 @@
 app = customtkinter.CTk()
 app.title("GanJingWorld")
-app.geometry("350x380")
+app.geometry("350x420")
 
 def stop():
     pass
+
+total = 0
 
 def check_status():
     d = 0
@@ -175,6 +177,7 @@ def save_image(url):
     except: return None
 
 def login_and_post(email, password, data, access_token=None):
+    global total
     dem = int(change_account.get())
     list_data = get_content(data, dem)
     print(len(list_data))
@@ -304,9 +307,11 @@ def login_and_post(email, password, data, access_token=None):
                 print(post_image)
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'Đăng {int(change_account.get())-dem+1} post thành công với account {email}:{password}\n')
+            total+=1
             frame_text_box.configure(state = "disabled")
             list_data.remove(list_data[dem-1])
             dem-=1
+            total_text_box.configure(text=f"Tổng số lượng bài đăng: {total}")
             time.sleep(int(delay.get()))
         except Exception as e:
             print(str(e))
@@ -350,7 +355,9 @@ def open_file_userpass():
     if file_text_path!="":
         a = open(file_text_path, "r").readlines()
         for cell in a:
-            list_userpass.append(cell.strip("\n"))
+            test = cell.strip("\n").split("|")
+            if len(test)==3 and test[0]!="" and test[1]!="" and test[2]!="":
+                list_userpass.append(cell.strip("\n"))
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Import success {len(list_userpass)} Data\n')
         frame_text_box.configure(state = "disabled")
@@ -394,5 +401,8 @@ file_button.grid(row = 0, column = 3, padx = (0,0))
 frame_text_box = customtkinter.CTkTextbox(app, width = 300, height= 220)
 frame_text_box.grid(row = 4, column = 0, pady = 10)
 frame_text_box.configure(state = "disabled")
+
+total_text_box = customtkinter.CTkLabel(app, text=f"Tổng số lượng bài đăng: {total}")
+total_text_box.grid(row = 5, column = 0, pady = 0)
 
 app.mainloop()
