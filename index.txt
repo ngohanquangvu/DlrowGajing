@@ -1,3 +1,4 @@
+
 app = customtkinter.CTk()
 app.title("GanJingWorld")
 app.geometry("350x380")
@@ -132,7 +133,10 @@ def get_content(page_username, number):
                 print(f"Request failed with status code {response.status_code}")
         except Exception as e:
             print(str(e))
-            return None, None
+            if len(list_content)==0:
+                return None, None
+            else:
+                return list_content
 
 
 def remove_links(text):
