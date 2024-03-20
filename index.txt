@@ -7,11 +7,6 @@ def stop():
 
 def check_status():
     d = 0
-    if len(list_page)==0:
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file name page\n')
-        frame_text_box.configure(state = "disabled")
-        d+=1
     if len(list_userpass)==0:
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file account\n')
@@ -86,26 +81,35 @@ def eaabw(cookie):
 if os.path.exists("./SaveData")==False: os.mkdir("./SaveData")  
 if os.path.exists("./ImageData")==False: os.mkdir("./ImageData")  
 
-def get_content(ck_fb, page_username):
-    global list_cookie
+list_token = []
+
+def get_content(page_username):
+    global list_cookie, list_token
     open(f"./SaveData/{page_username}.txt", "a")
     list_id_post = [i.strip("\n") for i in open(f"./SaveData/{page_username}.txt", "r").readlines()]
     try:
-        access_token = eaabw(ck_fb)
+        access_token = random.choice(list_token)
     except:
-        time.sleep(5)
-        ck = random.choice(list_cookie)
-        get_content(ck, page_username)
-    url = f"https://graph.facebook.com/{page_username}?access_token={access_token}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        print(data['id'])
+        try:
+            ck = random.choice(list_cookie)
+            access_token = eaabw(ck)
+        except: get_content(page_username)
+    if ("https://www.facebook.com/groups/" in page_username)==False:
+        url = f"https://graph.facebook.com/?id={page_username}&access_token={access_token}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            page_id = data['id']
+        else:
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f"Page hoặc group không hợp lệ\n")
+            frame_text_box.configure(state = "disabled")
+            return None, None
+        url = f"https://graph.facebook.com/v11.0/{page_id}/posts?access_token={access_token}&fields=message,full_picture"
     else:
-        print(f"Request failed with status code {response.status_code}")
+        page_id = page_username.split("https://www.facebook.com/groups/")[1]
+        url = f"https://graph.facebook.com/v11.0/{page_id}/feed?access_token={access_token}&fields=message,full_picture"
 
-    page_id = data['id']
-    url = f"https://graph.facebook.com/v11.0/{page_id}/posts?access_token={access_token}&fields=message,full_picture"
     while True:
         try:
             response = requests.get(url)
@@ -122,7 +126,7 @@ def get_content(ck_fb, page_username):
             else:
                 print(f"Request failed with status code {response.status_code}")
         except:
-            return "Page này đã đăng hết bài viết"
+            return None, None
 
 
 def remove_links(text):
@@ -161,144 +165,144 @@ def save_image(url):
             return aaa
     except: return None
 
-def login_and_post(email, password, content, img=None):
-    h = {
-        'Accept-Encoding':'gzip, deflate, br',
-        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-        'Content-Length':'2',
-        'Content-Type':'application/json',
-        'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
-        'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
-        'Gjw-Ts':'1710510510579',
-        'Origin':'https://www.ganjingworld.com',
-        'Referer':'https://www.ganjingworld.com/',
-        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-        'Sec-Ch-Ua-Mobile':'?0',
-        'Sec-Ch-Ua-Platform':'"Windows"',
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
-        'X-Cdk-Lrtm':'2024-03-15 20:48:30',
-    }
+def login_and_post(email, password, data):
+    dem = int(change_account.get())
+    while dem>=0:
+        content, img = get_content(data)
+        h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
 
-    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+        token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
 
-    d = {"user_email":email,"client_type":3}
+        d = {"user_email":email,"client_type":3}
 
-    h = {
-        'Authorization':token,
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
-        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
-        'Accept':'application/json, text/plain, */*',
-        'Accept-Encoding':'gzip, deflate, br',
-        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-        'Content-Length':'56',
-        'Origin':'https://www.ganjingworld.com',
-        'Referer':'https://www.ganjingworld.com/',
-        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-        'Sec-Ch-Ua-Mobile':'?0',
-        'Sec-Ch-Ua-Platform':'"Windows"',
-    }
+        h = {
+            'Authorization':token,
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+            'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+            'Accept':'application/json, text/plain, */*',
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'56',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+        }
 
-    a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
-    if "The user does not exist" in a.text:
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}, thay account\n')
-        frame_text_box.configure(state = "disabled")
-        acc = random.choice(list_userpass)
-        login_and_post(acc[0], acc[1], content, img)
-    server_salt = a.json()["data"]["server_salt"]
-    client_salt = a.json()["data"]["client_salt"]
-    def hash_password(pss, client_salt, server_salt):
-        x = hashlib.sha256((pss + client_salt).encode()).digest()
-        x_base64 = base64.b64encode(x).decode()
-        S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
-        S_base64 = base64.b64encode(S).decode()
-        return S_base64
+        a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
+        if "The user does not exist" in a.text:
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}, thay account\n')
+            frame_text_box.configure(state = "disabled")
+            return None
+        server_salt = a.json()["data"]["server_salt"]
+        client_salt = a.json()["data"]["client_salt"]
+        def hash_password(pss, client_salt, server_salt):
+            x = hashlib.sha256((pss + client_salt).encode()).digest()
+            x_base64 = base64.b64encode(x).decode()
+            S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
+            S_base64 = base64.b64encode(S).decode()
+            return S_base64
 
-    hashed_password = hash_password(password, client_salt, server_salt)
-    print(hashed_password)
+        hashed_password = hash_password(password, client_salt, server_salt)
+        print(hashed_password)
 
-    d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
+        d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
 
-    h = {
-        'Authorization':token,
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
-        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
-        'Accept':'application/json, text/plain, */*',
-        'Accept-Encoding':'gzip, deflate, br',
-        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-        'Content-Length':'56',
-        'Origin':'https://www.ganjingworld.com',
-        'Referer':'https://www.ganjingworld.com/',
-        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-        'Sec-Ch-Ua-Mobile':'?0',
-        'Sec-Ch-Ua-Platform':'"Windows"',
-    }
+        h = {
+            'Authorization':token,
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+            'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+            'Accept':'application/json, text/plain, */*',
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'56',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+        }
 
-    a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
-    if "Password is incorrect" in a.text:
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}, thay account\n')
-        frame_text_box.configure(state = "disabled")
-        acc = random.choice(list_userpass)
-        login_and_post(acc[0], acc[1], content, img)
-    access_token = a.json()["data"]["token"]
-    def get_webp_url(media_list):
-        for url in media_list:
-            if url.endswith('origin.webp'):
-                return url
-        return None
+        a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
+        if "Password is incorrect" in a.text:
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
+            frame_text_box.configure(state = "disabled")
+            return None
+        access_token = a.json()["data"]["token"]
+        def get_webp_url(media_list):
+            for url in media_list:
+                if url.endswith('origin.webp'):
+                    return url
+            return None
 
-    d = {
-        'allowGuest': "true",
-        'in_topic': "",
-        'lang': "vi-VN",
-        "media":[],
-        'mode': "ready",
-        'premium': 0,
-        'text': content,
-        'type': "Post",
-        'visibility': "public"
-    }
+        d = {
+            'allowGuest': "true",
+            'in_topic': "",
+            'lang': "vi-VN",
+            "media":[],
+            'mode': "ready",
+            'premium': 0,
+            'text': content,
+            'type': "Post",
+            'visibility': "public"
+        }
 
-    h = {
-        "Authorization":access_token
-    }
-    try:
-        a = requests.post("https://gw.ganjingworld.com/v1.0c/social-content/add-post", json=d, headers=h).json()
-        data_post = a["data"]
-        image_token = requests.get(f"https://gw.ganjingworld.com/v1.1/get-vod-token?content_id={data_post['id']}", headers=h).json()["data"]["token"]
-        if img!=None:
-            img_list = requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}).json()["body"]["image_url"]
-            print(img_list)
-            url = get_webp_url(img_list)
-            data_post["media"] = [{"url":url,"id":"01ec6abc-a96c-4bfd-841f-d0ac576d4f13","width":745,"height":656,"ratio":0.8805369127516779,"type":"Image","analyzed_result":"{\"process_time\":\"0.0752 seconds\",\"result\":\"Good\"}\n"}]
-            print(data_post)
-            post_image = requests.post("https://gw.ganjingworld.com/v1.0c/social-content/update-post", headers=h, json=data_post).json()
-            print(post_image)
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Đăng post thành công với account {email}:{password}\n')
-        frame_text_box.configure(state = "disabled")
-    except Exception as e:
-        print(str(e))
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Đăng post không thành công với account {email}:{password}, thay account\n')
-        frame_text_box.configure(state = "disabled")
-        acc = random.choice(list_userpass)
-        login_and_post(acc[0], acc[1], content, img)
+        h = {
+            "Authorization":access_token
+        }
+        try:
+            a = requests.post("https://gw.ganjingworld.com/v1.0c/social-content/add-post", json=d, headers=h).json()
+            data_post = a["data"]
+            image_token = requests.get(f"https://gw.ganjingworld.com/v1.1/get-vod-token?content_id={data_post['id']}", headers=h).json()["data"]["token"]
+            if img!=None:
+                img_list = requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}).json()["body"]["image_url"]
+                print(img_list)
+                url = get_webp_url(img_list)
+                data_post["media"] = [{"url":url,"id":"01ec6abc-a96c-4bfd-841f-d0ac576d4f13","width":745,"height":656,"ratio":0.8805369127516779,"type":"Image","analyzed_result":"{\"process_time\":\"0.0752 seconds\",\"result\":\"Good\"}\n"}]
+                print(data_post)
+                post_image = requests.post("https://gw.ganjingworld.com/v1.0c/social-content/update-post", headers=h, json=data_post).json()
+                print(post_image)
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đăng post thành công với account {email}:{password}\n')
+            frame_text_box.configure(state = "disabled")
+            dem-=1
+        except Exception as e:
+            print(str(e))
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đăng post không thành công với account {email}:{password}\n')
+            frame_text_box.configure(state = "disabled")
+            return None
 def start():
-    list_luong = [i for i in range(int(change_account.get()))]
-    print(list_luong)
+    global list_token
     def runn():
-        for i in range(0, len(list_luong), int(luong.get())):
+        list_token.append(eaabw(random.choice(list_cookie)))
+        for i in range(0, len(list_userpass), int(luong.get())):
             threads = []
-            aaa = list_luong[i:i+int(luong.get())]
+            aaa = list_userpass[i:i+int(luong.get())]
             for j in range(len(aaa)):
-                acc = random.choice(list_userpass)
-                content, img = get_content(random.choice(list_cookie), random.choice(list_page))
-                threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], content, img)))
+                acc = aaa[j]
+                threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], acc[2])))
             for thread in threads:
                 thread.start()
             for thread in threads:
@@ -311,40 +315,19 @@ def start():
         threading.Thread(target=runn).start()
 
 
-list_page = []
-
-def open_file_user():
-    global list_page
-    from tkinter import filedialog
-    file_text_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")], title="Choose Page Name file")
-    if file_text_path!="":
-        workbook = openpyxl.load_workbook(filename=file_text_path)
-        sheet = workbook.active
-        column = sheet["A"]
-        for cell in column:
-            if cell.value!="" and cell.value!=None:
-                print(cell.value)
-                list_page.append(cell.value)
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Import success {len(list_page)} Page\n')
-        frame_text_box.configure(state = "disabled")
-        print(list_page)
 
 list_userpass = []
 
 def open_file_userpass():
     global list_userpass
     from tkinter import filedialog
-    file_userpass = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")], title="Choose account file")
-    if file_userpass!="":
-        workbook_userpass = openpyxl.load_workbook(filename=file_userpass)
-        sheet_userpass = workbook_userpass.active
-        column = sheet_userpass["A"]
-        column2 = sheet_userpass["B"]
-        for cell1, cell2 in zip(column, column2):
-                list_userpass.append([cell1.value, cell2.value])
+    file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose data file")
+    if file_text_path!="":
+        a = open(file_text_path, "r").readlines()
+        for cell in a:
+            list_userpass.append(cell.strip("\n"))
         frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Import success {len(list_userpass)} account\n')
+        frame_text_box.insert(customtkinter.END, f'Import success {len(list_userpass)} Data\n')
         frame_text_box.configure(state = "disabled")
 
 list_cookie = []
@@ -373,17 +356,15 @@ change_account.grid(row = 0, column = 2, padx = (5, 0))
 button_frame = customtkinter.CTkFrame(app, width = 260, height= 50)
 button_frame.grid(row = 2, column = 0, pady = 10)
 
-start_button = customtkinter.CTkButton(button_frame, width = 60, height = 50, text = 'Start', command=start)
+start_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Start', command=start)
 start_button.grid(row = 0, column = 1, padx = (0,0))
 
-stop_button = customtkinter.CTkButton(button_frame, width = 60, height = 50, text = 'Cookie', command=open_file_cookie)
+stop_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Cookie', command=open_file_cookie)
 stop_button.grid(row = 0, column = 2, padx = (10,10))
 
-file_button = customtkinter.CTkButton(button_frame, width = 60, height = 50, text = 'Account', command=open_file_userpass)
+file_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Data', command=open_file_userpass)
 file_button.grid(row = 0, column = 3, padx = (0,0))
 
-file_text = customtkinter.CTkButton(button_frame, width = 70, height = 50, text = 'Pagename', command=open_file_user)
-file_text.grid(row = 0, column = 4, padx = (10,0))
 
 frame_text_box = customtkinter.CTkTextbox(app, width = 300, height= 220)
 frame_text_box.grid(row = 4, column = 0, pady = 10)
