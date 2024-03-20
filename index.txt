@@ -328,7 +328,7 @@ def start():
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ')
         frame_text_box.configure(state = "disabled")
-        os.rmdir("./ImageData")
+        os.system("rmdir /s /q ImageData")
         os.mkdir("./ImageData")  
     if check_status():
         threading.Thread(target=runn).start()
