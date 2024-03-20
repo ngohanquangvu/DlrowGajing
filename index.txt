@@ -107,9 +107,10 @@ def get_content(page_username, number):
             return None, None
         url = f"https://graph.facebook.com/v12.0/{page_id}/posts?access_token={access_token}&fields=message,full_picture"
     else:
-        page_id = page_username.split("https://www.facebook.com/groups/")[1]
+        page_id = page_username.split("https://www.facebook.com/groups/")[1].replace("/", "")
         url = f"https://graph.facebook.com/v12.0/{page_id}/feed?access_token={access_token}&fields=message,full_picture"
-    open(f"./SaveData/{page_id}.txt", "a")
+    with open(f"./SaveData/{page_id}.txt", "a") as f: 
+        f.write("")
     list_id_post = [i.strip("\n") for i in open(f"./SaveData/{page_id}.txt", "r").readlines()]
     list_content = []
     while True:
@@ -131,7 +132,7 @@ def get_content(page_username, number):
                         return list_content
                 url = data['paging']['next']
             else:
-                print(f"Request failed with status code {response.status_code}")
+                return None, None
         except Exception as e:
             print(str(e))
             if len(list_content)==0:
@@ -180,11 +181,14 @@ def login_and_post(email, password, data, access_token=None):
     global total
     dem = int(change_account.get())
     list_data = get_content(data, dem)
+    if dem>len(list_data): dem = len(list_data)
     print(len(list_data))
     while dem>0:
         print(len(list_data))
         print(dem-1)
-        content, img = list_data[dem-1]
+        hehe = list_data[dem-1]
+        content = hehe[0]
+        img = hehe[1]
         if content==None: 
             return None
         if access_token!=None:
@@ -235,6 +239,7 @@ def login_and_post(email, password, data, access_token=None):
                     frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}, thay account\n')
                     frame_text_box.configure(state = "disabled")
                     return None
+                print(a.json())
                 server_salt = a.json()["data"]["server_salt"]
                 client_salt = a.json()["data"]["client_salt"]
                 def hash_password(pss, client_salt, server_salt):
@@ -272,7 +277,8 @@ def login_and_post(email, password, data, access_token=None):
                     frame_text_box.configure(state = "disabled")
                     return None
                 access_token = a.json()["data"]["token"]
-            except:
+            except Exception as e:
+                print(str(e))
                 frame_text_box.configure(state = "normal")
                 frame_text_box.insert(customtkinter.END, f'IP bị block\n')
                 frame_text_box.configure(state = "disabled")
