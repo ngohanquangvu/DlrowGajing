@@ -303,7 +303,7 @@ def start():
             threads = []
             aaa = list_userpass[i:i+int(luong.get())]
             for j in range(len(aaa)):
-                acc = aaa[j]
+                acc = aaa[j].split("|")
                 threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], acc[2])))
             for thread in threads:
                 thread.start()
