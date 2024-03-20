@@ -169,6 +169,7 @@ def login_and_post(email, password, data):
     dem = int(change_account.get())
     while dem>=0:
         content, img = get_content(data)
+	if content == None: return None
         h = {
             'Accept-Encoding':'gzip, deflate, br',
             'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
