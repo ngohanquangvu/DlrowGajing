@@ -190,87 +190,94 @@ def login_and_post(email, password, data, access_token=None):
         if access_token!=None:
             pass
         else:
-            h = {
-                'Accept-Encoding':'gzip, deflate, br',
-                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-                'Content-Length':'2',
-                'Content-Type':'application/json',
-                'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
-                'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
-                'Gjw-Ts':'1710510510579',
-                'Origin':'https://www.ganjingworld.com',
-                'Referer':'https://www.ganjingworld.com/',
-                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-                'Sec-Ch-Ua-Mobile':'?0',
-                'Sec-Ch-Ua-Platform':'"Windows"',
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
-                'X-Cdk-Lrtm':'2024-03-15 20:48:30',
-            }
+            try:
+                h = {
+                    'Accept-Encoding':'gzip, deflate, br',
+                    'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                    'Content-Length':'2',
+                    'Content-Type':'application/json',
+                    'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+                    'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+                    'Gjw-Ts':'1710510510579',
+                    'Origin':'https://www.ganjingworld.com',
+                    'Referer':'https://www.ganjingworld.com/',
+                    'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                    'Sec-Ch-Ua-Mobile':'?0',
+                    'Sec-Ch-Ua-Platform':'"Windows"',
+                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                    'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+                    'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+                }
 
-            token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+                token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
 
-            d = {"user_email":email,"client_type":3}
+                d = {"user_email":email,"client_type":3}
 
-            h = {
-                'Authorization':token,
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
-                'X-Cdk-Lrtm':'2024-03-15 20:57:36',
-                'Accept':'application/json, text/plain, */*',
-                'Accept-Encoding':'gzip, deflate, br',
-                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-                'Content-Length':'56',
-                'Origin':'https://www.ganjingworld.com',
-                'Referer':'https://www.ganjingworld.com/',
-                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-                'Sec-Ch-Ua-Mobile':'?0',
-                'Sec-Ch-Ua-Platform':'"Windows"',
-            }
+                h = {
+                    'Authorization':token,
+                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                    'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+                    'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+                    'Accept':'application/json, text/plain, */*',
+                    'Accept-Encoding':'gzip, deflate, br',
+                    'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                    'Content-Length':'56',
+                    'Origin':'https://www.ganjingworld.com',
+                    'Referer':'https://www.ganjingworld.com/',
+                    'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                    'Sec-Ch-Ua-Mobile':'?0',
+                    'Sec-Ch-Ua-Platform':'"Windows"',
+                }
 
-            a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
-            if "The user does not exist" in a.text:
+                a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
+                if "The user does not exist" in a.text:
+                    frame_text_box.configure(state = "normal")
+                    frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}, thay account\n')
+                    frame_text_box.configure(state = "disabled")
+                    return None
+                server_salt = a.json()["data"]["server_salt"]
+                client_salt = a.json()["data"]["client_salt"]
+                def hash_password(pss, client_salt, server_salt):
+                    x = hashlib.sha256((pss + client_salt).encode()).digest()
+                    x_base64 = base64.b64encode(x).decode()
+                    S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
+                    S_base64 = base64.b64encode(S).decode()
+                    return S_base64
+
+                hashed_password = hash_password(password, client_salt, server_salt)
+                print(hashed_password)
+
+                d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
+
+                h = {
+                    'Authorization':token,
+                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                    'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+                    'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+                    'Accept':'application/json, text/plain, */*',
+                    'Accept-Encoding':'gzip, deflate, br',
+                    'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                    'Content-Length':'56',
+                    'Origin':'https://www.ganjingworld.com',
+                    'Referer':'https://www.ganjingworld.com/',
+                    'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                    'Sec-Ch-Ua-Mobile':'?0',
+                    'Sec-Ch-Ua-Platform':'"Windows"',
+                }
+
+                a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
+                if "Password is incorrect" in a.text:
+                    frame_text_box.configure(state = "normal")
+                    frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
+                    frame_text_box.configure(state = "disabled")
+                    return None
+                access_token = a.json()["data"]["token"]
+            except:
                 frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}, thay account\n')
+                frame_text_box.insert(customtkinter.END, f'IP bị block\n')
                 frame_text_box.configure(state = "disabled")
-                return None
-            server_salt = a.json()["data"]["server_salt"]
-            client_salt = a.json()["data"]["client_salt"]
-            def hash_password(pss, client_salt, server_salt):
-                x = hashlib.sha256((pss + client_salt).encode()).digest()
-                x_base64 = base64.b64encode(x).decode()
-                S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
-                S_base64 = base64.b64encode(S).decode()
-                return S_base64
-
-            hashed_password = hash_password(password, client_salt, server_salt)
-            print(hashed_password)
-
-            d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
-
-            h = {
-                'Authorization':token,
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
-                'X-Cdk-Lrtm':'2024-03-15 20:57:36',
-                'Accept':'application/json, text/plain, */*',
-                'Accept-Encoding':'gzip, deflate, br',
-                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-                'Content-Length':'56',
-                'Origin':'https://www.ganjingworld.com',
-                'Referer':'https://www.ganjingworld.com/',
-                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-                'Sec-Ch-Ua-Mobile':'?0',
-                'Sec-Ch-Ua-Platform':'"Windows"',
-            }
-
-            a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
-            if "Password is incorrect" in a.text:
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
-                frame_text_box.configure(state = "disabled")
-                return None
-            access_token = a.json()["data"]["token"]
+                time.sleep(10)
+                login_and_post(email, password, data, None)
         def get_webp_url(media_list):
             for url in media_list:
                 if url.endswith('origin.webp'):
