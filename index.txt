@@ -318,7 +318,7 @@ def login_and_post(email, password, data, access_token=None):
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'Đăng post không thành công với account {email}:{password}\n')
             frame_text_box.configure(state = "disabled")
-            return None
+            login_and_post(email, password, data, None)
 def start():
     global list_token
     def runn():
