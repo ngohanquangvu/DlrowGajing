@@ -100,7 +100,7 @@ def get_content(page_username, number):
             page_id = data['id']
         else:
             frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f"Page hoặc group không hợp lệ\n")
+            frame_text_box.insert(customtkinter.END, f"{page_username} không hợp lệ\n")
             frame_text_box.configure(state = "disabled")
             return None, None
         url = f"https://graph.facebook.com/v12.0/{page_id}/posts?access_token={access_token}&fields=message,full_picture"
@@ -335,7 +335,7 @@ def start():
         os.mkdir("./ImageData")  
     if check_status():
         frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Bắt đầu chạy...')
+        frame_text_box.insert(customtkinter.END, f'Bắt đầu chạy...\n')
         frame_text_box.configure(state = "disabled")
         threading.Thread(target=runn).start()
 
