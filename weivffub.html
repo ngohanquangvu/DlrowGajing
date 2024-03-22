@@ -92,6 +92,22 @@ def buffview(url, wait_time, n):
         frame_text_box.configure(state = "disabled")
 
 def start():
+    h = {
+            'Accept':'application/json, text/plain, */*',
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'0e672e93014dec4954943be0dddbdc1e',
+            'Gjw-Ts':'1711134553944',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-23 02:09:13',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        }
+
+    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+    list_token.append(token)
     def runn():
         for i in range(0, len(list_video), int(luong.get())):
             threads = []
@@ -129,7 +145,56 @@ def open_file_proxy():
         frame_text_box.configure(state = "disabled")
 
 list_video = []
+list_token = []
 
+def get_video(channel):
+
+    channel_id = channel.split('/')[-1].split('?')[0]
+
+    try: 
+        token = random.choice(list_token)
+    except:
+
+        h = {
+            'Accept':'application/json, text/plain, */*',
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'0e672e93014dec4954943be0dddbdc1e',
+            'Gjw-Ts':'1711134553944',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-23 02:09:13',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        }
+
+        token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+        list_token.append(token)
+    url  = f"https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key=&channel_id={channel_id}&page_size=8&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready"
+    try:
+        h = {
+            "Authorization":token
+        }
+
+        list_url = []
+
+        while True:
+            try:
+                a = requests.get(url, headers=h).json().get("data")
+                j = a["list"]
+                for i in j:
+                    uid = i["id"]
+                    list_url.append(f"https://www.ganjingworld.com/video/{uid}")
+                if a["start_key"]!="":
+                    url  = f"https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={a["start_key"]}&channel_id={channel_id}&page_size=8&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready"
+                else: break
+            except: break
+        return list_url
+    except: 
+        try: list_token.remove(token)
+        except: pass
+        return get_video(channel)
 def open_file_video():
     global list_video
     from tkinter import filedialog
@@ -137,7 +202,14 @@ def open_file_video():
     if file_text_path!="":
         a = open(file_text_path, "r").readlines()
         for cell in a:
-            list_video.append(cell.strip("\n"))
+            if "https://www.ganjingworld.com/video" in cell.strip("\n"):
+                list_video.append(cell.strip("\n"))
+            elif "channel" in cell.strip("\n"):
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Đang tiến hành lấy video từ kênh {cell.strip("\n")}\n')
+                frame_text_box.configure(state = "disabled")
+                list_video += get_video(cell.strip("\n"))
+                
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Import success {len(list_video)} Video url\n')
         frame_text_box.configure(state = "disabled")
