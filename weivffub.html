@@ -1,5 +1,3 @@
-
-
 app = customtkinter.CTk()
 app.title("Buffview Ganjinworld")
 app.geometry("450x390")
@@ -52,13 +50,15 @@ def check_status():
     if d>0: return False
     else: return True
 
-def buffview(url, wait_time, n, proxy = None, proxy_type = None):
+def buffview(url, wait_time, n):
 
     options = Options()
     options.binary_location = browser_path.get()
 
     options = webdriver.ChromeOptions()
-    if proxy!=None and proxy_type!=None:
+    if api_proxy!=None:
+        proxy_type = api_proxy.lower()
+        proxy = random.choice(list_proxy)
         options.add_argument(f'--proxy-server={proxy_type}://{proxy}')
     
     slg = int(view_count.get())
