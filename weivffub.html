@@ -1,0 +1,189 @@
+
+
+app = customtkinter.CTk()
+app.title("Buffview Ganjinworld")
+app.geometry("450x390")
+
+def stop():
+    pass
+
+total = 0
+
+def check_status():
+    d = 0
+    if len(list_proxy)==0 and api_proxy!="None":
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file account\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    if (api_proxy in options) == False:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng chọn loại proxy\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    
+    if len(list_video)==0:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file url\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+
+    try:
+        check = int(delay.get())
+    except:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của thời gian xem\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    
+    try:
+        check = int(luong.get())
+    except:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số luồng\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+
+    if browser_path=="":
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số bài đăng\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    if d>0: return False
+    else: return True
+
+def buffview(url, wait_time, n, proxy = None, proxy_type = None):
+
+    options = Options()
+    options.binary_location = browser_path.get()
+
+    options = webdriver.ChromeOptions()
+    if proxy!=None and proxy_type!=None:
+        options.add_argument(f'--proxy-server={proxy_type}://{proxy}')
+    
+    slg = int(view_count.get())
+    print(slg)
+    dem = 0
+
+    def open_and_wait(url, wait_time):
+        driver = webdriver.Chrome(options=options)
+        driver.set_window_size(300, 400) 
+        driver.get(url)
+        wait = WebDriverWait(driver, 20)
+        element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "vast-skip-button")))
+
+        try:
+            wait = WebDriverWait(driver, 20)
+            element = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'vast-skip-button enabled')]")))
+
+            driver.execute_script("arguments[0].click();", element)
+            print("Skip ads")
+        except Exception as e:
+            print("chưa thể skip")
+            pass
+        time.sleep(wait_time)
+        driver.quit()
+    while dem<slg:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.map(open_and_wait, [url]*n, [wait_time]*n)
+        dem+=n
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Sent {dem} view success to {url}\n')
+        frame_text_box.configure(state = "disabled")
+
+def start():
+    def runn():
+        for i in range(0, len(list_video), int(luong.get())):
+            threads = []
+            aaa = list_video[i:i+int(luong.get())]
+            for j in range(len(aaa)):
+                acc = aaa[j]
+                threads.append(threading.Thread(target=buffview, args=(acc, int(delay.get()), int(number_of_tab.get()))))
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ\n')
+        frame_text_box.configure(state = "disabled")
+    if check_status():
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Bắt đầu chạy...\n')
+        frame_text_box.configure(state = "disabled")
+        threading.Thread(target=runn).start()
+
+
+
+list_proxy = []
+
+def open_file_proxy():
+    global list_proxy
+    from tkinter import filedialog
+    file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose proxy file")
+    if file_text_path!="":
+        a = open(file_text_path, "r").readlines()
+        for cell in a:
+                list_proxy.append(cell.strip("\n"))
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Import success {len(list_proxy)} Proxies\n')
+        frame_text_box.configure(state = "disabled")
+
+list_video = []
+
+def open_file_video():
+    global list_video
+    from tkinter import filedialog
+    file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose cookie file")
+    if file_text_path!="":
+        a = open(file_text_path, "r").readlines()
+        for cell in a:
+            list_video.append(cell.strip("\n"))
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Import success {len(list_video)} Video url\n')
+        frame_text_box.configure(state = "disabled")
+
+infor_input = customtkinter.CTkFrame(app, width = 430)
+infor_input.grid(row = 0, column = 0, padx = 20, pady = (20, 10))
+delay = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Thời gian xem")
+delay.grid(row = 0, column = 0, padx = (0, 0))
+luong = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Luồng")
+luong.grid(row = 0, column = 1, padx = (5, 0))
+browser_path = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="browser path")
+browser_path.grid(row = 0, column = 2, padx = (0, 5))
+number_of_tab = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Số tab")
+number_of_tab.grid(row = 0, column = 3, padx = (0, 0))
+
+button_frame = customtkinter.CTkFrame(app, width = 260, height= 50)
+button_frame.grid(row = 2, column = 0, pady = 10)
+
+start_button = customtkinter.CTkButton(button_frame, width = 136, height = 50, text = 'Start', command=start)
+start_button.grid(row = 0, column = 1, padx = (0,0))
+
+stop_button = customtkinter.CTkButton(button_frame, width = 136, height = 50, text = 'Proxy', command=open_file_proxy)
+stop_button.grid(row = 0, column = 2, padx = (10,10))
+
+file_button = customtkinter.CTkButton(button_frame, width = 136, height = 50, text = 'Url Video', command=open_file_video)
+file_button.grid(row = 0, column = 3, padx = (0,0))
+
+data_frame = customtkinter.CTkFrame(app, width = 430, height= 50)
+data_frame.grid(row = 4, column = 0, pady = 10)
+
+view_count = customtkinter.CTkEntry(data_frame, width = 210, placeholder_text="Số view")
+view_count.grid(row = 0, column = 1)
+
+api_proxy = customtkinter.StringVar()
+
+def select_option(event):
+    global api_proxy
+    api_proxy = drop_down_menu.get()
+
+options = ["None", "Http", "Socks4", "Socks5"]
+drop_down_menu = customtkinter.CTkOptionMenu(data_frame, values=options, command=select_option, width=210, height=30)
+drop_down_menu.set("Chọn loại proxy")
+drop_down_menu.grid(row=0, column=0)
+
+frame_text_box = customtkinter.CTkTextbox(app, width = 430, height= 195)
+frame_text_box.grid(row = 5, column = 0, pady = (5, 5), padx = 5)
+frame_text_box.configure(state = "disabled")
+
+app.mainloop()
