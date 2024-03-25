@@ -1,3 +1,6 @@
+scraper = cfscrape.create_scraper()
+
+
 app = customtkinter.CTk()
 app.title("GanJingWorld")
 app.geometry("350x420")
@@ -244,8 +247,7 @@ def login_and_post(email, password, data, access_token=None):
                             'Sec-Ch-Ua-Mobile':'?0',
                             'Sec-Ch-Ua-Platform':'"Windows"',
                         }
-                        ss = cloudscraper.create_scraper()
-                        a = ss.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
+                        a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
                         print(a.json())
                         break
                     except: 
@@ -286,8 +288,7 @@ def login_and_post(email, password, data, access_token=None):
                     'Sec-Ch-Ua-Mobile':'?0',
                     'Sec-Ch-Ua-Platform':'"Windows"',
                 }
-                ss = cloudscraper.create_scraper()
-                a = ss.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
+                a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
                 if "Password is incorrect" in a.text:
                     frame_text_box.configure(state = "normal")
                     frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
