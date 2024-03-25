@@ -244,7 +244,7 @@ def login_and_post(email, password, data, access_token=None):
                             'Sec-Ch-Ua-Mobile':'?0',
                             'Sec-Ch-Ua-Platform':'"Windows"',
                         }
-
+                        ss = cloudscraper.create_scraper()
                         a = ss.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d)
                         print(a.json())
                         break
