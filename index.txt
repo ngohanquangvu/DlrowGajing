@@ -276,7 +276,6 @@ def login_and_post(email, password, data, access_token=None):
     dem = int(change_account.get())
     list_data = get_content(data, dem)
     if dem>len(list_data): dem = len(list_data)
-    open("log_post.txt", "a", encoding="utf-8").write(f"Start with {dem} post account {email}:{password}\n")
     while dem>0:
         try:
             hehe = list_data[dem-1]
@@ -419,6 +418,7 @@ def login_and_post(email, password, data, access_token=None):
             frame_text_box.configure(state = "disabled")
             list_data.remove(list_data[dem-1])
             dem-=1
+            open("Result.txt", "a", encoding="utf-8").write(f"Post {data_post['id']}, Image {img} with account {email}:{password}\n")
             time.sleep(int(delay.get()))
         except Exception as e:
             open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} in add post with account {email}:{password}\n")
