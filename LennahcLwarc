@@ -1,3 +1,4 @@
+
 if os.path.exists("Data")==False: os.mkdir("Data")
 
 list_token = []
@@ -63,10 +64,10 @@ def crawl_data(url):
 
                 ws = wb.active
                 ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"]])
-                wb.save(f'Data/{name_channel}/Video.xlsx')
             start_key = channel["data"]["start_key"]
             if start_key == "":
                 break
+            wb.save(f'Data/{name_channel}/Video.xlsx')
         except: 
             try: 
                 list_token.remove(token)
