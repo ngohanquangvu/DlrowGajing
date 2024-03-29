@@ -1,0 +1,134 @@
+if os.path.exists("Data")==False: os.mkdir("Data")
+
+list_token = []
+
+def get_token():
+    try:
+        token = random.choice(list_token)
+        return token
+    except:
+        h = {
+                    'Accept':'application/json, text/plain, */*',
+                    'Accept-Encoding':'gzip, deflate, br',
+                    'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                    'Content-Length':'2',
+                    'Content-Type':'application/json',
+                    'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+                    'Gjw-Sign':'0e672e93014dec4954943be0dddbdc1e',
+                    'Gjw-Ts':'1711134553944',
+                    'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+                    'X-Cdk-Lrtm':'2024-03-23 02:09:13',
+                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                }
+
+        token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+        list_token.append(token)
+        return token
+
+try:
+    get_token()
+except:pass
+
+def crawl_data(url):
+
+    id_channel = url.split("https://www.ganjingworld.com/channel/")[1]
+    while True:
+        try:
+            token = get_token()
+            break
+        except: pass
+    
+    try:
+        name_channel = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-channel-detail?id={id_channel}&lan=en-US&include_notification=true", headers={"Authorization":token}).json()
+
+        name_channel = f"{name_channel["data"]["name"]} - {name_channel["data"]["follower_count"]}"
+    except:
+        print(f"{url} không hợp lệ\n")
+        return None
+    print(f"Bắt đầu crawl dữ liệu của {name_channel}\n")
+
+    if os.path.exists(f"Data/{name_channel}")==False: os.mkdir(f"Data/{name_channel}")
+
+    start_key = ""
+
+    while True:
+        try:
+            channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
+            a = channel["data"]["list"]
+            for i in a:
+                if os.path.exists(f'Data/{name_channel}/Video.xlsx'):
+                    wb = load_workbook(f'Data/{name_channel}/Video.xlsx')
+                else:
+                    wb = Workbook()
+
+                ws = wb.active
+                ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"]])
+                wb.save(f'Data/{name_channel}/Video.xlsx')
+            start_key = channel["data"]["start_key"]
+            if start_key == "":
+                break
+        except: 
+            try: 
+                list_token.remove(token)
+                token = get_token()
+            except: pass
+    print(f"Crawl thành công video của {name_channel}\n")
+    start_key = ""
+
+    while True:
+        try:
+            channel =requests.get(f"https://gw.ganjingworld.com/v1.0c/social-content/get-owner-posts?owner_id={id_channel}&start_key={start_key}&page_size=100&post_image=true&query=post,view,like", headers={"Authorization":token}).json()
+            a = channel["data"]["list"]
+            if a == [] or a == None:
+                break 
+            for i in a:
+                if os.path.exists(f'Data/{name_channel}/Post.xlsx'):
+                    wb = load_workbook(f'Data/{name_channel}/Post.xlsx')
+                else:
+                    wb = Workbook()
+
+                ws = wb.active
+                ws.append([f'https://www.ganjingworld.com/post/{i["id"]}', i["like_count"], i["view_count"]])
+                wb.save(f'Data/{name_channel}/Post.xlsx')
+                
+            start_key = channel["data"]["start_key"]
+            if start_key == "":
+                break
+        except: 
+            try: 
+                list_token.remove(token)
+                token = get_token()
+            except: pass
+    print(f"Crawl thành công post của {name_channel}\n")
+
+start = input("Press any key to start...")
+
+os.system("cls")
+
+list_url = open(filedialog.askopenfilename(title="Nhập file url", filetypes=[("Text files", "*.txt")]), "r").read().split("\n")
+
+while True:
+    os.system("cls")
+    try: 
+        print(f"DATA: {len(list_url)} URL\n")
+        luong = int(input("Nhập số luồng: "))
+        break
+    except:
+        pass
+
+os.system("cls")
+print("Bắt đầu crawl dữ liệu\n")
+
+for i in range(0, len(list_url), luong):
+    threads = []
+    aa = list_url[i:i+luong]
+    for j in range(len(aa)):
+        try:
+            threads.append(threading.Thread(target=crawl_data, args=(aa[j],)))
+        except: pass
+    for j in threads:
+        j.start()
+    for j in threads:
+        j.join()
+os.system("cls")
+a = input("Hoàn thành, enter để tắt tool...")
