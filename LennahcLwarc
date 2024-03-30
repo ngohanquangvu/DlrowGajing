@@ -1,4 +1,6 @@
-if os.path.exists("Data")==False: os.mkdir("Data")
+
+if os.path.exists("Data_Post")==False: os.mkdir("Data_Post")
+if os.path.exists("Data_Video")==False: os.mkdir("Data_Video")
 
 list_token = []
 
@@ -47,8 +49,6 @@ def crawl_data(url):
         return None
     print(f"Bắt đầu crawl dữ liệu của {name_channel}\n")
 
-    if os.path.exists(f"Data/{name_channel}")==False: os.mkdir(f"Data/{name_channel}")
-
     start_key = ""
 
     while True:
@@ -56,14 +56,14 @@ def crawl_data(url):
             channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
             a = channel["data"]["list"]
             for i in a:
-                if os.path.exists(f'Data/{name_channel}/Video.xlsx'):
-                    wb = load_workbook(f'Data/{name_channel}/Video.xlsx')
+                if os.path.exists(f'Data_Video/{name_channel}.xlsx'):
+                    wb = load_workbook(f'Data_Video/{name_channel}.xlsx')
                 else:
                     wb = Workbook()
 
                 ws = wb.active
                 ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"]])
-                wb.save(f'Data/{name_channel}/Video.xlsx')
+                wb.save(f'Data_Video/{name_channel}.xlsx')
             start_key = channel["data"]["start_key"]
             if start_key == "":
                 break
@@ -82,8 +82,8 @@ def crawl_data(url):
             if a == [] or a == None:
                 break 
             for i in a:
-                if os.path.exists(f'Data/{name_channel}/Post.xlsx'):
-                    wb = load_workbook(f'Data/{name_channel}/Post.xlsx')
+                if os.path.exists(f'Data_Post/{name_channel}.xlsx'):
+                    wb = load_workbook(f'Data_Post/{name_channel}.xlsx')
                 else:
                     wb = Workbook()
 
@@ -91,7 +91,7 @@ def crawl_data(url):
                 ws.append([f'https://www.ganjingworld.com/post/{i["id"]}', i["like_count"], i["view_count"]])
                 
             start_key = channel["data"]["start_key"]
-            wb.save(f'Data/{name_channel}/Post.xlsx')
+            wb.save(f'Data_Post/{name_channel}.xlsx')
             if start_key == "":
                 break
             
@@ -132,5 +132,47 @@ for i in range(0, len(list_url), luong):
         j.start()
     for j in threads:
         j.join()
+
+os.system("cls")
+print("Hoàn thành crawl dữ liệu, đang gộp file\n")
+
+new_wb = Workbook()
+new_ws = new_wb.active
+files = [f for f in os.listdir('Data_Post') if f.endswith('.xlsx')]
+last_col = 1
+for file in files:
+    file_name, _ = os.path.splitext(file)
+
+    file_name_parts = file_name.split(' - ')
+    for j, value in enumerate(file_name_parts, start=last_col):
+        new_ws.cell(row=1, column=j, value=value)
+
+    wb = load_workbook(f'Data_Post/{file}')
+    ws = wb.active
+    for i, row in enumerate(ws.iter_rows(values_only=True), start=2):
+        for j, value in enumerate(row, start=last_col):
+            new_ws.cell(row=i, column=j, value=value)
+    last_col += ws.max_column+1
+new_wb.save('Post.xlsx')
+
+new_wb = Workbook()
+new_ws = new_wb.active
+files = [f for f in os.listdir('Data_Video') if f.endswith('.xlsx')]
+last_col = 1
+for file in files:
+    file_name, _ = os.path.splitext(file)
+
+    file_name_parts = file_name.split(' - ')
+    for j, value in enumerate(file_name_parts, start=last_col):
+        new_ws.cell(row=1, column=j, value=value)
+
+    wb = load_workbook(f'Data_Video/{file}')
+    ws = wb.active
+    for i, row in enumerate(ws.iter_rows(values_only=True), start=2):
+        for j, value in enumerate(row, start=last_col):
+            new_ws.cell(row=i, column=j, value=value)
+    last_col += ws.max_column+1
+new_wb.save('Video.xlsx')
+
 os.system("cls")
 a = input("Hoàn thành, enter để tắt tool...")
