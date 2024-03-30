@@ -1,4 +1,3 @@
-
 if os.path.exists("Data_Post")==False: os.mkdir("Data_Post")
 if os.path.exists("Data_Video")==False: os.mkdir("Data_Video")
 
@@ -42,7 +41,11 @@ def crawl_data(url):
     
     try:
         name_channel = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-channel-detail?id={id_channel}&lan=en-US&include_notification=true", headers={"Authorization":token}).json()
+        invalid_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
 
+        name_file = f"{name_channel['data']['name']}"
+        for char in invalid_chars:
+            name_file = name_file.replace(char, '')
         name_channel = f"{name_channel["data"]["name"]} - {name_channel["data"]["follower_count"]}"
     except:
         print(f"{url} không hợp lệ\n")
@@ -55,19 +58,28 @@ def crawl_data(url):
         try:
             channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
             a = channel["data"]["list"]
-            for i in a:
-                if os.path.exists(f'Data_Video/{name_channel}.xlsx'):
-                    wb = load_workbook(f'Data_Video/{name_channel}.xlsx')
-                else:
-                    wb = Workbook()
+            if a == [] or a == None:
+                break
+            if os.path.exists(f'Data_Video/{name_file}.xlsx'):
+                    wb = load_workbook(f'Data_Video/{name_file}.xlsx')
+            else:
+                wb = Workbook()
 
-                ws = wb.active
+            ws = wb.active
+            ws.append([name_channel.split(" - ")[0], name_channel.split(" - ")[1]])
+            for i in a:
+
                 ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"]])
-                wb.save(f'Data_Video/{name_channel}.xlsx')
+                while True:
+                    try:
+                        wb.save(f'Data_Video/{name_file}.xlsx')
+                        break
+                    except: pass
             start_key = channel["data"]["start_key"]
             if start_key == "":
                 break
-        except: 
+        except Exception as e:
+            print(str(e)) 
             try: 
                 list_token.remove(token)
                 token = get_token()
@@ -81,21 +93,28 @@ def crawl_data(url):
             a = channel["data"]["list"]
             if a == [] or a == None:
                 break 
-            for i in a:
-                if os.path.exists(f'Data_Post/{name_channel}.xlsx'):
-                    wb = load_workbook(f'Data_Post/{name_channel}.xlsx')
-                else:
-                    wb = Workbook()
+            if os.path.exists(f'Data_Post/{name_file}.xlsx'):
+                    wb = load_workbook(f'Data_Post/{name_file}.xlsx')
+            else:
+                wb = Workbook()
 
-                ws = wb.active
+            ws = wb.active
+            ws.append([name_channel.split(" - ")[0], name_channel.split(" - ")[1]])
+            wb.save(f'Data_Post/{name_file}.xlsx')
+            for i in a:
+            
                 ws.append([f'https://www.ganjingworld.com/post/{i["id"]}', i["like_count"], i["view_count"]])
-                
+                while True:
+                    try:
+                        wb.save(f'Data_Post/{name_file}.xlsx')
+                        break
+                    except: pass
             start_key = channel["data"]["start_key"]
-            wb.save(f'Data_Post/{name_channel}.xlsx')
             if start_key == "":
                 break
             
-        except: 
+        except Exception as e:
+            print(str(e))  
             try: 
                 list_token.remove(token)
                 token = get_token()
@@ -141,11 +160,6 @@ new_ws = new_wb.active
 files = [f for f in os.listdir('Data_Post') if f.endswith('.xlsx')]
 last_col = 1
 for file in files:
-    file_name, _ = os.path.splitext(file)
-
-    file_name_parts = file_name.split(' - ')
-    for j, value in enumerate(file_name_parts, start=last_col):
-        new_ws.cell(row=1, column=j, value=value)
 
     wb = load_workbook(f'Data_Post/{file}')
     ws = wb.active
@@ -160,11 +174,6 @@ new_ws = new_wb.active
 files = [f for f in os.listdir('Data_Video') if f.endswith('.xlsx')]
 last_col = 1
 for file in files:
-    file_name, _ = os.path.splitext(file)
-
-    file_name_parts = file_name.split(' - ')
-    for j, value in enumerate(file_name_parts, start=last_col):
-        new_ws.cell(row=1, column=j, value=value)
 
     wb = load_workbook(f'Data_Video/{file}')
     ws = wb.active
