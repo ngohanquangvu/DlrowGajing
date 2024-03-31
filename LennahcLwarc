@@ -1,3 +1,9 @@
+def convert_timestamp_to_date(timestamp):
+    time_struct = time.localtime(timestamp / 1000)
+
+    return (time.strftime('%d-%m-%Y', time_struct))
+
+
 if os.path.exists("Data_Post")==False: os.mkdir("Data_Post")
 if os.path.exists("Data_Video")==False: os.mkdir("Data_Video")
 
@@ -67,7 +73,7 @@ def crawl_data(url):
     ws = wb.active
     ws.append([name_channel, f"{sub} Người đăng ký"])
     ws.append(["", "", ""])
-    ws.append(["Link", "Tiêu đề", "Lượt xem"])
+    ws.append(["Link", "Tiêu đề", "Lượt xem", "Ngày đăng"])
     wb.save(f'Data_Video/{name_file}.xlsx')
     while True:
         try:
@@ -76,7 +82,7 @@ def crawl_data(url):
             if a == [] or a == None:
                 break
             for i in a:
-                ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"]])
+                ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"], convert_timestamp_to_date(i["created_at"])])
                 while True:
                     try:
                         wb.save(f'Data_Video/{name_file}.xlsx')
@@ -104,7 +110,7 @@ def crawl_data(url):
     ws = wb.active
     ws.append([name_channel, f"{sub} Người đăng ký"])
     ws.append(["", "", ""])
-    ws.append(["Link", "Lượt like", "Lượt xem"])
+    ws.append(["Link", "Lượt like", "Lượt xem", "Ngày đăng"])
     wb.save(f'Data_Post/{name_file}.xlsx')
     while True:
         try:
@@ -116,7 +122,7 @@ def crawl_data(url):
             
             for i in a:
             
-                ws.append([f'https://www.ganjingworld.com/post/{i["id"]}', i["like_count"], i["view_count"]])
+                ws.append([f'https://www.ganjingworld.com/post/{i["id"]}', i["like_count"], i["view_count"], convert_timestamp_to_date(i["created_at"]) ])
                 while True:
                     try:
                         wb.save(f'Data_Post/{name_file}.xlsx')
