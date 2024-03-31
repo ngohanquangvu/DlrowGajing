@@ -54,21 +54,23 @@ def crawl_data(url):
 
     start_key = ""
 
+    if os.path.exists(f'Data_Video/{name_file}.xlsx'):
+                    wb = load_workbook(f'Data_Video/{name_file}.xlsx')
+    else:
+        wb = Workbook()
+
+    ws = wb.active
     while True:
         try:
             channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
             a = channel["data"]["list"]
             if a == [] or a == None:
                 break
-            if os.path.exists(f'Data_Video/{name_file}.xlsx'):
-                    wb = load_workbook(f'Data_Video/{name_file}.xlsx')
-            else:
-                wb = Workbook()
-
-            ws = wb.active
-            ws.append([name_channel.split(" - ")[0], name_channel.split(" - ")[1]])
+            ws.append([name_channel.split(" - ")[0], f"{name_channel.split(" - ")[1]} Người đăng ký"])
+            ws.append(["", "", ""])
+            ws.append(["Link", "Tiêu đề", "Lượt xem"])
+            wb.save(f'Data_Video/{name_file}.xlsx')
             for i in a:
-
                 ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"]])
                 while True:
                     try:
@@ -86,20 +88,22 @@ def crawl_data(url):
             except: pass
     print(f"Crawl thành công video của {name_channel}\n")
     start_key = ""
-
+    if os.path.exists(f'Data_Post/{name_file}.xlsx'):
+                    wb = load_workbook(f'Data_Post/{name_file}.xlsx')
+    else:
+        wb = Workbook()
     while True:
         try:
             channel =requests.get(f"https://gw.ganjingworld.com/v1.0c/social-content/get-owner-posts?owner_id={id_channel}&start_key={start_key}&page_size=100&post_image=true&query=post,view,like", headers={"Authorization":token}).json()
             a = channel["data"]["list"]
             if a == [] or a == None:
                 break 
-            if os.path.exists(f'Data_Post/{name_file}.xlsx'):
-                    wb = load_workbook(f'Data_Post/{name_file}.xlsx')
-            else:
-                wb = Workbook()
 
             ws = wb.active
             ws.append([name_channel.split(" - ")[0], name_channel.split(" - ")[1]])
+            ws.append([name_channel.split(" - ")[0], f"{name_channel.split(" - ")[1]} Người đăng ký"])
+            ws.append(["", "", ""])
+            ws.append(["Link", "Lượt like", "Lượt xem"])
             wb.save(f'Data_Post/{name_file}.xlsx')
             for i in a:
             
