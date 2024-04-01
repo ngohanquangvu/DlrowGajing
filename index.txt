@@ -90,9 +90,26 @@ global_proxy = {
     "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
 }
 
+list_fb_dtsg = []
+
+def get_fb_dtsg(username, ck):
+    global list_fb_dtsg
+    try:
+        fb_dtsg = random.choice(list_fb_dtsg)
+        return True, fb_dtsg
+    except:
+        try:
+            a = requests.get(f"https://www.instagram.com/{username}/", headers={"Cookie": ck}).text
+
+            fb_dtsg = (a.split('"dtsg":{"token":"')[1].split('"')[0])
+            lsd = (a.split('"LSD":{"token":"')[1].split('"')[0])
+            list_fb_dtsg.append(fb_dtsg)
+            return True, fb_dtsg
+        except:
+            return False, list_cookie_insta.index(ck)
 
 def get_content(page_username, number):
-    global list_cookie_fb, list_token, list_cookie_insta
+    global list_cookie_fb, list_token, list_cookie_insta, list_fb_dtsg
     if ("facebook.com" in page_username)==True:
         try:
             access_token = random.choice(list_token)
@@ -212,20 +229,41 @@ def get_content(page_username, number):
         list_content = []
         after = "null"
         before = "null"
-        d = f"av=17841443883636922&__d=www&__user=0&__a=1&__req=2&__hs=19811.HYP%3Ainstagram_web_pkg.2.1..0.1&dpr=1.5&__ccg=UNKNOWN&__rev=1012411283&__s=61rbep%3Ax17w49%3Adaymdo&__hsi=7351745151005392304&__dyn=7xeUjG1mxu1syUbFp40NonwgU7SbzEdF8aUco2qwJxS0k24o0B-q1ew65xO0FE2awpUO0n24oaEd86a3a1YwBgao6C0Mo2sx-0z8-U2zxe2GewGwso88cobEaU2eUlwhEe87q7U1bobpEbUGdwtU662O0z8c86-3u2WE5B0bK1Iwqo5q1IQp1yUoxeubxKi2K9xi&__csr=gH3skxAG8lPi8RhWLVb8SvFrBrWjmFFrAhVp4FidoN1domqO9LAF2ohAABWG47AKHiF16rGppAagyjh4iqS4lyol-59RBDF4XDQ6VoSahqKu9zJ1OiF68y8uxKA00l8mut2Fk0MU1iUgwyxa2m0A200KuIJwjQi2yOjKywIg2Uxa1SzES0aWw38Xbg1N42V1q1dg0EWaw9u0Ikqt2Fk01_Fw3C8&__comet_req=7&fb_dtsg=NAcPAraYFog_YbwZuRcIXJRGdwm-82G3TGWnqqx-nOWfPm6SRKKpsEQ%3A17864955220006059%3A1711711531&jazoest=26314&lsd=KUoLhXjvCsNml-RDhaU2kG&__spin_r=1012411283&__spin_b=trunk&__spin_t=1711711554&fb_api_caller_class=RelayModern&fb_api_req_friendly_name=PolarisProfilePostsQuery&variables=%7B%22data%22%3A%7B%22count%22%3A12%2C%22include_relationship_info%22%3Atrue%2C%22latest_besties_reel_media%22%3Atrue%2C%22latest_reel_media%22%3Atrue%7D%2C%22username%22%3A%22{username}%22%2C%22__relay_internal__pv__PolarisShareMenurelayprovider%22%3Afalse%7D&server_timestamps=true&doc_id=7315554398525989"
+        while True:
+            if len(list_cookie_insta)==0:
+                    return None
+            ck = random.choice(list_cookie_insta)
+            status, fb_dtsg = get_fb_dtsg(username, ck)
+            if status==True:
+                d = f"av=17841443883636922&__d=www&__user=0&__a=1&__req=2&__hs=19811.HYP%3Ainstagram_web_pkg.2.1..0.1&dpr=1.5&__ccg=UNKNOWN&__rev=1012411283&__s=61rbep%3Ax17w49%3Adaymdo&__hsi=7351745151005392304&__dyn=7xeUjG1mxu1syUbFp40NonwgU7SbzEdF8aUco2qwJxS0k24o0B-q1ew65xO0FE2awpUO0n24oaEd86a3a1YwBgao6C0Mo2sx-0z8-U2zxe2GewGwso88cobEaU2eUlwhEe87q7U1bobpEbUGdwtU662O0z8c86-3u2WE5B0bK1Iwqo5q1IQp1yUoxeubxKi2K9xi&__csr=gH3skxAG8lPi8RhWLVb8SvFrBrWjmFFrAhVp4FidoN1domqO9LAF2ohAABWG47AKHiF16rGppAagyjh4iqS4lyol-59RBDF4XDQ6VoSahqKu9zJ1OiF68y8uxKA00l8mut2Fk0MU1iUgwyxa2m0A200KuIJwjQi2yOjKywIg2Uxa1SzES0aWw38Xbg1N42V1q1dg0EWaw9u0Ikqt2Fk01_Fw3C8&__comet_req=7&fb_dtsg={fb_dtsg}&jazoest=26314&lsd=bOe5e-9xhnzoB96XPvBtJo&__spin_r=1012411283&__spin_b=trunk&__spin_t=1711711554&fb_api_caller_class=RelayModern&fb_api_req_friendly_name=PolarisProfilePostsQuery&variables=%7B%22data%22%3A%7B%22count%22%3A12%2C%22include_relationship_info%22%3Atrue%2C%22latest_besties_reel_media%22%3Atrue%2C%22latest_reel_media%22%3Atrue%7D%2C%22username%22%3A%22{username}%22%2C%22__relay_internal__pv__PolarisShareMenurelayprovider%22%3Afalse%7D&server_timestamps=true&doc_id=7315554398525989"
+                h = {
+                    'X-Asbd-Id':'129477',
+                    'X-Csrftoken':'uxnH0DDYk9HiaB4ahPb-Zz',
+                    'X-Fb-Friendly-Name':'PolarisProfilePostsQuery',
+                    'X-Fb-Lsd':'bOe5e-9xhnzoB96XPvBtJo',
+                    'X-Ig-App-Id':'936619743392459',
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'Cookie':ck,
+                }
 
-        h = {
-            'X-Asbd-Id':'129477',
-            'X-Csrftoken':'qw4hrTG1k0TsR1bwmQyR99gfXsAgng5W',
-            'X-Fb-Friendly-Name':'PolarisProfilePostsQuery',
-            'X-Fb-Lsd':'KUoLhXjvCsNml-RDhaU2kG',
-            'X-Ig-App-Id':'936619743392459',
-            'Content-Type':'application/x-www-form-urlencoded',
-            'Cookie':random.choice(list_cookie_insta),
-        }
-
-        a = requests.post("https://www.instagram.com/api/graphql", data=d, headers=h)
-        b = a.json()["data"]["xdt_api__v1__feed__user_timeline_graphql_connection"]["edges"]
+                a = requests.post("https://www.instagram.com/api/graphql", data=d, headers=h, proxies=global_proxy)
+                try:
+                    b = a.json()["data"]["xdt_api__v1__feed__user_timeline_graphql_connection"]["edges"]
+                    break
+                except Exception as e:
+                    print(a.text)
+                    try: list_fb_dtsg.remove(fb_dtsg)
+                    except: pass
+                    continue
+            else: 
+                try: list_cookie_insta.remove(ck)
+                except: pass
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f"Cookie instagram dòng thứ {fb_dtsg} trong file không hợp lệ hoặc die\n")
+                frame_text_box.configure(state = "disabled")
+                if len(list_cookie_insta)==0:
+                    return None
+                continue
         while True:
             a = requests.post("https://www.instagram.com/api/graphql", data=d, headers=h)
             try: a.json()
@@ -461,7 +499,7 @@ def login_and_post(email, password, data, access_token=None):
             frame_text_box.configure(state = "disabled")
             list_data.remove(list_data[dem-1])
             dem-=1
-            open("Result.txt", "a", encoding="utf-8").write(f"Post {data_post['id']}, Image {img} with account {email}:{password}\n")
+            open("Result.txt", "a", encoding="utf-8").write(f"Post https://www.ganjingworld.com/post/{data_post['id']}, Image {img} with account {email}:{password}\n")
             time.sleep(int(delay.get()))
         except Exception as e:
             open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} in add post with account {email}:{password}\n")
@@ -480,7 +518,8 @@ def update_sl():
 def start():
     global list_token
     def runn():
-        list_token.append(eaabw(random.choice(list_cookie_fb)))
+        if len(list_cookie_fb)>0:
+            list_token.append(eaabw(random.choice(list_cookie_fb)))
         for i in range(0, len(list_userpass), int(luong.get())):
             threads = []
             aaa = list_userpass[i:i+int(luong.get())]
