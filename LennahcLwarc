@@ -73,7 +73,7 @@ def crawl_data(url):
     ws = wb.active
     ws.append([name_channel, f"{sub} Người đăng ký"])
     ws.append(["", "", ""])
-    ws.append(["Link", "Tiêu đề", "Lượt xem", "Ngày đăng"])
+    ws.append(["Link", "Tiêu đề", "Lượt xem", "Ngày đăng", "Loại"])
     wb.save(f'Data_Video/{name_file}.xlsx')
     while True:
         try:
@@ -82,7 +82,7 @@ def crawl_data(url):
             if a == [] or a == None:
                 break
             for i in a:
-                ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"], convert_timestamp_to_date(i["created_at"])])
+                ws.append([f'https://www.ganjingworld.com/video/{i["id"]}', i["title"], i["view_count"], convert_timestamp_to_date(i["created_at"]), "Video"])
                 while True:
                     try:
                         wb.save(f'Data_Video/{name_file}.xlsx')
@@ -98,6 +98,58 @@ def crawl_data(url):
                 token = get_token()
             except: pass
     print(f"Crawl thành công video của {name_channel}\n")
+
+
+    start_key = ""
+    while True:
+        try:
+            channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Shorts&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
+            a = channel["data"]["list"]
+            if a == [] or a == None:
+                break
+            for i in a:
+                ws.append([f'https://www.ganjingworld.com/short/{i["id"]}', i["title"], i["view_count"], convert_timestamp_to_date(i["created_at"]), "Short"])
+                while True:
+                    try:
+                        wb.save(f'Data_Video/{name_file}.xlsx')
+                        break
+                    except: pass
+            start_key = channel["data"]["start_key"]
+            if start_key == "":
+                break
+        except Exception as e:
+            print(str(e)) 
+            try: 
+                list_token.remove(token)
+                token = get_token()
+            except: pass
+    print(f"Crawl thành công Short của {name_channel}\n")
+
+    start_key = ""
+    while True:
+        try:
+            channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Live&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
+            a = channel["data"]["list"]
+            if a == [] or a == None:
+                break
+            for i in a:
+                ws.append([f'https://www.ganjingworld.com/live/{i["id"]}', i["title"], i["view_count"], convert_timestamp_to_date(i["created_at"]), "Live"])
+                while True:
+                    try:
+                        wb.save(f'Data_Video/{name_file}.xlsx')
+                        break
+                    except: pass
+            start_key = channel["data"]["start_key"]
+            if start_key == "":
+                break
+        except Exception as e:
+            print(str(e)) 
+            try: 
+                list_token.remove(token)
+                token = get_token()
+            except: pass
+    print(f"Crawl thành công Live của {name_channel}\n")
+
     start_key = ""
     if os.path.exists(f'Data_Post/{name_file}.xlsx'):
         while True:
