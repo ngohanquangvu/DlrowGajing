@@ -1,0 +1,206 @@
+def generate_vietnamese_names_and_genders():
+    fake = Faker('vi_VN')  # Vietnamese names
+    profile = fake.simple_profile()
+    return (f"{profile['name']}|{'0' if profile['sex'] == 'M' else '1'}")
+
+
+def generate_password(length=8):
+    # All the characters that can be used to generate the password
+    all_characters = string.ascii_letters + string.digits
+    if length < 8:
+        print("Password length should be at least 8")
+        return None
+
+    # At least one lowercase, one uppercase and one digit
+    password = [random.choice(string.ascii_lowercase), 
+                random.choice(string.ascii_uppercase), 
+                random.choice(string.digits)]
+
+    # Other random characters
+    password += random.sample(all_characters, length - 3)
+
+    # Shuffle the list of characters
+    random.shuffle(password)
+
+    # Convert list to string
+    password = ''.join(password)
+
+    return password
+
+def get_code(email):
+    name = email.split("@")[0]
+    domain = email.split("@")[1]
+    b = requests.get(f"https://www.1secmail.com/api/v1/?action=getMessages&login={name}&domain={domain}").json()
+    for i in b:
+        if i["subject"] == "Let's complete your Gan Jing World registration":
+            c = requests.get(f"https://www.1secmail.com/api/v1/?action=readMessage&login={name}&domain={domain}&id={i["id"]}").json()
+            code = (c["htmlBody"].split("please confirm your email address by entering the verification code below:")[1].split("This verification code expires after 30 minutes.")[0].replace(" ",""))
+            return code
+    return False
+
+list_login_token = []
+
+def get_login_token():
+    global list_login_token
+    if len(list_login_token) != 0:
+        return random.choice(list_login_token)
+    else:
+        h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
+
+        token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+        list_login_token.append(token)
+        return token
+
+def RegAcc(index):
+    global running, success, custom
+    token = get_login_token()
+    email = requests.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1").json()[0]
+    running[index].append([email,"","Đang kiểm tra email..."])
+    while True:
+        global_proxy = {
+            "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
+            "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
+        }
+        try:
+            check_email = requests.post("https://gw.ganjingworld.com/v1.0c/signupcheckname", json={"email":email,"create_new_user_id":True}, headers={'Authorization':token}, proxies=global_proxy).json()
+            if check_email["result"]["message"]=="Ok":
+                break
+            else:
+                email = requests.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1").json()[0]
+                running[index].append([email,"","Đang kiểm tra email..."])
+        except: pass
+    running[index]= [email,"","Email Hợp lệ"]
+
+    # Given values
+    n = generate_password(11)
+    running[index]= [email,n,"Đang tạo tài khoản..."]
+    m = "U+tkGvBsXsy/bvCdwZGsmw9TFPDmcmVbfrU/FmMRnHI="
+    t = email
+    u = check_email["data"]["new_user_id"]
+    d = check_email["data"]["uuid"]
+    r = 'en-US'
+
+    # Create hash
+    hash_object = hashlib.sha256((n + m).encode())
+    g = base64.b64encode(hash_object.digest()).decode()
+
+    # Create EC key
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    public_key = private_key.public_key()
+
+    # Get public key in SPKI format
+    public_key_pem = public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    ).decode().replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").replace("\n", "")
+
+    # Create signature
+
+    # Create signature
+    data_to_sign = (base64.b64encode(u.encode()).decode() + g).encode()
+    signature = base64.b64encode(private_key.sign(data_to_sign, ec.ECDSA(hashes.SHA256()))).decode()
+
+    # Create object
+    x = {
+        'client_salt': m,
+        'client_type': 3,
+        'email': t.lower(),
+        'password_hash': g,
+        'public_key': public_key_pem,
+        'reserved_name_id': d,
+        'signature': signature,
+        'user_id': u,
+        'test_only': False,
+        'lang': r
+    }
+
+    login = requests.post("https://gw.ganjingworld.com/v1.0c/signup", headers={'Authorization':token}, json=x).json()
+    if login["result"]["message"] == "Ok":
+        running[index]= [email,n,"Đã tạo tài khoản"]
+        code = str(get_code(email))
+        dem = 0
+        while code == "False":
+            code = str(get_code(email))
+            running[index]= [email,n,"Đang lấy mã xác minh..."]
+            dem+=1
+            if dem==10:
+                running[index]= [email,n,"Đăng ký thất bại"]
+                custom+=1
+                return
+        a = requests.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}).json()
+        if (a["result"]["message"]=="Ok"):
+            running[index]= [email,n,"Đã xác minh tài khoản"]
+            access_token = a["data"]["token"]
+            data_profile = generate_vietnamese_names_and_genders().split("|")
+            set_name = requests.post("https://gw.ganjingworld.com/v1.0c/uploaduserprofile",json={"user_id":u,"user_name":data_profile[0],"phone":"","gender":data_profile[1]}, headers={'Authorization':access_token}).json()
+            if set_name["result"]["message"]=="Ok":
+                running[index]= [email,n,"Đặt tên thành công"]
+            uuid = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers={'Authorization':access_token}).json()["data"]["user_profile"]["profileId"]
+            running[index]= [email,n,"Đăng ký thành công"]
+            open("Result.txt","a",encoding="utf-8").write(f"{email}|{n}|https://www.ganjingworld.com/channel/{uuid}|{access_token}\n")
+            success+=1
+        else:
+            running[index]= [email,n,"Đăng ký thất bại"]
+            custom+=1
+            time.sleep(1)
+    else:
+        running[index]= [email,n,"Đăng ký thất bại"]
+        custom+=1
+        time.sleep(1)
+
+def checking():
+    global running, success, custom, n
+    while status:
+        for j in range(len(running)):
+            if running[j][2]=="Đăng ký thành công":
+                print(f"\033[32mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            elif running[j][2]=="Đăng ký thất bại":
+                print(f"\033[31mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            else:
+                print(f"\033[33mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+        print(f"\033[32mSuccess: {success} | \033[31mCustom: {custom} | \033[33mProcess: {int((success+custom)/n)*100}%\033[0m")
+        time.sleep(1)
+        os.system('cls')
+    
+
+n = int(input("Enter the number of accounts you want to create: "))
+sl = [None]*n
+success = 0
+custom = 0
+status = False
+luong = int(input("Enter the number of threads: "))
+os.system("cls")
+running = [['','',''] for _ in range(luong)]
+status = True
+t = threading.Thread(target=checking)
+t.start()
+for i in range(0,len(sl), luong):
+    aaa = sl[i:i+luong]
+    threads = []
+    for j in range(len(aaa)):
+       threads.append(threading.Thread(target=RegAcc, args=(j,)))
+    for j in threads:
+        j.start()
+    for j in threads:
+        j.join()
+    running = [['','',''] for _ in range(luong)]
+t.join()
