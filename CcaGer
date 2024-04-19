@@ -165,7 +165,7 @@ def RegAcc(index):
         time.sleep(1)
 
 def checking():
-    global running, success, custom, n
+    global running, success, custom, n, start_time
     while status:
         for j in range(len(running)):
             if running[j][2]=="Đăng ký thành công":
@@ -177,7 +177,14 @@ def checking():
             else:
                 print(f"\033[33mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
                 print("")
-        print(f"\033[32mSuccess: {success} | \033[31mCustom: {custom} | \033[33mProcess: {int((success+custom)/n)*100}%\033[0m")
+        end_time = time.time()
+
+        execution_time = end_time - start_time
+        hours, rem = divmod(execution_time, 3600)
+        minutes, seconds = divmod(rem, 60)
+        formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
+
+        print(f"\033[32mSuccess: {success} | \033[31mCustom: {custom} | \033[33mProcess: {int((success+custom)/n)*100}% - {formatted_time}\033[0m")
         time.sleep(1)
         os.system('cls')
     
@@ -191,6 +198,7 @@ luong = int(input("Enter the number of threads: "))
 os.system("cls")
 running = [['','',''] for _ in range(luong)]
 status = True
+start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
 for i in range(0,len(sl), luong):
