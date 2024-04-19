@@ -67,6 +67,9 @@ def get_login_token():
             "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
         }
         while True:
+            if len(list_login_token) != 0:
+                return random.choice(list_login_token)
+            
             try:
                 token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=global_proxy).json()["data"]["accessToken"]
                 list_login_token.append(token)
