@@ -113,7 +113,7 @@ def RegAcc(index):
             running[index]= ["Đang lấy token","",""]
             token = get_login_token()
             email = generate_random_email()
-            running[index].append([email,"","Đang kiểm tra email..."])
+            running[index] = [email,"","Đang kiểm tra email..."]
             while True:
                 global_proxy = {
                     "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
@@ -125,7 +125,7 @@ def RegAcc(index):
                         break
                     else:
                         email = generate_random_email()
-                        running[index].append([email,"","Đang kiểm tra email..."])
+                        running[index] = [email,"","Đang kiểm tra email..."]
                 except: pass
             running[index]= [email,"","Email Hợp lệ"]
 
@@ -233,6 +233,9 @@ def checking():
     while status:
         for j in range(len(running)):
             if running[j][2]=="Đăng ký thành công":
+                print(f"\033[32mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            elif running[j][2]=="Đã xác minh tài khoản":
                 print(f"\033[32mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
                 print("")
             elif running[j][2]=="Đăng ký thất bại":
