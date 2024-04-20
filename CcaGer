@@ -30,13 +30,15 @@ def generate_password(length=8):
 def get_code(email):
     name = email.split("@")[0]
     domain = email.split("@")[1]
-    b = requests.get(f"https://www.1secmail.com/api/v1/?action=getMessages&login={name}&domain={domain}").json()
-    for i in b:
-        if i["subject"] == "Let's complete your Gan Jing World registration":
-            c = requests.get(f"https://www.1secmail.com/api/v1/?action=readMessage&login={name}&domain={domain}&id={i["id"]}").json()
-            code = (c["htmlBody"].split("please confirm your email address by entering the verification code below:")[1].split("This verification code expires after 30 minutes.")[0].replace(" ",""))
-            return code
-    return False
+    try:
+        b = requests.get(f"https://www.1secmail.com/api/v1/?action=getMessages&login={name}&domain={domain}").json()
+        for i in b:
+            if i["subject"] == "Let's complete your Gan Jing World registration":
+                c = requests.get(f"https://www.1secmail.com/api/v1/?action=readMessage&login={name}&domain={domain}&id={i["id"]}").json()
+                code = (c["htmlBody"].split("please confirm your email address by entering the verification code below:")[1].split("This verification code expires after 30 minutes.")[0].replace(" ",""))
+                return code
+        return False
+    except: return False
 
 list_login_token = []
 
@@ -69,112 +71,165 @@ def get_login_token():
         while True:
             if len(list_login_token) != 0:
                 return random.choice(list_login_token)
-            
             try:
                 token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=global_proxy).json()["data"]["accessToken"]
                 list_login_token.append(token)
                 return token
             except: pass
+h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
+try:
+    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+    list_login_token.append(token)
+except: 
+    pass
+
+
+def generate_random_email():
+    # Tạo một chuỗi ngẫu nhiên gồm 10 ký tự
+    random_string = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(random.randint(7, 21)))
+    email = random_string + "@1secmail.com"
+    return email
 
 def RegAcc(index):
-    global running, success, custom
-    token = get_login_token()
-    email = requests.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1").json()[0]
-    running[index].append([email,"","Đang kiểm tra email..."])
-    while True:
-        global_proxy = {
-            "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
-            "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
-        }
+    global running, success, custom, slg_acc
+    while success+custom<slg_acc:
         try:
-            check_email = requests.post("https://gw.ganjingworld.com/v1.0c/signupcheckname", json={"email":email,"create_new_user_id":True}, headers={'Authorization':token}, proxies=global_proxy).json()
-            if check_email["result"]["message"]=="Ok":
-                break
+            running[index]= ["Đang lấy token","",""]
+            token = get_login_token()
+            email = generate_random_email()
+            running[index].append([email,"","Đang kiểm tra email..."])
+            while True:
+                global_proxy = {
+                    "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
+                    "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
+                }
+                try:
+                    check_email = requests.post("https://gw.ganjingworld.com/v1.0c/signupcheckname", json={"email":email,"create_new_user_id":True}, headers={'Authorization':token}, proxies=global_proxy).json()
+                    if check_email["result"]["message"]=="Ok":
+                        break
+                    else:
+                        email = generate_random_email()
+                        running[index].append([email,"","Đang kiểm tra email..."])
+                except: pass
+            running[index]= [email,"","Email Hợp lệ"]
+
+            # Given values
+            n = generate_password(11)
+            running[index]= [email,n,"Đang tạo tài khoản..."]
+            m = "U+tkGvBsXsy/bvCdwZGsmw9TFPDmcmVbfrU/FmMRnHI="
+            t = email
+            u = check_email["data"]["new_user_id"]
+            d = check_email["data"]["uuid"]
+            r = 'en-US'
+
+            # Create hash
+            hash_object = hashlib.sha256((n + m).encode())
+            g = base64.b64encode(hash_object.digest()).decode()
+
+            # Create EC key
+            private_key = ec.generate_private_key(ec.SECP256R1())
+            public_key = private_key.public_key()
+
+            # Get public key in SPKI format
+            public_key_pem = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            ).decode().replace("-----BEGIN PUBLIC KEY-----","").replace("-----END PUBLIC KEY-----","").replace("\n", "")
+
+            # Create signature
+            data_to_sign = (base64.b64encode(u.encode()).decode() + g).encode()
+            signature = base64.b64encode(private_key.sign(data_to_sign, ec.ECDSA(hashes.SHA256()))).decode()
+
+            # Create object
+            x = {
+                'client_salt': m,
+                'client_type': 3,
+                'email': t.lower(),
+                'password_hash': g,
+                'public_key': public_key_pem,
+                'reserved_name_id': d,
+                'signature': signature,
+                'user_id': u,
+                'test_only': False,
+                'lang': r
+            }
+
+            while True:
+                try:
+                    login = requests.post("https://gw.ganjingworld.com/v1.0c/signup", headers={'Authorization':token}, json=x, proxies={
+                            "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
+                            "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
+                        }).json()
+                    if login["result"]["message"] == "Server internal error" or login["result"]["message"] == "Save User Information Failed.":
+                        continue
+                    else: break
+                except: pass
+            if login["result"]["message"] == "Ok":
+                running[index]= [email,n,"Đã tạo tài khoản"]
+                code = str(get_code(email))
+                dem = 0
+                while code == "False":
+                    running[index]= [email,n,"Đang lấy mã xác minh..."]
+                    dem+=1
+                    if dem==5:
+                        running[index]= [email,n,"Đăng ký thất bại, không lấy được mã xác minh"]
+                        open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không lấy được mã xác minh\n")
+                        custom+=1
+                        break
+                    code = str(get_code(email))
+                if running[index][2] != "Đăng ký thất bại, không lấy được mã xác minh":
+                    while True:
+                        try:
+                            a = requests.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}, proxies={"http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
+                                    "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"}).json()
+                            if a["result"]["message"]=="Ok":
+                                break
+                            else:
+                                running[index]= [email,n,"Xác minh thất bại, xác minh lại tài khoản..."]
+                                open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không xác minh thành công|{a}\n")
+                        except: pass
+                    if (a["result"]["message"]=="Ok"):
+                        running[index]= [email,n,"Đã xác minh tài khoản"]
+                        access_token = a["data"]["token"]
+                        data_profile = generate_vietnamese_names_and_genders().split("|")
+                        uuid = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers={'Authorization':access_token}).json()["data"]["user_profile"]["profileId"]
+                        open("Result.txt","a",encoding="utf-8").write(f"{email}|{n}|https://www.ganjingworld.com/channel/{uuid}|{access_token}\n")
+                        success+=1
+                        set_name = requests.post("https://gw.ganjingworld.com/v1.0c/uploaduserprofile",json={"user_id":u,"user_name":data_profile[0],"phone":"","gender":data_profile[1]}, headers={'Authorization':access_token}).json()
+                        if set_name["result"]["message"]=="Ok":
+                            running[index]= [email,n,"Đặt tên thành công"]
+                        running[index]= [email,n,"Đăng ký thành công"]
+                    else:
+                        open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không xác minh thành công\n")
+                        running[index]= [email,n,"Đăng ký thất bại, không xác minh thành công"]
+                        custom+=1
+                        time.sleep(1)
             else:
-                email = requests.get("https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1").json()[0]
-                running[index].append([email,"","Đang kiểm tra email..."])
-        except: pass
-    running[index]= [email,"","Email Hợp lệ"]
-
-    # Given values
-    n = generate_password(11)
-    running[index]= [email,n,"Đang tạo tài khoản..."]
-    m = "U+tkGvBsXsy/bvCdwZGsmw9TFPDmcmVbfrU/FmMRnHI="
-    t = email
-    u = check_email["data"]["new_user_id"]
-    d = check_email["data"]["uuid"]
-    r = 'en-US'
-
-    # Create hash
-    hash_object = hashlib.sha256((n + m).encode())
-    g = base64.b64encode(hash_object.digest()).decode()
-
-    # Create EC key
-    private_key = ec.generate_private_key(ec.SECP256R1())
-    public_key = private_key.public_key()
-
-    # Get public key in SPKI format
-    public_key_pem = public_key.public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo
-    ).decode().replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").replace("\n", "")
-
-    # Create signature
-
-    # Create signature
-    data_to_sign = (base64.b64encode(u.encode()).decode() + g).encode()
-    signature = base64.b64encode(private_key.sign(data_to_sign, ec.ECDSA(hashes.SHA256()))).decode()
-
-    # Create object
-    x = {
-        'client_salt': m,
-        'client_type': 3,
-        'email': t.lower(),
-        'password_hash': g,
-        'public_key': public_key_pem,
-        'reserved_name_id': d,
-        'signature': signature,
-        'user_id': u,
-        'test_only': False,
-        'lang': r
-    }
-
-    login = requests.post("https://gw.ganjingworld.com/v1.0c/signup", headers={'Authorization':token}, json=x).json()
-    if login["result"]["message"] == "Ok":
-        running[index]= [email,n,"Đã tạo tài khoản"]
-        code = str(get_code(email))
-        dem = 0
-        while code == "False":
-            code = str(get_code(email))
-            running[index]= [email,n,"Đang lấy mã xác minh..."]
-            dem+=1
-            if dem==10:
-                running[index]= [email,n,"Đăng ký thất bại"]
+                running[index]= [email,n,"Đăng ký thất bại, không đăng ký thành công"]
+                open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không đăng ký thành công|{login}\n")
                 custom+=1
-                return
-        a = requests.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}).json()
-        if (a["result"]["message"]=="Ok"):
-            running[index]= [email,n,"Đã xác minh tài khoản"]
-            access_token = a["data"]["token"]
-            data_profile = generate_vietnamese_names_and_genders().split("|")
-            set_name = requests.post("https://gw.ganjingworld.com/v1.0c/uploaduserprofile",json={"user_id":u,"user_name":data_profile[0],"phone":"","gender":data_profile[1]}, headers={'Authorization':access_token}).json()
-            if set_name["result"]["message"]=="Ok":
-                running[index]= [email,n,"Đặt tên thành công"]
-            uuid = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers={'Authorization':access_token}).json()["data"]["user_profile"]["profileId"]
-            running[index]= [email,n,"Đăng ký thành công"]
-            open("Result.txt","a",encoding="utf-8").write(f"{email}|{n}|https://www.ganjingworld.com/channel/{uuid}|{access_token}\n")
-            success+=1
-        else:
-            running[index]= [email,n,"Đăng ký thất bại"]
-            custom+=1
-            time.sleep(1)
-    else:
-        running[index]= [email,n,"Đăng ký thất bại"]
-        custom+=1
-        time.sleep(1)
+                time.sleep(1)
+            running[index]= ["","",""]
+        except: pass
 
 def checking():
-    global running, success, custom, n, start_time
+    global running, success, custom, slg_acc, start_time
     while status:
         for j in range(len(running)):
             if running[j][2]=="Đăng ký thành công":
@@ -193,13 +248,13 @@ def checking():
         minutes, seconds = divmod(rem, 60)
         formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
 
-        print(f"\033[32mSuccess: {success} | \033[31mCustom: {custom} | \033[33mProcess: {int((success+custom)/n)*100}% - {formatted_time}\033[0m")
+        print(f"\033[32mSuccess: {success} | \033[31mCustom: {custom} | \033[33mProcess: {int((success+custom)/slg_acc)*100}% - {formatted_time}\033[0m")
         time.sleep(1)
         os.system('cls')
     
 
-n = int(input("Enter the number of accounts you want to create: "))
-sl = [None]*n
+slg_acc = int(input("Enter the number of accounts you want to create: "))
+sl = [None]*slg_acc
 success = 0
 custom = 0
 status = False
@@ -210,14 +265,19 @@ status = True
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
-for i in range(0,len(sl), luong):
-    aaa = sl[i:i+luong]
-    threads = []
-    for j in range(len(aaa)):
-       threads.append(threading.Thread(target=RegAcc, args=(j,)))
-    for j in threads:
-        j.start()
-    for j in threads:
-        j.join()
-    running = [['','',''] for _ in range(luong)]
+threads = []
+for i in range(luong):
+       threads.append(threading.Thread(target=RegAcc, args=(i,)))
+for j in threads:
+    j.start()
+for j in threads:
+    j.join()
 t.join()
+end_time = time.time()
+
+execution_time = end_time - start_time
+hours, rem = divmod(execution_time, 3600)
+minutes, seconds = divmod(rem, 60)
+formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
+print(f"\033[32mSuccess: {success} | \033[31mCustom: {custom} | \033[33mProcess: {int((success+custom)/slg_acc)*100}% - {formatted_time}\033[0m")
+end = input("Press Enter to exit")
