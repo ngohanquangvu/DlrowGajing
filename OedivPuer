@@ -1,0 +1,426 @@
+app = customtkinter.CTk()
+app.title("GanJingWorld Reup Video")
+app.geometry("350x420")
+
+total = 0
+
+def check_status():
+    d = 0
+    if len(list_userpass)==0:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file account\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    try:
+        check = int(delay.get())
+    except:
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của delay\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    try:
+        check = int(change_account.get())
+    except Exception as e:
+        print(str(e))
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số bài đăng\n')
+        frame_text_box.configure(state = "disabled")
+        d+=1
+    if d>0: return False
+    else: return True
+
+if os.path.exists("./SaveData")==False: os.mkdir("./SaveData")  
+if os.path.exists("./ImageData")==False: os.mkdir("./ImageData")  
+if os.path.exists("./VideoData")==False: os.mkdir("./VideoData")  
+
+list_token = []
+
+global_proxy = {
+    "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
+    "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
+}
+
+
+def save_video(url):
+    aaa = f'./VideoData'
+    name_file = f'{time.time()}.mp4'
+    yt = YouTube(url)
+    stream = yt.streams.get_highest_resolution()
+    stream.download(output_path=aaa, filename=name_file)
+    return f'{aaa}/{name_file}'
+
+def remove_hashtags(text):
+    return re.sub(r'#\S+', '', text)
+
+def save_image(url):
+    try:
+        response = requests.get(url, stream=True)
+
+        if response.status_code == 200:
+            aaa = f'./ImageData/{time.time()}.jpg'
+            with open(aaa, 'wb') as f:
+                f.write(response.content)
+            return aaa
+    except: return None
+
+list_login_token = []
+
+def get_login_token():
+    global list_login_token
+    if len(list_login_token) != 0:
+        return random.choice(list_login_token)
+    else:
+        h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
+
+        token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+        list_login_token.append(token)
+        return token
+    
+def get_id_channel(data):
+    return data.split("/")[-1]
+    
+def get_content(data, dem):
+    channel_id = get_id_channel(data)
+    if not os.path.isfile(f"./SaveData/{channel_id}.txt"):
+        open(f"./SaveData/{channel_id}.txt", 'w').close()
+    a = [i.strip("\n") for i in open(f"./SaveData/{channel_id}.txt", "r").readlines()]
+    list_token = []
+    api_key = "AIzaSyAF53lY6V6os-gzDs4xLnjEX4lk8e2Nkwc"
+
+    base_video_url = 'https://www.youtube.com/watch?v='
+    base_search_url = 'https://www.googleapis.com/youtube/v3/search?'
+
+    first_url = base_search_url+'key={}&channelId={}&part=snippet,id&order=date&maxResults=25'.format(api_key, channel_id)
+
+    video_links = []
+    url = first_url
+    while True:
+        inp = urllib.request.urlopen(url)
+        resp = json.load(inp)
+
+        for i in resp['items']:
+            if i['id']['kind'] == "youtube#video":
+                if i['id']['videoId'] not in a:
+                    a.append(i['id']['videoId'])
+                    open(f"./SaveData/{channel_id}.txt", "a").write(f"{i['id']['videoId']}\n")
+                    video_links.append([base_video_url + i['id']['videoId'], i['snippet']['title'], i['snippet']['description'], i['snippet']['thumbnails']['default']['url']])
+
+                if len(video_links)==dem:
+                    return video_links
+        try:
+            next_page_token = resp['nextPageToken']
+            if next_page_token in list_token:
+                break
+            else:
+                list_token.append(next_page_token)
+                url = first_url + '&pageToken={}'.format(next_page_token)
+        except:
+            break
+    return video_links
+
+def get_webp_url(media_list):
+            for url in media_list:
+                if url.endswith('origin.webp'):
+                    return url
+            return None
+
+
+def upload_video(token, title, description, video_path, url_poster, email, password):
+
+    h = {
+        'User-Agent': 'GJWAndroid v2.0.4(20000004); Debug=false; DefEnv=prod; DevOpts=false; BuildType=release; OS=REL(28); Model=SM-G988N; Manu=samsung',
+        'Accept-Encoding':'gzip, deflate, br, zstd',
+        'Authorization':token
+    }
+
+    info = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers=h).json()
+    profile_id = info["data"]["user_profile"]["profileId"]
+    d = '{"id":"","type":"Video","title":"'+title+'","description":"'+description+'","poster_url":"","poster_hd_url":"","meta":{"video_status":"uploading","video_id":"","video_url":"","video_filename":"a.mp4"},"price":0,"premium":0,"visibility":"public","category_id":"cat1","lang":"en-US","mode":"draft","version":0,"priority":"high","comment_disabled":false,"keywords":[],"liveRedirect":{},"livechat_disabled":true,"set_as_premiere":false,"profile":"fullbitrate","user_id2":"'+str(profile_id)+'","time_scheduled":'+str(int(time.time()*1000))+',"variant":{"default":{"buy_info":{"price":""},"rent_info":{"price":""}}}}'
+    d = json.loads(d)
+    a = requests.post("https://gw.ganjingworld.com/v1.0c/add-content", headers=h, json=d).json()
+    print(a)
+    content_id = a["data"]["id"]
+    print(content_id)
+    update_token = requests.get(f"https://gw.ganjingworld.com/v1.1/get-vod-token?content_id={content_id}", headers=h).json()["data"]["token"]
+    print(update_token)
+
+    # Đọc file video
+    with open(video_path, 'rb') as f:
+        file_content = f.read()
+    # Tạo yêu cầu POST để khởi tạo việc tải lên
+    response = requests.post(
+        'https://vodapi.cloudokyo.cloud/api/v1/tus/upload',
+        headers={
+            'Authorization': f'Bearer {update_token}',
+            'Upload-Length': str(len(file_content)),  # Kích thước của file
+            'Tus-Resumable': '1.0.0',
+            "Upload-Metadata":"parent_folders MWdsMGt0a2duaWo3eFpLRTdPWnRkSXZhTTFyZDB1,filename YjA5YTQ3MTItMDczYy00ZTVhLTg0YTktNDMyNjY2Y2Q1N2Q2X3ZpZGVvX21wNC5tcDQ=,filetype dmlkZW8vbXA0,profile_name ZnVsbGJpdHJhdGU=,auto_caption_flag ZmFsc2U=,preview_start MDA6MDA6MDA=,preview_end MDA6MDA6MjA=,priority aGlnaA==,content_type VmlkZW8=,content_id MWdtaTg0NWplMXQ2RnJ1b2NScUltQXRLRjFmbzFj,language ZW4tVVM=,analyze_flag dHJ1ZQ==,channel_id MWdsMGt1MGNqaDU3MlBLTkhxVzY1NFpHQjFvczBj"
+        }
+    )
+
+    # Lấy URL để tải lên từ phản hồi
+    upload_url = response.headers['Location']
+
+    # Tải lên file video bằng yêu cầu PATCH
+    frame_text_box.configure(state = "normal")
+    frame_text_box.insert(customtkinter.END, f'Đang upload video với account {email}:{password}\n')
+    frame_text_box.configure(state = "disabled")
+    response = requests.patch(
+        upload_url,
+        headers={
+            'Authorization': f'Bearer {update_token}',
+            'Content-Type': 'application/offset+octet-stream',
+            'Upload-Offset': '0',
+            'Tus-Resumable': '1.0.0',
+        },
+        data=file_content  # Nội dung của file
+    )
+
+    # Kiểm tra xem việc tải lên có thành công không
+    if response.status_code == 204:
+        print('Upload successful')
+    else:
+        print('Upload failed')
+
+    a = requests.get(upload_url, headers={'Authorization':f"Bearer {update_token}"}).json()
+    print(a)
+    id_video = a['body']["video_id"]
+
+    wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}).json()
+    print(wait)
+    url_video = wait["body"]["url"]
+    print(url_video)
+
+    b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (url_poster, open(url_poster, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {update_token}"}).json()
+    img_list =b["body"]["image_url"]
+
+
+
+    url_poster = get_webp_url(img_list)
+    d = '{"id":"'+content_id+'","poster_url":"'+url_poster+'","meta":{"video_status":"ready","video_id":"'+str(id_video)+'","video_filename":"a.mp4","hidden":false,"video_url":"'+url_video+'","featured_video":"","encrypt_method":"","duration":0,"original_duration":0}}'
+
+    up_video = requests.post("https://gw.ganjingworld.com/v1.0c/update-content", headers={'Authorization':token,"Accept":"application/json","Accept-Encoding":"gzip, deflate, br, zstd"}, json=json.loads(d))
+    print(up_video.json()) 
+    if up_video.json()["result"]["message"]=="Ok":
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Đăng video thành công với account {email}:{password}\n')
+        frame_text_box.configure(state = "disabled")
+
+def login_and_post(email, password, data, access_token=None):
+    global total
+    dem = int(change_account.get())
+    list_data = get_content(data, dem)
+    if dem>len(list_data): dem = len(list_data)
+    while dem>0:
+        try:
+            hehe = list_data[dem-1]
+            url_video = hehe[0]
+            title = remove_hashtags(hehe[1])
+            description = remove_hashtags(hehe[2])
+            img = hehe[3]
+        except: 
+            dem-=1
+            continue
+        if access_token!=None:
+            pass
+        else:
+            try:
+                while True:
+                    try:
+                        token_login = get_login_token()
+                        d = {"user_email":email,"client_type":3}
+
+                        h = {
+                            'Authorization':token_login,
+                            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+                            'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+                            'Accept':'application/json, text/plain, */*',
+                            'Accept-Encoding':'gzip, deflate, br',
+                            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                            'Content-Length':'56',
+                            'Origin':'https://www.ganjingworld.com',
+                            'Referer':'https://www.ganjingworld.com/',
+                            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                            'Sec-Ch-Ua-Mobile':'?0',
+                            'Sec-Ch-Ua-Platform':'"Windows"',
+                        }
+                        a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=global_proxy)
+                        print(a.json())
+                        break
+                    except Exception as e:
+                        print(f"Error get salt {str(e)}") 
+                        continue
+                if "The user does not exist" in a.text:
+                    frame_text_box.configure(state = "normal")
+                    frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
+                    frame_text_box.configure(state = "disabled")
+                    return None
+                else:
+                    open("log.txt", "a", encoding="utf-8").write(f"Result: {a.text} with account {email}:{password}\n")
+                server_salt = a.json()["data"]["server_salt"]
+                client_salt = a.json()["data"]["client_salt"]
+                def hash_password(pss, client_salt, server_salt):
+                    x = hashlib.sha256((pss + client_salt).encode()).digest()
+                    x_base64 = base64.b64encode(x).decode()
+                    S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
+                    S_base64 = base64.b64encode(S).decode()
+                    return S_base64
+
+                hashed_password = hash_password(password, client_salt, server_salt)
+                print(hashed_password)
+
+                d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
+
+                h = {
+                    'Authorization':token_login,
+                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                    'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+                    'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+                    'Accept':'application/json, text/plain, */*',
+                    'Accept-Encoding':'gzip, deflate, br',
+                    'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                    'Content-Length':'56',
+                    'Origin':'https://www.ganjingworld.com',
+                    'Referer':'https://www.ganjingworld.com/',
+                    'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                    'Sec-Ch-Ua-Mobile':'?0',
+                    'Sec-Ch-Ua-Platform':'"Windows"',
+                }
+                while True:
+                    try:
+                        a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=global_proxy)
+                        if "Password is incorrect" in a.text:
+                            frame_text_box.configure(state = "normal")
+                            frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
+                            frame_text_box.configure(state = "disabled")
+                            return None
+                        access_token = a.json()["data"]["token"]
+                        break
+                    except Exception as e: 
+                        print(f"Error login {str(e)}") 
+                        pass
+            except Exception as e:
+                open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} with account {email}:{password}\n")
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'IP bị block\n')
+                frame_text_box.configure(state = "disabled")
+                time.sleep(10)
+                login_and_post(email, password, data, None)
+
+        try:
+            img = save_image(img)
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đang tải video với account {email}:{password}\n')
+            frame_text_box.configure(state = "disabled")
+            video = save_video(url_video)
+            upload_video(access_token, title, description, video, img, email, password)
+
+            total+=1
+            list_data.remove(list_data[dem-1])
+            dem-=1
+            time.sleep(int(delay.get()))
+        except Exception as e:
+            open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} in add post with account {email}:{password}\n")
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đăng post không thành công với account {email}:{password}\n')
+            frame_text_box.configure(state = "disabled")
+            login_and_post(email, password, data, None)
+    print(f"Done with acc {email}:{password}")
+
+def update_sl():
+    global total
+    while True:
+        total_text_box.configure(text=f"Tổng số lượng Video đã đăng: {total}")
+        time.sleep(1)
+
+def start():
+    global list_token
+    def runn():
+        for i in range(0, len(list_userpass), int(luong.get())):
+            threads = []
+            aaa = list_userpass[i:i+int(luong.get())]
+            for j in range(len(aaa)):
+                acc = aaa[j].split("|")
+                threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], acc[2])))
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ')
+        frame_text_box.configure(state = "disabled")
+        os.system("rmdir /s /q ImageData")
+        os.mkdir("./ImageData")  
+        os.system("rmdir /s /q VideoData")
+        os.mkdir("./VideoData")  
+    if check_status():
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Bắt đầu chạy...\n')
+        frame_text_box.configure(state = "disabled")
+        threading.Thread(target=runn).start()
+        threading.Thread(target=update_sl).start()
+
+
+
+list_userpass = []
+
+def open_file_userpass():
+    global list_userpass
+    from tkinter import filedialog
+    file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose data file")
+    if file_text_path!="":
+        a = open(file_text_path, "r").readlines()
+        for cell in a:
+            test = cell.strip("\n").split("|")
+            if len(test)==3 and test[0]!="" and test[1]!="" and test[2]!="":
+                list_userpass.append(cell.strip("\n"))
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Import success {len(list_userpass)} Data\n')
+        frame_text_box.configure(state = "disabled")
+
+infor_input = customtkinter.CTkFrame(app, width = 310)
+infor_input.grid(row = 0, column = 0, padx = 20, pady = (20, 10))
+delay = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Delay")
+delay.grid(row = 0, column = 0, padx = (0, 5))
+luong = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Luồng")
+luong.grid(row = 0, column = 1, padx = (0, 0))
+change_account = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Nhập số Video")
+change_account.grid(row = 0, column = 2, padx = (5, 0))
+
+button_frame = customtkinter.CTkFrame(app, width = 260, height= 50)
+button_frame.grid(row = 2, column = 0, pady = 10)
+
+start_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Start', command=start)
+start_button.grid(row = 0, column = 1, padx = (0,0))
+
+stop_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Custom Des')
+stop_button.grid(row = 0, column = 2, padx = (10,10))
+
+file_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Data', command=open_file_userpass)
+file_button.grid(row = 0, column = 3, padx = (0,0))
+
+frame_text_box = customtkinter.CTkTextbox(app, width = 300, height= 220)
+frame_text_box.grid(row = 4, column = 0, pady = 10)
+frame_text_box.configure(state = "disabled")
+
+total_text_box = customtkinter.CTkLabel(app, text=f"Tổng số lượng Video đã đăng: {total}")
+total_text_box.grid(row = 5, column = 0, pady = 0)
+
+app.mainloop()
