@@ -181,16 +181,27 @@ def upload_video(token, title, description, video_path, url_poster, email, passw
     frame_text_box.configure(state = "normal")
     frame_text_box.insert(customtkinter.END, f'Đang upload video với account {email}:{password}\n')
     frame_text_box.configure(state = "disabled")
-    response = requests.patch(
-        upload_url,
-        headers={
-            'Authorization': f'Bearer {update_token}',
-            'Content-Type': 'application/offset+octet-stream',
-            'Upload-Offset': '0',
-            'Tus-Resumable': '1.0.0',
-        },
-        data=file_content  # Nội dung của file
-    )
+    h_update = {
+                'Authorization': f'Bearer {update_token}',
+                'Content-Type': 'application/offset+octet-stream',
+                'Upload-Offset': '0',
+                'Tus-Resumable': '1.0.0',
+            }
+    while True:
+        response = requests.patch(
+            upload_url,
+            headers=h_update,
+            data=file_content  # Nội dung của file
+        )
+        if response.headers["upload-offset"]==str(len(file_content)):
+            break
+        else:
+            h_update = {
+                'Authorization': f'Bearer {update_token}',
+                'Content-Type': 'application/offset+octet-stream',
+                'Upload-Offset': response.headers["upload-offset"],
+                'Tus-Resumable': '1.0.0',
+            }
 
     # Kiểm tra xem việc tải lên có thành công không
     if response.status_code == 204:
