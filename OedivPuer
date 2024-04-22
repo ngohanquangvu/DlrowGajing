@@ -57,7 +57,7 @@ def save_image(url):
         response = requests.get(url, stream=True)
 
         if response.status_code == 200:
-            aaa = f'./ImageData/{time.time()}.jpg'
+            aaa = f'./ImageData/{time.time()}.png'
             with open(aaa, 'wb') as f:
                 f.write(response.content)
             return aaa
@@ -96,42 +96,25 @@ def get_id_channel(data):
     return requests.get(data).text.split('https://www.youtube.com/channel/')[1].split('"')[0]
     
 def get_content(data, dem):
-    channel_id = get_id_channel(data)
+    try:
+        channel_id = get_id_channel(data)
+    except:
+        return None
     if not os.path.isfile(f"./SaveData/{channel_id}.txt"):
         open(f"./SaveData/{channel_id}.txt", 'a').close()
     a = [i.strip("\n") for i in open(f"./SaveData/{channel_id}.txt", "r").readlines()]
-    list_token = []
-    api_key = "AIzaSyBPpi1jo9KMK8QNvmOi_e5ob4inEalNrZg"
-
-    base_video_url = 'https://www.youtube.com/watch?v='
-    base_search_url = 'https://www.googleapis.com/youtube/v3/search?'
-
-    first_url = base_search_url+'key={}&channelId={}&part=snippet,id&order=date&maxResults=25'.format(api_key, channel_id)
-
     video_links = []
-    url = first_url
-    while True:
-        inp = urllib.request.urlopen(url)
-        resp = json.load(inp)
-
-        for i in resp['items']:
-            if i['id']['kind'] == "youtube#video":
-                if i['id']['videoId'] not in a:
-                    a.append(i['id']['videoId'])
-                    open(f"./SaveData/{channel_id}.txt", "a").write(f"{i['id']['videoId']}\n")
-                    video_links.append([base_video_url + i['id']['videoId'], i['snippet']['title'], i['snippet']['description'], i['snippet']['thumbnails']['high']['url']])
-
-                if len(video_links)==dem:
-                    return video_links
-        try:
-            next_page_token = resp['nextPageToken']
-            if next_page_token in list_token:
-                break
-            else:
-                list_token.append(next_page_token)
-                url = first_url + '&pageToken={}'.format(next_page_token)
-        except:
-            break
+    videos = scrapetube.get_channel(channel_id)
+    for i in videos:
+        if (i in a)==False:
+            dem-=1
+            des = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text.split('"shortDescription":"')[1].split('"')[0]
+            title = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text.split('"title":"')[1].split('"')[0]
+            video_links.append([f'https://www.youtube.com/watch?v={i["videoId"]}', title, des, str(i["thumbnail"]["thumbnails"][-1].get("url")).split("?")[0]])
+            a.append(i["videoId"])
+            open(f"./SaveData/{channel_id}.txt", "a").write(i["videoId"]+"\n")
+            if dem==0:
+                return video_links
     return video_links
 
 def get_webp_url(media_list):
@@ -142,7 +125,7 @@ def get_webp_url(media_list):
 
 
 def upload_video(token, title, description, video_path, url_poster, email, password):
-
+    global global_proxy
     h = {
         'Accept-Encoding':'gzip, deflate, br, zstd',
         'Authorization':token
@@ -153,7 +136,8 @@ def upload_video(token, title, description, video_path, url_poster, email, passw
     d = '{"id":"","type":"Video","title":"'+title+'","description":"'+description+'","poster_url":"","poster_hd_url":"","meta":{"video_status":"uploading","video_id":"","video_url":"","video_filename":"a.mp4"},"price":0,"premium":0,"visibility":"public","category_id":"cat1","lang":"en-US","mode":"draft","version":0,"priority":"high","comment_disabled":false,"keywords":[],"liveRedirect":{},"livechat_disabled":true,"set_as_premiere":false,"profile":"fullbitrate","user_id2":"'+str(profile_id)+'","time_scheduled":'+str(int(time.time()*1000))+',"variant":{"default":{"buy_info":{"price":""},"rent_info":{"price":""}}}}'
     d = json.loads(d)
     a = requests.post("https://gw.ganjingworld.com/v1.0c/add-content", headers=h, json=d).json()
-    print(a)
+    if a["result"]["message"]!="Ok":
+        return None
     content_id = a["data"]["id"]
     print(content_id)
     update_token = requests.get(f"https://gw.ganjingworld.com/v1.1/get-vod-token?content_id={content_id}", headers=h).json()["data"]["token"]
@@ -178,7 +162,7 @@ def upload_video(token, title, description, video_path, url_poster, email, passw
 
     # Tải lên file video bằng yêu cầu PATCH
     frame_text_box.configure(state = "normal")
-    frame_text_box.insert(customtkinter.END, f'Đang upload video với account {email}:{password}\n')
+    frame_text_box.insert(customtkinter.END, f'[{email}:{password}] đang upload video\n')
     frame_text_box.configure(state = "disabled")
     h_update = {
                 'Authorization': f'Bearer {update_token}',
@@ -203,41 +187,69 @@ def upload_video(token, title, description, video_path, url_poster, email, passw
                 'Tus-Resumable': '1.0.0',
             }
 
-    # Kiểm tra xem việc tải lên có thành công không
     if response.status_code == 204:
         print('Upload successful')
     else:
         print('Upload failed')
-
-    a = requests.get(upload_url, headers={'Authorization':f"Bearer {update_token}"}).json()
-    print(a)
-    id_video = a['body']["video_id"]
-
-    wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}).json()
-    print(wait)
-    url_video = wait["body"]["url"]
-    print(url_video)
-
-    b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (url_poster, open(url_poster, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {update_token}"}).json()
-    img_list =b["body"]["image_url"]
+    
 
 
 
-    url_poster = get_webp_url(img_list)
+    while True:
+        a = requests.get(upload_url, headers={'Authorization':f"Bearer {update_token}"}).json()
+        id_video = a['body']["video_id"]
+
+        wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}).json()
+
+        try:
+            url_video = wait["body"]["url"]
+            print(url_video)
+            break
+        except:
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] video upload thành công {wait["body"]["progress"]}%\n')
+            frame_text_box.configure(state = "disabled")
+            time.sleep(3)
+            pass
+    frame_text_box.configure(state = "normal")
+    frame_text_box.insert(customtkinter.END, f'[{email}:{password}] upload thành công video\n')
+    frame_text_box.configure(state = "disabled")
+    print(url_poster)
+    while True:
+        try:
+            b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (url_poster, open(url_poster, "rb"), f'image/{str(os.path.splitext(url_poster)[1]).replace(".","")}')}, headers={"Authorization":f"Bearer {update_token}"}, proxies=global_proxy).json()
+            print(b)
+            img_list =b["body"]["image_url"]
+            url_poster = get_webp_url(img_list)
+            break
+        except Exception as e:
+            print(f"error upload image {str(e)}")
+            pass
+    frame_text_box.configure(state = "normal")
+    frame_text_box.insert(customtkinter.END, f'[{email}:{password}] đang upload thumbnail\n')
+    frame_text_box.configure(state = "disabled")
     d = '{"id":"'+content_id+'","poster_url":"'+url_poster+'","meta":{"video_status":"ready","video_id":"'+str(id_video)+'","video_filename":"a.mp4","hidden":false,"video_url":"'+url_video+'","featured_video":"","encrypt_method":"","duration":0,"original_duration":0}}'
 
     up_video = requests.post("https://gw.ganjingworld.com/v1.0c/update-content", headers={'Authorization':token,"Accept":"application/json","Accept-Encoding":"gzip, deflate, br, zstd"}, json=json.loads(d))
     print(up_video.json()) 
     if up_video.json()["result"]["message"]=="Ok":
         frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Đăng video thành công với account {email}:{password}\n')
+        frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Reup thành công video\n')
         frame_text_box.configure(state = "disabled")
+        return True
 
 def login_and_post(email, password, data, access_token=None):
     global total
     dem = int(change_account.get())
     list_data = get_content(data, dem)
+    if list_data==None:
+        open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password}|Lỗi channel {data}\n")
+        return
     if dem>len(list_data): dem = len(list_data)
+    total_dem = dem
+    frame_text_box.configure(state = "normal")
+    frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Reup {dem} Video\n')
+    frame_text_box.configure(state = "disabled")
     while dem>0:
         print(access_token)
         try:
@@ -323,10 +335,10 @@ def login_and_post(email, password, data, access_token=None):
                             frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
                             frame_text_box.configure(state = "disabled")
                             return None
+                        access_token = a.json()["data"]["token"]
                         frame_text_box.configure(state = "normal")
                         frame_text_box.insert(customtkinter.END, f'Đăng nhập thành công account {email}:{password}\n')
                         frame_text_box.configure(state = "disabled")
-                        access_token = a.json()["data"]["token"]
                         break
                     except Exception as e: 
                         print(f"Error login {str(e)}") 
@@ -342,22 +354,26 @@ def login_and_post(email, password, data, access_token=None):
         try:
             img = save_image(img)
             frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'Đang tải video với account {email}:{password}\n')
+            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đang tải video\n')
             frame_text_box.configure(state = "disabled")
             video = save_video(url_video)
             upload_video(access_token, title, description, video, img, email, password)
+            if upload_video(access_token, title, description, video, img, email, password)==None:
+                break
 
             total+=1
-            list_data.remove(list_data[dem-1])
             dem-=1
+            os.remove(video)
+            os.remove(img)
             time.sleep(int(delay.get()))
         except Exception as e:
+            os.remove(video)
             open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} in add post with account {email}:{password}\n")
             frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'Đăng Video không thành công với account {email}:{password}\n')
+            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đăng video không thành công\n')
             frame_text_box.configure(state = "disabled")
-            login_and_post(email, password, data, None)
     print(f"Done with acc {email}:{password}")
+    open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password} reup {total_dem-dem} Video\n")
 
 def update_sl():
     global total
