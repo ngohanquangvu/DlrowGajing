@@ -198,11 +198,7 @@ def RegAcc(index):
                         try:
                             a = requests.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}, proxies={"http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
                                     "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"}).json()
-                            if a["result"]["message"]=="Ok":
-                                break
-                            else:
-                                running[index]= [email,n,"Xác minh thất bại, xác minh lại tài khoản..."]
-                                open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không xác minh thành công|{a}\n")
+                            break
                         except: pass
                     if (a["result"]["message"]=="Ok"):
                         running[index]= [email,n,"Đã xác minh tài khoản"]
