@@ -93,12 +93,12 @@ def get_login_token():
         return token
     
 def get_id_channel(data):
-    return data.split("/")[-1]
+    return requests.get(data).text.split('https://www.youtube.com/channel/')[1].split('"')[0]
     
 def get_content(data, dem):
     channel_id = get_id_channel(data)
     if not os.path.isfile(f"./SaveData/{channel_id}.txt"):
-        open(f"./SaveData/{channel_id}.txt", 'w').close()
+        open(f"./SaveData/{channel_id}.txt", 'a').close()
     a = [i.strip("\n") for i in open(f"./SaveData/{channel_id}.txt", "r").readlines()]
     list_token = []
     api_key = "AIzaSyAF53lY6V6os-gzDs4xLnjEX4lk8e2Nkwc"
@@ -144,7 +144,6 @@ def get_webp_url(media_list):
 def upload_video(token, title, description, video_path, url_poster, email, password):
 
     h = {
-        'User-Agent': 'GJWAndroid v2.0.4(20000004); Debug=false; DefEnv=prod; DevOpts=false; BuildType=release; OS=REL(28); Model=SM-G988N; Manu=samsung',
         'Accept-Encoding':'gzip, deflate, br, zstd',
         'Authorization':token
     }
@@ -193,7 +192,8 @@ def upload_video(token, title, description, video_path, url_poster, email, passw
             headers=h_update,
             data=file_content  # Nội dung của file
         )
-        if response.headers["upload-offset"]==str(len(file_content)):
+        print(response.headers["upload-offset"], len(file_content))
+        if int(response.headers["upload-offset"])==int(len(file_content)):
             break
         else:
             h_update = {
@@ -239,6 +239,7 @@ def login_and_post(email, password, data, access_token=None):
     list_data = get_content(data, dem)
     if dem>len(list_data): dem = len(list_data)
     while dem>0:
+        print(access_token)
         try:
             hehe = list_data[dem-1]
             url_video = hehe[0]
@@ -322,6 +323,9 @@ def login_and_post(email, password, data, access_token=None):
                             frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
                             frame_text_box.configure(state = "disabled")
                             return None
+                        frame_text_box.configure(state = "normal")
+                        frame_text_box.insert(customtkinter.END, f'Đăng nhập thành công account {email}:{password}\n')
+                        frame_text_box.configure(state = "disabled")
                         access_token = a.json()["data"]["token"]
                         break
                     except Exception as e: 
@@ -350,7 +354,7 @@ def login_and_post(email, password, data, access_token=None):
         except Exception as e:
             open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} in add post with account {email}:{password}\n")
             frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'Đăng post không thành công với account {email}:{password}\n')
+            frame_text_box.insert(customtkinter.END, f'Đăng Video không thành công với account {email}:{password}\n')
             frame_text_box.configure(state = "disabled")
             login_and_post(email, password, data, None)
     print(f"Done with acc {email}:{password}")
@@ -375,7 +379,7 @@ def start():
             for thread in threads:
                 thread.join()
         frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ')
+        frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ\n')
         frame_text_box.configure(state = "disabled")
         os.system("rmdir /s /q ImageData")
         os.mkdir("./ImageData")  
