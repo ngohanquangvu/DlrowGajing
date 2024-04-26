@@ -171,6 +171,7 @@ def buffview(url, wait_time, n):
     dem = 0
 
     def open_and_wait(url, wait_time):
+        time.sleep(random.uniform(2, 4))
         driver = webdriver.Chrome(options=options)
         driver.set_window_size(300, 400) 
         driver.get(url)
