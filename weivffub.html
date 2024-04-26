@@ -108,6 +108,17 @@ def check_status():
         frame_text_box.insert(customtkinter.END, f'Vui lòng nhập Browser path\n')
         frame_text_box.configure(state = "disabled")
         d+=1
+
+    if date_entry.get()!="":
+        try:
+            time.strptime(date_entry, "%d/%m/%Y")
+        except:
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng ngày tháng năm\n')
+            frame_text_box.configure(state = "disabled")
+            d+=1    
+
+
     if d>0: return False
     else: return True
 
