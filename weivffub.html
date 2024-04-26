@@ -151,11 +151,22 @@ def get_proxy():
         list_key.remove(key)
         get_proxy()
 
+def check_proxy(proxy):
+    p = {
+        "http": f"http://{proxy}",
+        "https": f"http://{proxy}"
+    }
+    try:
+        a = requests.get("https://icanhazip.com/", proxies=p).text
+        return True
+    except:
+        return False
 
 def buffview(url, wait_time, n):
 
     options = Options()
     options.binary_location = browser_path.get()
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
     options = webdriver.ChromeOptions()
     if api_proxy!='None':
@@ -163,15 +174,20 @@ def buffview(url, wait_time, n):
         proxy = random.choice(list_proxy)
         options.add_argument(f'--proxy-server={proxy_type}://{proxy}')
     if len(list_key)>0:
-        proxy = get_proxy()
-        options.add_argument(f'--proxy-server=http://{proxy}')
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Đang lấy proxy\n')
+        frame_text_box.configure(state = "disabled")
+        while True:
+            proxy = get_proxy()
+            if check_proxy(proxy)==True:
+                options.add_argument(f'--proxy-server=http://{proxy}')
+                break
     
     slg = int(view_count.get())
     print(slg)
     dem = 0
 
     def open_and_wait(url, wait_time):
-        time.sleep(random.uniform(2, 4))
         driver = webdriver.Chrome(options=options)
         driver.set_window_size(300, 400) 
         driver.get(url)
@@ -191,11 +207,22 @@ def buffview(url, wait_time, n):
         driver.quit()
     while dem<slg:
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(open_and_wait, [url]*n, [wait_time]*n)
+            for url in [url]*n:
+                executor.submit(open_and_wait, url, wait_time)
+                time.sleep(random.randint(1,3))  # Thời gian chờ trước khi mở tab tiếp theo
         dem+=n
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Sent {dem} view success to {url}\n')
         frame_text_box.configure(state = "disabled")
+        try:  # For Windows
+                os.system('taskkill /F /IM chrome.exe')
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Clear tiến trình thành công\n')
+                frame_text_box.configure(state = "disabled")
+        except:  # For Linux
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Clear tiến trình không thành công\n')
+                frame_text_box.configure(state = "disabled")
 
 h = {
             'Accept':'application/json, text/plain, */*',
@@ -250,15 +277,6 @@ def start():
                 thread.start()
             for thread in threads:
                 thread.join()
-            try:  # For Windows
-                os.system('taskkill /F /IM chrome.exe')
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Clear tiến trình thành công\n')
-                frame_text_box.configure(state = "disabled")
-            except:  # For Linux
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Clear tiến trình không thành công\n')
-                frame_text_box.configure(state = "disabled")
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ\n')
         frame_text_box.configure(state = "disabled")
@@ -347,15 +365,16 @@ def open_file_video():
     file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose video file")
     if file_text_path!="":
         a = open(file_text_path, "r").readlines()
+        print(a)
         for cell in a:
-            if "https://www.ganjingworld.com/video" in cell.strip("\n"):
+            if "video" in cell.strip("\n"):
                 list_video.append(cell.strip("\n"))
             elif "channel" in cell.strip("\n"):
                 frame_text_box.configure(state = "normal")
                 frame_text_box.insert(customtkinter.END, f'Đang tiến hành lấy video từ kênh {cell.strip("\n")}\n')
                 frame_text_box.configure(state = "disabled")
                 list_video += get_video(cell.strip("\n"))
-                
+        
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Import success {len(list_video)} Video url\n')
         frame_text_box.configure(state = "disabled")
