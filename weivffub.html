@@ -174,9 +174,6 @@ def buffview(url, wait_time, n):
             proxy = random.choice(list_proxy)
             options.add_argument(f'--proxy-server={proxy_type}://{proxy}')
         if len(list_key)>0:
-            frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'Đang lấy proxy\n')
-            frame_text_box.configure(state = "disabled")
             while True:
                 proxy = get_proxy()
                 if check_proxy(proxy)==True:
@@ -185,11 +182,11 @@ def buffview(url, wait_time, n):
         driver = webdriver.Chrome(options=options)
         driver.set_window_size(300, 400) 
         driver.get(url)
-        wait = WebDriverWait(driver, 20)
+        wait = WebDriverWait(driver, 8)
         element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "vast-skip-button")))
 
         try:
-            wait = WebDriverWait(driver, 20)
+            wait = WebDriverWait(driver, 8)
             element = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'vast-skip-button enabled')]")))
 
             driver.execute_script("arguments[0].click();", element)
