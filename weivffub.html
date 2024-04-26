@@ -1,4 +1,3 @@
-
 app = customtkinter.CTk()
 app.title("Buffview Ganjinworld")
 app.geometry("450x420")
@@ -55,10 +54,11 @@ def get_homepage_content(language, page_size):
     return list_rs
 
 def check_status():
+    global list_video
     d = 0
     if len(list_proxy)==0 and api_proxy!="None":
         frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file account\n')
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file proxy\n')
         frame_text_box.configure(state = "disabled")
         d+=1
     if (api_proxy in options) == False:
