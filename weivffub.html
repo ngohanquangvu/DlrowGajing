@@ -137,16 +137,10 @@ def get_proxy():
     ip = my_ip()
     a = requests.get(f"https://apikey.site/key/get-new-ip?key={key}").json()
     if a["message"] == "SUCCESS":
-        if a["data"]["authIp"] == ip:
-            return f'{a["data"]["host"]}:{a["data"]["port"]}'
-        else:
-            get_proxy()
+        return f'{a["data"]["host"]}:{a["data"]["port"]}'
     elif a["message"] == "GET_IP_TOO_FAST":
         a = requests.get(f"https://apikey.site/key/get-current-ip?key={key}").json()
-        if a["data"]["authIp"] == ip:
-            return f'{a["data"]["host"]}:{a["data"]["port"]}'
-        else:
-            get_proxy()
+        return f'{a["data"]["host"]}:{a["data"]["port"]}'
     else:
         list_key.remove(key)
         get_proxy()
@@ -169,25 +163,25 @@ def buffview(url, wait_time, n):
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
     options = webdriver.ChromeOptions()
-    if api_proxy!='None':
-        proxy_type = api_proxy.lower()
-        proxy = random.choice(list_proxy)
-        options.add_argument(f'--proxy-server={proxy_type}://{proxy}')
-    if len(list_key)>0:
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Đang lấy proxy\n')
-        frame_text_box.configure(state = "disabled")
-        while True:
-            proxy = get_proxy()
-            if check_proxy(proxy)==True:
-                options.add_argument(f'--proxy-server=http://{proxy}')
-                break
     
     slg = int(view_count.get())
     print(slg)
     dem = 0
 
     def open_and_wait(url, wait_time):
+        if api_proxy!='None':
+            proxy_type = api_proxy.lower()
+            proxy = random.choice(list_proxy)
+            options.add_argument(f'--proxy-server={proxy_type}://{proxy}')
+        if len(list_key)>0:
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đang lấy proxy\n')
+            frame_text_box.configure(state = "disabled")
+            while True:
+                proxy = get_proxy()
+                if check_proxy(proxy)==True:
+                    options.add_argument(f'--proxy-server=http://{proxy}')
+                    break
         driver = webdriver.Chrome(options=options)
         driver.set_window_size(300, 400) 
         driver.get(url)
