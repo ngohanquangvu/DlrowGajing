@@ -1,6 +1,6 @@
 app = customtkinter.CTk()
 app.title("Buffview Ganjinworld")
-app.geometry("450x420")
+app.geometry("450x455")
 
 def stop():
     pass
@@ -54,7 +54,7 @@ def get_homepage_content(language, page_size):
     return list_rs
 
 def check_status():
-    global list_video
+    global list_video, language
     d = 0
     if len(list_proxy)==0 and api_proxy!="None":
         frame_text_box.configure(state = "normal")
@@ -76,19 +76,16 @@ def check_status():
         else:
             try:
                 check = int(post_count.get())
-                list_video = get_homepage_content(language.get(), check)
+                list_video = get_homepage_content(language, check)
                 frame_text_box.configure(state = "normal")
                 frame_text_box.insert(customtkinter.END, f'Import success {len(list_video)} Video url\n')
                 frame_text_box.configure(state = "disabled")
-            except:
+            except Exception as e:
+                print(str(e))
                 frame_text_box.configure(state = "normal")
                 frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số lượng post\n')
                 frame_text_box.configure(state = "disabled")
                 d+=1
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file url\n')
-        frame_text_box.configure(state = "disabled")
-        d+=1
 
     try:
         check = int(delay.get())
@@ -171,6 +168,30 @@ h = {
 
 token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
 
+def check_url(url, date):
+    uid = url.split("/")[-1]
+    timestamp = requests.get(f"https://gw.ganjingworld.com/v1.1/content/query?id={uid}&lang=vi-VN&ids={uid}&with_desc=true&query=basic&include_unlisted=true").json()["data"]["list"][0].get("time_scheduled")
+    timestamp = timestamp/1000
+    def timestamp_to_date(timestamp):
+        # Chuyển đổi timestamp thành struct_time
+        time_struct = time.localtime(timestamp)
+        
+        # Định dạng struct_time thành chuỗi ngày/tháng/năm
+        date_str = time.strftime("%d/%m/%Y", time_struct)
+        
+        return date_str
+
+    day, month, year = date.split("/")
+    
+    # Thêm 0 vào trước ngày và tháng nếu chúng chỉ có một chữ số
+    day = day.zfill(2)
+    month = month.zfill(2)
+    
+    date =  f"{day}/{month}/{year}"
+    if date == timestamp_to_date(timestamp):
+        return True
+    return False
+
 def start():
 
     def runn():
@@ -184,10 +205,24 @@ def start():
                 thread.start()
             for thread in threads:
                 thread.join()
+            try:  # For Windows
+                os.system('taskkill /F /IM chrome.exe')
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Clear tiến trình thành công\n')
+                frame_text_box.configure(state = "disabled")
+            except:  # For Linux
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Clear tiến trình không thành công\n')
+                frame_text_box.configure(state = "disabled")
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ\n')
         frame_text_box.configure(state = "disabled")
     if check_status():
+        if date_entry.get()!="":
+            list_video = [cell for cell in list_video if check_url(cell, date_entry.get())]
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Filter success {len(list_video)} Video url\n')
+            frame_text_box.configure(state = "disabled")
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Bắt đầu chạy...\n')
         frame_text_box.configure(state = "disabled")
@@ -338,8 +373,12 @@ drop_down_menu_language = customtkinter.CTkOptionMenu(data_frame, values=options
 drop_down_menu_language.set("Chọn loại ngôn ngữ")
 drop_down_menu_language.grid(row=1, column=0)
 
+date_entry = customtkinter.CTkEntry(app, width = 430, placeholder_text="Nhập đúng định dạng ngày tháng năm (dd/mm/yyyy)")
+date_entry.grid(row = 5, column = 0, pady = (5, 5), padx = 5)
+
+
 frame_text_box = customtkinter.CTkTextbox(app, width = 430, height= 190)
-frame_text_box.grid(row = 5, column = 0, pady = (5, 5), padx = 5)
+frame_text_box.grid(row = 6, column = 0, pady = (5, 5), padx = 5)
 frame_text_box.configure(state = "disabled")
 
 app.mainloop()
