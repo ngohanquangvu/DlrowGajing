@@ -237,7 +237,7 @@ def check_url(url, date):
     return False
 
 def start():
-
+    global list_video
     def runn():
         for i in range(0, len(list_video), int(luong.get())):
             threads = []
