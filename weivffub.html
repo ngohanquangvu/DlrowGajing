@@ -1,11 +1,58 @@
+
 app = customtkinter.CTk()
 app.title("Buffview Ganjinworld")
-app.geometry("450x390")
+app.geometry("450x420")
 
 def stop():
     pass
 
 total = 0
+
+def get_language_code(language):
+    language_codes = {
+        "Vietnamese": "vi-VN",
+        "English": "en-US",
+        "Taiwanese": "zh-TW",
+        "Chinese": "zh-CN",
+        "Japanese": "ja-JP",
+        "Korean": "ko-KR",
+        "German": "de-DE",
+        "Spanish": "es-ES",
+        "French": "fr-FR",
+        "Indonesian": "id-ID",
+        "Italian": "it-IT",
+        "Russian": "ru-RU",
+    }
+    print(list(language_codes.keys()))
+    return language_codes.get(language, "en-US")
+
+def get_homepage_content(language, page_size):
+    language_code = get_language_code(language)
+    if page_size <=100:
+        url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
+        response = requests.get(url)
+        list_content = response.json()["data"]["list"]
+        list_rs = []
+        for i in list_content:
+            if i["type"] == "Video":
+                list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+    else:
+        while page_size > 100:
+            url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size=100"
+            response = requests.get(url)
+            list_content = response.json()["data"]["list"]
+            for i in list_content:
+                if i["type"] == "Video":
+                    list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+            page_size -= 100
+        if page_size > 0:
+            url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
+            response = requests.get(url)
+            list_content = response.json()["data"]["list"]
+            for i in list_content:
+                if i["type"] == "Video":
+                    list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+    return list_rs
 
 def check_status():
     d = 0
@@ -21,6 +68,23 @@ def check_status():
         d+=1
     
     if len(list_video)==0:
+        if post_count.get()=="" or post_count.get()=="0":
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Vui lòng nhập số lượng post hoặc nhập file url\n')
+            frame_text_box.configure(state = "disabled")
+            d+=1
+        else:
+            try:
+                check = int(post_count.get())
+                list_video = get_homepage_content(language.get(), check)
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Import success {len(list_video)} Video url\n')
+                frame_text_box.configure(state = "disabled")
+            except:
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số lượng post\n')
+                frame_text_box.configure(state = "disabled")
+                d+=1
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file url\n')
         frame_text_box.configure(state = "disabled")
@@ -44,7 +108,7 @@ def check_status():
 
     if browser_path=="":
         frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số bài đăng\n')
+        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập Browser path\n')
         frame_text_box.configure(state = "disabled")
         d+=1
     if d>0: return False
@@ -260,7 +324,21 @@ drop_down_menu = customtkinter.CTkOptionMenu(data_frame, values=options, command
 drop_down_menu.set("Chọn loại proxy")
 drop_down_menu.grid(row=0, column=0)
 
-frame_text_box = customtkinter.CTkTextbox(app, width = 430, height= 195)
+post_count = customtkinter.CTkEntry(data_frame, width = 210, placeholder_text="Số Post từ trang chủ")
+post_count.grid(row = 1, column = 1)
+
+language = customtkinter.StringVar()
+
+def select_option_language(event):
+    global language
+    language = drop_down_menu.get()
+
+options_language = ['Vietnamese', 'English', 'Taiwanese', 'Chinese', 'Japanese', 'Korean', 'German', 'Spanish', 'French', 'Indonesian', 'Italian', 'Russian']
+drop_down_menu_language = customtkinter.CTkOptionMenu(data_frame, values=options_language, command=select_option_language, width=210, height=30)
+drop_down_menu_language.set("Chọn loại ngôn ngữ")
+drop_down_menu_language.grid(row=1, column=0)
+
+frame_text_box = customtkinter.CTkTextbox(app, width = 430, height= 190)
 frame_text_box.grid(row = 5, column = 0, pady = (5, 5), padx = 5)
 frame_text_box.configure(state = "disabled")
 
