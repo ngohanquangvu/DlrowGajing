@@ -122,6 +122,22 @@ def check_status():
     if d>0: return False
     else: return True
 
+list_key = ['f527a2d0-f831-b98a-827259a3c6be','3257208e-c61d-806d-b282fb7cb975','16f46cb8-bb37-af85-0610f8f5e626','1f0d3a6d-160b-8adb-25149423ca4a','e1db9c5a-b893-aa50-65dc5af552f7','e4caefa1-cc8f-9576-4cd75b80af62']
+
+def get_proxy():
+    global list_key
+    key = random.choice(list_key)
+    a = requests.get(f"https://apikey.site/key/get-new-ip?key={key}").json()
+    if a["message"] == "SUCCESS":
+        return f'{a["data"]["host"]}:{a["data"]["port"]}'
+    elif a["message"] == "GET_IP_TOO_FAST":
+        a = requests.get(f"https://apikey.site/key/get-current-ip?key={key}").json()
+        return f'{a["data"]["host"]}:{a["data"]["port"]}'
+    else:
+        list_key.remove(key)
+        get_proxy()
+
+
 def buffview(url, wait_time, n):
 
     options = Options()
@@ -132,6 +148,9 @@ def buffview(url, wait_time, n):
         proxy_type = api_proxy.lower()
         proxy = random.choice(list_proxy)
         options.add_argument(f'--proxy-server={proxy_type}://{proxy}')
+    if len(list_key)>0:
+        proxy = get_proxy()
+        options.add_argument(f'--proxy-server=http://{proxy}')
     
     slg = int(view_count.get())
     print(slg)
