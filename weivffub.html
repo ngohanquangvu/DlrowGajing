@@ -124,15 +124,29 @@ def check_status():
 
 list_key = ['f527a2d0-f831-b98a-827259a3c6be','3257208e-c61d-806d-b282fb7cb975','16f46cb8-bb37-af85-0610f8f5e626','1f0d3a6d-160b-8adb-25149423ca4a','e1db9c5a-b893-aa50-65dc5af552f7','e4caefa1-cc8f-9576-4cd75b80af62']
 
+def my_ip():
+    try:
+        ip = requests.get("https://api.ipify.org").text
+        return ip
+    except:
+        return "Unable to get your IP"
+
 def get_proxy():
     global list_key
     key = random.choice(list_key)
+    ip = my_ip()
     a = requests.get(f"https://apikey.site/key/get-new-ip?key={key}").json()
     if a["message"] == "SUCCESS":
-        return f'{a["data"]["host"]}:{a["data"]["port"]}'
+        if a["data"]["authIp"] == ip:
+            return f'{a["data"]["host"]}:{a["data"]["port"]}'
+        else:
+            get_proxy()
     elif a["message"] == "GET_IP_TOO_FAST":
         a = requests.get(f"https://apikey.site/key/get-current-ip?key={key}").json()
-        return f'{a["data"]["host"]}:{a["data"]["port"]}'
+        if a["data"]["authIp"] == ip:
+            return f'{a["data"]["host"]}:{a["data"]["port"]}'
+        else:
+            get_proxy()
     else:
         list_key.remove(key)
         get_proxy()
