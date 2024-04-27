@@ -1,306 +1,166 @@
-app = customtkinter.CTk()
-app.title("Buffview Ganjinworld")
-app.geometry("450x455")
+list_login_token = []
 
-def stop():
-    pass
-
-total = 0
-
-def get_language_code(language):
-    language_codes = {
-        "Vietnamese": "vi-VN",
-        "English": "en-US",
-        "Taiwanese": "zh-TW",
-        "Chinese": "zh-CN",
-        "Japanese": "ja-JP",
-        "Korean": "ko-KR",
-        "German": "de-DE",
-        "Spanish": "es-ES",
-        "French": "fr-FR",
-        "Indonesian": "id-ID",
-        "Italian": "it-IT",
-        "Russian": "ru-RU",
-    }
-    print(list(language_codes.keys()))
-    return language_codes.get(language, "en-US")
-
-def get_homepage_content(language, page_size):
-    language_code = get_language_code(language)
-    if page_size <=100:
-        url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
-        response = requests.get(url)
-        list_content = response.json()["data"]["list"]
-        list_rs = []
-        for i in list_content:
-            if i["type"] == "Video":
-                list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+def get_login_token():
+    global list_login_token
+    if len(list_login_token) != 0:
+        return random.choice(list_login_token)
     else:
-        while page_size > 100:
-            url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size=100"
-            response = requests.get(url)
-            list_content = response.json()["data"]["list"]
-            for i in list_content:
-                if i["type"] == "Video":
-                    list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
-            page_size -= 100
-        if page_size > 0:
-            url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
-            response = requests.get(url)
-            list_content = response.json()["data"]["list"]
-            for i in list_content:
-                if i["type"] == "Video":
-                    list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
-    return list_rs
-
-def check_status():
-    global list_video, language
-    d = 0
-    if len(list_proxy)==0 and api_proxy!="None":
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập file proxy\n')
-        frame_text_box.configure(state = "disabled")
-        d+=1
-    if (api_proxy in options) == False:
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng chọn loại proxy\n')
-        frame_text_box.configure(state = "disabled")
-        d+=1
-    
-    if len(list_video)==0:
-        if post_count.get()=="" or post_count.get()=="0":
-            frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'Vui lòng nhập số lượng post hoặc nhập file url\n')
-            frame_text_box.configure(state = "disabled")
-            d+=1
-        else:
-            try:
-                check = int(post_count.get())
-                list_video = get_homepage_content(language, check)
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Import success {len(list_video)} Video url\n')
-                frame_text_box.configure(state = "disabled")
-            except Exception as e:
-                print(str(e))
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số lượng post\n')
-                frame_text_box.configure(state = "disabled")
-                d+=1
-
-    try:
-        check = int(delay.get())
-    except:
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của thời gian xem\n')
-        frame_text_box.configure(state = "disabled")
-        d+=1
-    
-    try:
-        check = int(luong.get())
-    except:
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng của số luồng\n')
-        frame_text_box.configure(state = "disabled")
-        d+=1
-
-    if browser_path=="":
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Vui lòng nhập Browser path\n')
-        frame_text_box.configure(state = "disabled")
-        d+=1
-
-    if date_entry.get()!="":
-        try:
-            time.strptime(date_entry, "%d/%m/%Y")
-        except:
-            frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'Vui lòng nhập đúng định dạng ngày tháng năm\n')
-            frame_text_box.configure(state = "disabled")
-            d+=1    
-
-
-    if d>0: return False
-    else: return True
-
-list_key = ['f527a2d0-f831-b98a-827259a3c6be','3257208e-c61d-806d-b282fb7cb975','16f46cb8-bb37-af85-0610f8f5e626','1f0d3a6d-160b-8adb-25149423ca4a','e1db9c5a-b893-aa50-65dc5af552f7','e4caefa1-cc8f-9576-4cd75b80af62']
-
-def my_ip():
-    try:
-        ip = requests.get("https://api.ipify.org").text
-        return ip
-    except:
-        return "Unable to get your IP"
-
-def get_proxy():
-    global list_key
-    key = random.choice(list_key)
-    ip = my_ip()
-    a = requests.get(f"https://apikey.site/key/get-new-ip?key={key}").json()
-    if a["message"] == "SUCCESS":
-        return f'{a["data"]["host"]}:{a["data"]["port"]}'
-    elif a["message"] == "GET_IP_TOO_FAST":
-        a = requests.get(f"https://apikey.site/key/get-current-ip?key={key}").json()
-        return f'{a["data"]["host"]}:{a["data"]["port"]}'
-    else:
-        list_key.remove(key)
-        get_proxy()
-
-def check_proxy(proxy):
-    p = {
-        "http": f"http://{proxy}",
-        "https": f"http://{proxy}"
-    }
-    try:
-        a = requests.get("https://icanhazip.com/", proxies=p).text
-        return True
-    except:
-        return False
-
-def buffview(url, wait_time, n):
-
-    options = Options()
-    options.binary_location = browser_path.get()
-    options.add_experimental_option('excludeSwitches', ['enable-logging'])
-
-    options = webdriver.ChromeOptions()
-    
-    slg = int(view_count.get())
-    print(slg)
-    dem = 0
-
-    def open_and_wait(url, wait_time):
-        if api_proxy!='None':
-            proxy_type = api_proxy.lower()
-            proxy = random.choice(list_proxy)
-            options.add_argument(f'--proxy-server={proxy_type}://{proxy}')
-        if len(list_key)>0:
-            while True:
-                proxy = get_proxy()
-                if check_proxy(proxy)==True:
-                    options.add_argument(f'--proxy-server=http://{proxy}')
-                    break
-        driver = webdriver.Chrome(options=options)
-        driver.set_window_size(300, 400) 
-        driver.get(url)
-        wait = WebDriverWait(driver, 8)
-        element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "vast-skip-button")))
-
-        try:
-            wait = WebDriverWait(driver, 8)
-            element = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'vast-skip-button enabled')]")))
-
-            driver.execute_script("arguments[0].click();", element)
-            print("Skip ads")
-        except Exception as e:
-            print("chưa thể skip")
-            pass
-        time.sleep(wait_time)
-        driver.quit()
-    while dem<slg:
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for url in [url]*n:
-                executor.submit(open_and_wait, url, wait_time)
-                time.sleep(random.randint(1,3))  # Thời gian chờ trước khi mở tab tiếp theo
-        dem+=n
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Sent {dem} view success to {url}\n')
-        frame_text_box.configure(state = "disabled")
-        try:  # For Windows
-                os.system('taskkill /F /IM chrome.exe')
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Clear tiến trình thành công\n')
-                frame_text_box.configure(state = "disabled")
-        except:  # For Linux
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Clear tiến trình không thành công\n')
-                frame_text_box.configure(state = "disabled")
-
-h = {
-            'Accept':'application/json, text/plain, */*',
+        h = {
             'Accept-Encoding':'gzip, deflate, br',
             'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
             'Content-Length':'2',
             'Content-Type':'application/json',
             'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
-            'Gjw-Sign':'0e672e93014dec4954943be0dddbdc1e',
-            'Gjw-Ts':'1711134553944',
-            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
-            'X-Cdk-Lrtm':'2024-03-23 02:09:13',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
             'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
         }
+        global_proxy = {
+            "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
+            "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
+        }
+        while True:
+            if len(list_login_token) != 0:
+                return random.choice(list_login_token)
+            try:
+                token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=global_proxy).json()["data"]["accessToken"]
+                list_login_token.append(token)
+                return token
+            except: pass
+h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
+try:
+    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+    list_login_token.append(token)
+except: 
+    pass
 
-token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
 
-def check_url(url, date):
+def buff_view(url, index):
+    global running
+    running[index] = [f"Loading", url, "Đang lấy thông tin video"]
     uid = url.split("/")[-1]
-    timestamp = requests.get(f"https://gw.ganjingworld.com/v1.1/content/query?id={uid}&lang=vi-VN&ids={uid}&with_desc=true&query=basic&include_unlisted=true").json()["data"]["list"][0].get("time_scheduled")
-    timestamp = timestamp/1000
-    def timestamp_to_date(timestamp):
-        # Chuyển đổi timestamp thành struct_time
-        time_struct = time.localtime(timestamp)
-        
-        # Định dạng struct_time thành chuỗi ngày/tháng/năm
-        date_str = time.strftime("%d/%m/%Y", time_struct)
-        
-        return date_str
 
-    day, month, year = date.split("/")
+    h = {
+                'Accept':'application/json, text/plain, */*',
+                'Accept-Encoding':'gzip, deflate, br',
+                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                'Content-Length':'2',
+                'Content-Type':'application/json',
+                'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+                'Gjw-Sign':'0e672e93014dec4954943be0dddbdc1e',
+                'Gjw-Ts':'1711134553944',
+                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+                'X-Cdk-Lrtm':'2024-03-23 02:09:13',
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            }
+
+    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+
+
+    d = {
+        "id":uid,
+    }
+    h = {
+        "Authorization":token,
+    }
+
+
+    a = requests.post("https://gw.ganjingworld.com/v1.0c/get-content-url", json=d, headers=h).json()
+
+    m3u8_url = a["data"]["url"]
+
+    def duration_by_url(url: str) -> int:
+        try:
+            playlist = m3u8.load(url)
+            if playlist.playlists:
+                return duration_by_url(playlist.playlists[0].absolute_uri)
+            return int(sum(x.duration for x in playlist.segments))
+        except Exception:
+            return 0
+    duration = duration_by_url(m3u8_url)
+
+    d = {
+        "lan": "vi-VN",
+        "position_sec": random.uniform(0, duration),
+        "video_id":uid
+    }
+
+
+    d = {
+        "id":uid,
+    }
+
+    running[index] = ["Loading", url, "Lấy thông tin thành công"]
+    current_view = int()
+    while True:
+        count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h).json()
+        try:
+            running[index] = ["Sending view", url, f"{current_view} views"]
+
+            if count["data"]["view_count"]>current_view:
+                current_view = count["data"]["view_count"]
+                running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
+            else:
+                running[index] = ["Sending view", url, f"{current_view} views"]
+
+            time.sleep(delay)
+        except Exception as e:
+            open("error.txt", "a").write(f"{str(e)} | {count}\n")
+            running[index] = ["Sent view unsuccessfully", url, f"{current_view} views"]
+            time.sleep(delay)
+
+def checking():
+    global running, success, custom, slg_acc, start_time, status
+    while status:
+        for j in range(len(running)):
+            if running[j][0]=="Sent view successfully":
+                print(f"\033[32mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            elif running[j][2]=="Sending view":
+                print(f"\033[33mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            elif running[j][2]=="Sent view unsuccessfully":
+                print(f"\033[31mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            else:
+                print(f"\033[36mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+        end_time = time.time()
+
+        execution_time = end_time - start_time
+        hours, rem = divmod(execution_time, 3600)
+        minutes, seconds = divmod(rem, 60)
+        formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
+
+        print(f"\033[33mProcess: {formatted_time}\033[0m")
+        time.sleep(1)
+        os.system('cls')
     
-    # Thêm 0 vào trước ngày và tháng nếu chúng chỉ có một chữ số
-    day = day.zfill(2)
-    month = month.zfill(2)
-    
-    date =  f"{day}/{month}/{year}"
-    if date == timestamp_to_date(timestamp):
-        return True
-    return False
 
-def start():
-    global list_video
-    def runn():
-        for i in range(0, len(list_video), int(luong.get())):
-            threads = []
-            aaa = list_video[i:i+int(luong.get())]
-            for j in range(len(aaa)):
-                acc = aaa[j]
-                threads.append(threading.Thread(target=buffview, args=(acc, int(delay.get()), int(number_of_tab.get()))))
-            for thread in threads:
-                thread.start()
-            for thread in threads:
-                thread.join()
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ\n')
-        frame_text_box.configure(state = "disabled")
-    if check_status():
-        if date_entry.get()!="":
-            list_video = [cell for cell in list_video if check_url(cell, date_entry.get())]
-            frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'Filter success {len(list_video)} Video url\n')
-            frame_text_box.configure(state = "disabled")
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Bắt đầu chạy...\n')
-        frame_text_box.configure(state = "disabled")
-        threading.Thread(target=runn).start()
-
-
-
-list_proxy = []
-
-def open_file_proxy():
-    global list_proxy
-    from tkinter import filedialog
-    file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose proxy file")
-    if file_text_path!="":
-        a = open(file_text_path, "r").readlines()
-        for cell in a:
-                list_proxy.append(cell.strip("\n"))
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Import success {len(list_proxy)} Proxies\n')
-        frame_text_box.configure(state = "disabled")
-
-list_video = []
 list_token = []
-list_token.append(token)
 
 def get_video(channel):
 
@@ -350,90 +210,54 @@ def get_video(channel):
         try: list_token.remove(token)
         except: pass
         return get_video(channel)
-def open_file_video():
-    global list_video
-    from tkinter import filedialog
-    file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose video file")
-    if file_text_path!="":
-        a = open(file_text_path, "r").readlines()
-        print(a)
-        for cell in a:
-            if "video" in cell.strip("\n"):
-                list_video.append(cell.strip("\n"))
-            elif "channel" in cell.strip("\n"):
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'Đang tiến hành lấy video từ kênh {cell.strip("\n")}\n')
-                frame_text_box.configure(state = "disabled")
-                list_video += get_video(cell.strip("\n"))
-        
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'Import success {len(list_video)} Video url\n')
-        frame_text_box.configure(state = "disabled")
 
-def run_open_file():
-    threading.Thread(target=open_file_video).start()
+while True:
+    try:
+        a = input("Enter to import file")
+        list_open = open(filedialog.askopenfilename(title="Select file", filetypes=(("Text files", "*.txt"),("all files", "*.*"))), "r", encoding="utf-8", errors="replace").read().split("\n")
+        break
+    except:
+        os.system("cls")
+        pass
+print("Đang nhập video...")
+list_url = []
+for i in list_open:
+    if "/video/" in i:
+        list_url.append(i)
+    elif "/channel/" in i:
+        list_url+=get_video(i)
+    else:
+        list_url.remove(i)
+os.system("cls")
+print(f"Đã tìm thấy {len(list_url)} video")
+view = int(input("Enter the number of views: "))
+delay = int(input("Enter the delay time (s): "))
+luong = int(input("Enter the number of threads: "))
+os.system("cls")
+running = [['','',''] for _ in range(luong)]
+status = True
+start_time = time.time()
+t = threading.Thread(target=checking)
+t.start()
+for i in range(0, len(list_url), luong):
+    threads = []
+    aaa = list_url[i:i+luong]
+    for i in aaa:
+        threads.append(threading.Thread(target=buff_view, args=(i,aaa.index(i))))
+    for j in threads:
+        j.start()
+    for j in threads:
+        j.join()
+    print("--------------------")
+    print(f"Sent view to {len(aaa)} videos complete")
+    print("--------------------")
+status = False
+t.join()
+end_time = time.time()
 
-
-infor_input = customtkinter.CTkFrame(app, width = 430)
-infor_input.grid(row = 0, column = 0, padx = 20, pady = (20, 10))
-delay = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Thời gian xem")
-delay.grid(row = 0, column = 0, padx = (0, 0))
-luong = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Luồng")
-luong.grid(row = 0, column = 1, padx = (5, 0))
-browser_path = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="browser path")
-browser_path.grid(row = 0, column = 2, padx = (0, 5))
-number_of_tab = customtkinter.CTkEntry(infor_input, width = 100, placeholder_text="Số tab")
-number_of_tab.grid(row = 0, column = 3, padx = (0, 0))
-
-button_frame = customtkinter.CTkFrame(app, width = 260, height= 50)
-button_frame.grid(row = 2, column = 0, pady = 10)
-
-start_button = customtkinter.CTkButton(button_frame, width = 136, height = 50, text = 'Start', command=start)
-start_button.grid(row = 0, column = 1, padx = (0,0))
-
-stop_button = customtkinter.CTkButton(button_frame, width = 136, height = 50, text = 'Proxy', command=open_file_proxy)
-stop_button.grid(row = 0, column = 2, padx = (10,10))
-
-file_button = customtkinter.CTkButton(button_frame, width = 136, height = 50, text = 'Url Video', command=run_open_file)
-file_button.grid(row = 0, column = 3, padx = (0,0))
-
-data_frame = customtkinter.CTkFrame(app, width = 430, height= 50)
-data_frame.grid(row = 4, column = 0, pady = 10)
-
-view_count = customtkinter.CTkEntry(data_frame, width = 210, placeholder_text="Số view")
-view_count.grid(row = 0, column = 1)
-
-api_proxy = customtkinter.StringVar()
-
-def select_option(event):
-    global api_proxy
-    api_proxy = drop_down_menu.get()
-
-options = ["None", "Http", "Socks4", "Socks5"]
-drop_down_menu = customtkinter.CTkOptionMenu(data_frame, values=options, command=select_option, width=210, height=30)
-drop_down_menu.set("Chọn loại proxy")
-drop_down_menu.grid(row=0, column=0)
-
-post_count = customtkinter.CTkEntry(data_frame, width = 210, placeholder_text="Số Post từ trang chủ")
-post_count.grid(row = 1, column = 1)
-
-language = customtkinter.StringVar()
-
-def select_option_language(event):
-    global language
-    language = drop_down_menu.get()
-
-options_language = ['Vietnamese', 'English', 'Taiwanese', 'Chinese', 'Japanese', 'Korean', 'German', 'Spanish', 'French', 'Indonesian', 'Italian', 'Russian']
-drop_down_menu_language = customtkinter.CTkOptionMenu(data_frame, values=options_language, command=select_option_language, width=210, height=30)
-drop_down_menu_language.set("Chọn loại ngôn ngữ")
-drop_down_menu_language.grid(row=1, column=0)
-
-date_entry = customtkinter.CTkEntry(app, width = 430, placeholder_text="Nhập đúng định dạng ngày tháng năm (dd/mm/yyyy)")
-date_entry.grid(row = 5, column = 0, pady = (5, 5), padx = 5)
-
-
-frame_text_box = customtkinter.CTkTextbox(app, width = 430, height= 190)
-frame_text_box.grid(row = 6, column = 0, pady = (5, 5), padx = 5)
-frame_text_box.configure(state = "disabled")
-
-app.mainloop()
+execution_time = end_time - start_time
+hours, rem = divmod(execution_time, 3600)
+minutes, seconds = divmod(rem, 60)
+formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
+print(f"\033[32mProcess: {formatted_time}\033[0m  | Sent view complete")
+end = input("Press Enter to exit")
