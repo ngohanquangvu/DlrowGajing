@@ -81,31 +81,19 @@ def buff_view(url, index):
         else:
             
             get_proxy()
-
-    pr = get_proxy()
-    p = {
-        "http":f"http://{pr}",
-        "https":f"http://{pr}"
-    }
+    while True:
+        try:
+            pr = get_proxy()
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            break
+        except:
+            time.sleep(1)
     running[index] = [f"Loading", url, "Đang lấy thông tin video"]
     uid = url.split("/")[-1]
-
-    h = {
-                'Accept':'application/json, text/plain, */*',
-                'Accept-Encoding':'gzip, deflate, br',
-                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-                'Content-Length':'2',
-                'Content-Type':'application/json',
-                'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
-                'Gjw-Sign':'0e672e93014dec4954943be0dddbdc1e',
-                'Gjw-Ts':'1711134553944',
-                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
-                'X-Cdk-Lrtm':'2024-03-23 02:09:13',
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-            }
-
-    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=p).json()["data"]["accessToken"]
-
+    token = get_login_token()
 
     d = {
         "id":uid,
@@ -114,10 +102,24 @@ def buff_view(url, index):
         "Authorization":token,
     }
 
+    while True:
+        while True:
+            try:
+                pr = get_proxy()
+                p = {
+                    "http":f"http://{pr}",
+                    "https":f"http://{pr}"
+                }
+                break
+            except:
+                time.sleep(1)
+        try:
+            a = requests.post("https://gw.ganjingworld.com/v1.0c/get-content-url", json=d, headers=h, proxies=p).json()
 
-    a = requests.post("https://gw.ganjingworld.com/v1.0c/get-content-url", json=d, headers=h, proxies=p).json()
-
-    m3u8_url = a["data"]["url"]
+            m3u8_url = a["data"]["url"]
+            break
+        except:
+            time.sleep(1)
 
     def duration_by_url(url: str) -> int:
         try:
@@ -168,11 +170,17 @@ def buff_view(url, index):
                 
                 get_proxy()
 
-        pr = get_proxy()
-        p = {
-            "http":f"http://{pr}",
-            "https":f"http://{pr}"
-        }
+
+        while True:
+            try:
+                pr = get_proxy()
+                p = {
+                    "http":f"http://{pr}",
+                    "https":f"http://{pr}"
+                }
+                break
+            except:
+                time.sleep(1)
         try:
             running[index] = ["Sending view", url, f"{current_view} views"]
             count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
@@ -199,10 +207,10 @@ def checking():
             if running[j][0]=="Sent view successfully":
                 print(f"\033[32mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
                 print("")
-            elif running[j][2]=="Sending view":
+            elif running[j][0]=="Sending view":
                 print(f"\033[33mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
                 print("")
-            elif running[j][2]=="Sent view unsuccessfully":
+            elif running[j][0]=="Sent view unsuccessfully":
                 print(f"\033[31mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
                 print("")
             else:
