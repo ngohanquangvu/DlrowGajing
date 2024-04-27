@@ -267,8 +267,10 @@ t.start()
 for i in range(0, len(list_url), luong):
     threads = []
     aaa = list_url[i:i+luong]
+    index = 0
     for i in aaa:
-        threads.append(threading.Thread(target=buff_view, args=(i,aaa.index(i))))
+        threads.append(threading.Thread(target=buff_view, args=(i,index)))
+        index+=1
     for j in threads:
         j.start()
     for j in threads:
