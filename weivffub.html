@@ -54,9 +54,11 @@ try:
 except: 
     pass
 
+list_uid = []
+list_duration = []
 
 def buff_view(url, index):
-    global running, view
+    global running, view, list_uid, list_duration
     def my_ip():
         try:
             ip = requests.get("https://api.ipify.org").text
@@ -93,6 +95,8 @@ def buff_view(url, index):
             time.sleep(1)
     running[index] = [f"Loading", url, "Đang lấy thông tin video"]
     uid = url.split("/")[-1]
+    if uid not in list_uid:
+        list_uid.append(uid)
     token = get_login_token()
 
     d = {
@@ -100,46 +104,6 @@ def buff_view(url, index):
     }
     h = {
         "Authorization":token,
-    }
-
-    while True:
-        while True:
-            try:
-                pr = get_proxy()
-                p = {
-                    "http":f"http://{pr}",
-                    "https":f"http://{pr}"
-                }
-                break
-            except:
-                time.sleep(1)
-        try:
-            a = requests.post("https://gw.ganjingworld.com/v1.0c/get-content-url", json=d, headers=h, proxies=p).json()
-
-            m3u8_url = a["data"]["url"]
-            break
-        except:
-            time.sleep(1)
-
-    def duration_by_url(url: str) -> int:
-        try:
-            playlist = m3u8.load(url)
-            if playlist.playlists:
-                return duration_by_url(playlist.playlists[0].absolute_uri)
-            return int(sum(x.duration for x in playlist.segments))
-        except Exception:
-            return 0
-    duration = duration_by_url(m3u8_url)
-
-    d = {
-        "lan": "vi-VN",
-        "position_sec": random.uniform(0, duration),
-        "video_id":uid
-    }
-
-
-    d = {
-        "id":uid,
     }
 
     running[index] = ["Loading", url, "Lấy thông tin thành công"]
