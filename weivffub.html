@@ -22,10 +22,7 @@ def get_login_token():
             'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
             'X-Cdk-Lrtm':'2024-03-15 20:48:30',
         }
-        global_proxy = {
-            "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
-            "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
-        }
+        global_proxy = None
         while True:
             if len(list_login_token) != 0:
                 return random.choice(list_login_token)
