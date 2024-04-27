@@ -116,9 +116,39 @@ def buff_view(url, index):
     running[index] = ["Loading", url, "Lấy thông tin thành công"]
     current_view = int()
     while True:
-        count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h).json()
+        def my_ip():
+            try:
+                ip = requests.get("https://api.ipify.org").text
+                return ip
+            except:
+                return "Unable to get your IP"
+
+        def get_proxy():
+            key = random.choice(['f527a2d0-f831-b98a-827259a3c6be','3257208e-c61d-806d-b282fb7cb975','16f46cb8-bb37-af85-0610f8f5e626','1f0d3a6d-160b-8adb-25149423ca4a','e1db9c5a-b893-aa50-65dc5af552f7','e4caefa1-cc8f-9576-4cd75b80af62'])
+            a = requests.get(f"https://apikey.site/key/get-new-ip?key={key}").json()
+            if a["message"] == "SUCCESS":
+                if a["data"]["authIp"] == my_ip():
+                    return f'{a["data"]["host"]}:{a["data"]["port"]}'
+                else:
+                    get_proxy()
+            elif a["message"] == "GET_IP_TOO_FAST":
+                a = requests.get(f"https://apikey.site/key/get-current-ip?key={key}").json()
+                if a["data"]["authIp"] == my_ip():
+                    return f'{a["data"]["host"]}:{a["data"]["port"]}'
+                else:
+                    get_proxy()
+            else:
+                
+                get_proxy()
+
+        pr = get_proxy()
+        p = {
+            "http":f"http://{pr}",
+            "https":f"http://{pr}"
+        }
         try:
             running[index] = ["Sending view", url, f"{current_view} views"]
+            count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
 
             if count["data"]["view_count"]>current_view:
                 current_view = count["data"]["view_count"]
@@ -128,7 +158,7 @@ def buff_view(url, index):
 
             time.sleep(delay)
         except Exception as e:
-            open("error.txt", "a").write(f"{str(e)} | {count}\n")
+            open("error.txt", "a").write(f"{str(e)}\n")
             running[index] = ["Sent view unsuccessfully", url, f"{current_view} views"]
             time.sleep(delay)
 
