@@ -59,40 +59,6 @@ list_duration = []
 
 def buff_view(url, index):
     global running, view, list_uid, list_duration
-    def my_ip():
-        try:
-            ip = requests.get("https://api.ipify.org").text
-            return ip
-        except:
-            return "Unable to get your IP"
-
-    def get_proxy():
-        key = random.choice(['f527a2d0-f831-b98a-827259a3c6be','3257208e-c61d-806d-b282fb7cb975','16f46cb8-bb37-af85-0610f8f5e626','1f0d3a6d-160b-8adb-25149423ca4a','e1db9c5a-b893-aa50-65dc5af552f7','e4caefa1-cc8f-9576-4cd75b80af62'])
-        a = requests.get(f"https://apikey.site/key/get-new-ip?key={key}").json()
-        if a["message"] == "SUCCESS":
-            if a["data"]["authIp"] == my_ip():
-                return f'{a["data"]["host"]}:{a["data"]["port"]}'
-            else:
-                get_proxy()
-        elif a["message"] == "GET_IP_TOO_FAST":
-            a = requests.get(f"https://apikey.site/key/get-current-ip?key={key}").json()
-            if a["data"]["authIp"] == my_ip():
-                return f'{a["data"]["host"]}:{a["data"]["port"]}'
-            else:
-                get_proxy()
-        else:
-            
-            get_proxy()
-    while True:
-        try:
-            pr = get_proxy()
-            p = {
-                "http":f"http://{pr}",
-                "https":f"http://{pr}"
-            }
-            break
-        except:
-            time.sleep(1)
     running[index] = [f"Loading", url, "Đang lấy thông tin video"]
     uid = url.split("/")[-1]
     if uid not in list_uid:
