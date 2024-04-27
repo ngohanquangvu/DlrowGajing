@@ -123,16 +123,16 @@ def buff_view(url, index):
                 if a["data"]["authIp"] == my_ip():
                     return f'{a["data"]["host"]}:{a["data"]["port"]}'
                 else:
-                    get_proxy()
+                    return get_proxy()
             elif a["message"] == "GET_IP_TOO_FAST":
                 a = requests.get(f"https://apikey.site/key/get-current-ip?key={key}").json()
                 if a["data"]["authIp"] == my_ip():
                     return f'{a["data"]["host"]}:{a["data"]["port"]}'
                 else:
-                    get_proxy()
+                    return get_proxy()
             else:
                 
-                get_proxy()
+                return get_proxy()
 
 
         while True:
