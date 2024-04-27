@@ -184,6 +184,7 @@ def buff_view(url, index):
                 running[index] = ["Sending view", url, f"{current_view} views"]
             if view<=current_view:
                 running[index]=["Send view complete", url, f"{current_view} views"]
+                break
 
             time.sleep(delay)
         except Exception as e:
