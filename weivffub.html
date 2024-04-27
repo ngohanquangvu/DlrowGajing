@@ -253,8 +253,6 @@ for i in list_open:
         list_url.append(i)
     elif "/channel/" in i:
         list_url+=get_video(i)
-    else:
-        list_url.remove(i)
 os.system("cls")
 print(f"Đã tìm thấy {len(list_url)} video")
 view = int(input("Enter the number of views: "))
