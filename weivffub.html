@@ -81,44 +81,58 @@ def get_proxy():
             else:
                 
                 return get_proxy()
+            
+def check_url(url, date):
+    uid = url.split("/")[-1]
+    timestamp = requests.get(f"https://gw.ganjingworld.com/v1.1/content/query?id={uid}&lang=vi-VN&ids={uid}&with_desc=true&query=basic&include_unlisted=true").json()["data"]["list"][0].get("time_scheduled")
+    timestamp = timestamp/1000
+    def timestamp_to_date(timestamp):
+        time_struct = time.localtime(timestamp)
+        date_str = time.strftime("%d/%m/%Y", time_struct)
+        
+        return date_str
+
+    day, month, year = date.split("/")
+    day = day.zfill(2)
+    month = month.zfill(2)
+    
+    date =  f"{day}/{month}/{year}"
+    if date == timestamp_to_date(timestamp):
+        return True
+    return False
+
 
 def buff_view(url, index):
-    global running, view, list_uid, list_duration
+    global running, view, list_uid, list_login_token
     running[index] = [f"Loading", url, "Đang lấy thông tin video"]
     uid = url.split("/")[-1]
     if uid not in list_uid:
         list_uid.append(uid)
-    token = get_login_token()
-
-    d = {
-        "id":uid,
-    }
-    h = {
-        "Authorization":token,
-    }
-
     running[index] = ["Loading", url, "Lấy thông tin thành công"]
     current_view = 0
     while True:
-        while True:
-            try:
-                pr = random.choice(['rotating6-161055.proxyaz.net:5000', 'rotating6-161055.proxyaz.net:5001', 'rotating6-161055.proxyaz.net:5002', 'rotating6-161055.proxyaz.net:5003', 'rotating6-161055.proxyaz.net:5004', 'rotating6-161055.proxyaz.net:5005', 'rotating6-161055.proxyaz.net:5006', 'rotating6-161055.proxyaz.net:5007', 'rotating6-161055.proxyaz.net:5008', 'rotating6-161055.proxyaz.net:5009', 'rotating6-161055.proxyaz.net:5010', 'rotating6-161055.proxyaz.net:5011', 'rotating6-161055.proxyaz.net:5012', 'rotating6-161055.proxyaz.net:5013', 'rotating6-161055.proxyaz.net:5014', 'rotating6-161055.proxyaz.net:5015', 'rotating6-161055.proxyaz.net:5016', 'rotating6-161055.proxyaz.net:5017', 'rotating6-161055.proxyaz.net:5018', 'rotating6-161055.proxyaz.net:5019', 'rotating6-161055.proxyaz.net:5020', 'rotating6-161055.proxyaz.net:5021', 'rotating6-161055.proxyaz.net:5022', 'rotating6-161055.proxyaz.net:5023', 'rotating6-161055.proxyaz.net:5024', 'rotating6-161055.proxyaz.net:5025', 'rotating6-161055.proxyaz.net:5026', 'rotating6-161055.proxyaz.net:5027', 'rotating6-161055.proxyaz.net:5028', 'rotating6-161055.proxyaz.net:5029', 'rotating6-161055.proxyaz.net:5030', 'rotating6-161055.proxyaz.net:5031', 'rotating6-161055.proxyaz.net:5032', 'rotating6-161055.proxyaz.net:5033', 'rotating6-161055.proxyaz.net:5034', 'rotating6-161055.proxyaz.net:5035', 'rotating6-161055.proxyaz.net:5036', 'rotating6-161055.proxyaz.net:5037', 'rotating6-161055.proxyaz.net:5038', 'rotating6-161055.proxyaz.net:5039', 'rotating6-161055.proxyaz.net:5040', 'rotating6-161055.proxyaz.net:5041', 'rotating6-161055.proxyaz.net:5042', 'rotating6-161055.proxyaz.net:5043', 'rotating6-161055.proxyaz.net:5044', 'rotating6-161055.proxyaz.net:5045', 'rotating6-161055.proxyaz.net:5046', 'rotating6-161055.proxyaz.net:5047', 'rotating6-161055.proxyaz.net:5048', 'rotating6-161055.proxyaz.net:5049'])
-                p = {
-                    "http":f"http://{pr}",
-                    "https":f"http://{pr}"
-                }
-                break
-            except:
-                time.sleep(1)
+        pr = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
+        pr = "vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080"
+        p = {
+            "http":f"http://{pr}",
+            "https":f"http://{pr}"
+        }
+        token = get_login_token()
         try:
+            h = {
+                "Authorization":token
+            }
+            d = {
+                "id":uid,
+            }
             running[index] = ["Sending view", url, f"{current_view} views"]
             count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
-
             if count["data"]["view_count"]>current_view:
                 current_view = count["data"]["view_count"]
                 running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
             else:
                 running[index] = ["Sending view", url, f"{current_view} views"]
+
             if view<=current_view:
                 running[index]=["Send view complete", url, f"{current_view} views"]
                 break
@@ -207,15 +221,105 @@ def get_video(channel):
         try: list_token.remove(token)
         except: pass
         return get_video(channel)
+    
+def get_language_code(language):
+    language_codes = {
+        "Vietnamese": "vi-VN",
+        "English": "en-US",
+        "Taiwanese": "zh-TW",
+        "Chinese": "zh-CN",
+        "Japanese": "ja-JP",
+        "Korean": "ko-KR",
+        "German": "de-DE",
+        "Spanish": "es-ES",
+        "French": "fr-FR",
+        "Indonesian": "id-ID",
+        "Italian": "it-IT",
+        "Russian": "ru-RU",
+    }
+    return language_codes.get(language, "en-US")
 
-while True:
-    try:
-        a = input("Enter to import file")
-        list_open = open(filedialog.askopenfilename(title="Select file", filetypes=(("Text files", "*.txt"),("all files", "*.*"))), "r", encoding="utf-8", errors="replace").read().split("\n")
-        break
-    except:
-        os.system("cls")
-        pass
+def get_homepage_content(language, page_size):
+    list_rs = []
+    language_code = get_language_code(language)
+    if page_size <=20:
+        url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
+        response = requests.get(url)
+        list_content = response.json()["data"]["list"]
+        list_rs = []
+        for i in list_content:
+            if i["type"] == "Video":
+                list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+    else:
+        while page_size > 20:
+            url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size=100"
+            response = requests.get(url)
+            list_content = response.json()["data"]["list"]
+            for i in list_content:
+                if i["type"] == "Video":
+                    list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+            page_size -= 20
+        if page_size > 0:
+            url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
+            response = requests.get(url)
+            list_content = response.json()["data"]["list"]
+            for i in list_content:
+                if i["type"] == "Video":
+                    list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+    return list_rs
+
+list_open = []
+
+def menu():
+    global list_open
+    os.system("cls")
+    print("1. Import file")
+    print("2. Crawl Post")
+    print("")
+    choice = input("Enter your choice: ")
+    os.system("cls")
+    if choice == "1":
+        while True:
+            try:
+                a = input("Enter to import file")
+                list_open = open(filedialog.askopenfilename(title="Select file", filetypes=(("Text files", "*.txt"),("all files", "*.*"))), "r", encoding="utf-8", errors="replace").read().split("\n")
+                break
+            except:
+                os.system("cls")
+                pass
+    elif choice == "2":
+        while True:
+            try:
+                list_lang = [
+                    "Vietnamese",
+                    "English",
+                    "Taiwanese",
+                    "Chinese",
+                    "Japanese",
+                    "Korean",
+                    "German",
+                    "Spanish",
+                    "French",
+                    "Indonesian",
+                    "Italian",
+                    "Russian",
+                ]
+                for i in list_lang:
+                    print(f"{int(list_lang.index(i)+1)}. {i}")
+                lang_choice = int(input("Enter the language: "))
+                break
+            except:
+                os.system("cls")
+                pass
+        while True:
+            try:
+                page_size = int(input("Enter the number of videos: "))
+                break
+            except:
+                os.system("cls")
+                pass
+        list_open = get_homepage_content(list_lang[lang_choice-1], page_size)
+menu()
 print("Đang nhập video...")
 list_url = []
 for i in list_open:
@@ -224,6 +328,24 @@ for i in list_open:
     elif "/channel/" in i:
         list_url+=get_video(i)
 os.system("cls")
+
+while True:
+    try:
+        print(f"Đã tìm thấy {len(list_url)} video")
+        print("1. Filter date (để trống nếu không cần, định dạng ngày/tháng/năm): ")
+        print("2. Continue")
+        print("")
+        choice = input("Enter your choice: ")
+        if choice == "1":
+            date = input("Enter the date: ")
+            list_url = [i for i in list_url if check_url(i, date)]
+            os.system("cls")
+            break
+        else:
+            os.system("cls")
+            break
+    except:
+        os.system("cls")
 print(f"Đã tìm thấy {len(list_url)} video")
 view = int(input("Enter the number of views: "))
 delay = int(input("Enter the delay time (s): "))
