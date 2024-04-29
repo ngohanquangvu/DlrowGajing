@@ -101,50 +101,78 @@ def check_url(url, date):
         return True
     return False
 
+current_url_index = 0
 
-def buff_view(url, index):
-    global running, view, list_uid, list_login_token
-    running[index] = [f"Loading", url, "Đang lấy thông tin video"]
-    uid = url.split("/")[-1]
-    if uid not in list_uid:
-        list_uid.append(uid)
-    running[index] = ["Loading", url, "Lấy thông tin thành công"]
-    current_view = 0
+def buff_view(index, lock):
+    global running, view, list_uid, list_login_token, current_url_index
     while True:
-        pr = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
-        pr = "vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080"
-        p = {
-            "http":f"http://{pr}",
-            "https":f"http://{pr}"
-        }
-        token = get_login_token()
-        try:
-            h = {
-                "Authorization":token
-            }
-            d = {
-                "id":uid,
-            }
-            running[index] = ["Sending view", url, f"{current_view} views"]
-            count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
-            if count["data"]["view_count"]>current_view:
-                current_view = count["data"]["view_count"]
-                running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
-            else:
-                running[index] = ["Sending view", url, f"{current_view} views"]
-
-            if view<=current_view:
-                running[index]=["Send view complete", url, f"{current_view} views"]
+        with lock:
+            url = list_url[current_url_index]
+            current_url_index+=1
+            if current_url_index>=len(list_url):
                 break
+        sai_so = random.randint(0, 600)
+        running[index] = [f"Loading", url, "Đang lấy thông tin video"]
+        uid = url.split("/")[-1]
+        running[index] = ["Loading", url, "Lấy thông tin thành công"]
+        current_view = 0
+        while True:
+            pr = "vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            token = get_login_token()
+            try:
+                h = {
+                    "Authorization":token
+                }
+                d = {
+                    "id":uid,
+                }
+                running[index] = ["Sending view", url, f"{current_view} views"]
+                count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                target_view = count["data"]["view_count"]+view
+                current_view = count["data"]["view_count"]
+                break
+            except:
+                pass
+        while True:
+            pr = "vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            token = get_login_token()
+            try:
+                h = {
+                    "Authorization":token
+                }
+                d = {
+                    "id":uid,
+                }
+                running[index] = ["Sending view", url, f"{current_view} views"]
+                count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                if count["data"]["view_count"]>current_view:
+                    current_view = count["data"]["view_count"]
+                    running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
+                else:
+                    running[index] = ["Sending view", url, f"{current_view} views"]
 
-            time.sleep(delay)
-        except Exception as e:
-            open("error.txt", "a").write(f"{str(e)}\n")
-            running[index] = ["Sent view unsuccessfully", url, f"{current_view} views"]
-            time.sleep(delay)
+                if target_view<=current_view:
+                    running[index]=["Send view complete", url, f"{current_view} views"]
+                    break
+
+                time.sleep(delay)
+            except Exception as e:
+                open("error.txt", "a").write(f"{str(e)}\n")
+                running[index] = ["Sent view unsuccessfully", url, f"{current_view} views"]
+                time.sleep(delay)
+        running[index] = ["", "", ""]
+    running[index] = [f"Hoàn thành buff view tại luồng {index}", "", ""]
 
 def checking():
-    global running, success, custom, slg_acc, start_time, status
+    global running, success, custom, slg_acc, start_time, status, current_url_index
     while status:
         for j in range(len(running)):
             if running[j][0]=="Sent view successfully":
@@ -166,7 +194,7 @@ def checking():
         minutes, seconds = divmod(rem, 60)
         formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
 
-        print(f"\033[33mProcess: {formatted_time}\033[0m")
+        print(f"\033[33mProcess: {formatted_time} - Url complete: {current_url_index}\033[0m")
         time.sleep(1)
         os.system('cls')
     
@@ -356,20 +384,14 @@ status = True
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
-for i in range(0, len(list_url), luong):
-    threads = []
-    aaa = list_url[i:i+luong]
-    index = 0
-    for i in aaa:
-        threads.append(threading.Thread(target=buff_view, args=(i,index)))
-        index+=1
-    for j in threads:
-        j.start()
-    for j in threads:
-        j.join()
-    print("--------------------")
-    print(f"Sent view to {len(aaa)} videos complete")
-    print("--------------------")
+lock = threading.Lock()
+threads = []
+for i in range(luong):
+    threads.append(threading.Thread(target=buff_view, args=(i,lock)))
+for j in threads:
+    j.start()
+for j in threads:
+    j.join()
 status = False
 t.join()
 end_time = time.time()
