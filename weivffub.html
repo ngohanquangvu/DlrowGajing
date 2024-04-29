@@ -102,9 +102,11 @@ def check_url(url, date):
     return False
 
 current_url_index = 0
+url_complete = 0
+
 
 def buff_view(index, lock):
-    global running, view, list_uid, list_login_token, current_url_index
+    global running, url_complete, view, list_uid, list_login_token, current_url_index
     while True:
         with lock:
             url = list_url[current_url_index]
@@ -169,10 +171,11 @@ def buff_view(index, lock):
                 running[index] = ["Sent view unsuccessfully", url, f"{current_view} views"]
                 time.sleep(delay)
         running[index] = ["", "", ""]
+        url_complete+=1
     running[index] = [f"Hoàn thành buff view tại luồng {index}", "", ""]
 
 def checking():
-    global running, success, custom, slg_acc, start_time, status, current_url_index
+    global running, success, custom, slg_acc, start_time, status, current_url_index, url_complete
     while status:
         for j in range(len(running)):
             if running[j][0]=="Sent view successfully":
@@ -194,7 +197,7 @@ def checking():
         minutes, seconds = divmod(rem, 60)
         formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
 
-        print(f"\033[33mProcess: {formatted_time} - Url complete: {current_url_index}\033[0m")
+        print(f"\033[33mProcess: {formatted_time} - Url complete: {url_complete}\033[0m")
         time.sleep(1)
         os.system('cls')
     
@@ -351,7 +354,7 @@ menu()
 print("Đang nhập video...")
 list_url = []
 for i in list_open:
-    if "/video/" in i:
+    if "/video/" in i or "/shorts/" in i or "/post/" in i or "/news/" in i or "/live/" in i:
         list_url.append(i)
     elif "/channel/" in i:
         list_url+=get_video(i)
