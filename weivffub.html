@@ -205,6 +205,7 @@ def checking():
 list_token = []
 
 def get_video(channel):
+    global list_token, list_url
 
     channel_id = channel.split('/')[-1].split('?')[0]
 
@@ -234,7 +235,6 @@ def get_video(channel):
             "Authorization":token
         }
 
-        list_url = []
 
         while True:
             try:
@@ -257,17 +257,15 @@ def get_video(channel):
             "Authorization":token
         }
 
-        list_url = []
-
         while True:
             try:
                 a = requests.get(url, headers=h).json().get("data")
                 j = a["list"]
                 for i in j:
                     uid = i["id"]
-                    list_url.append(f"https://www.ganjingworld.com/video/{uid}")
+                    list_url.append(f"https://www.ganjingworld.com/shorts/{uid}")
                 if a["start_key"]!="":
-                    url  = f"https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={a["start_key"]}&channel_id={channel_id}&page_size=8&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready"
+                    url  = f"https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={a["start_key"]}&channel_id={channel_id}&page_size=8&content_type=Shorts&include_hidden=true&query=basic,view&visibility=public&mode=ready"
                 else: break
             except: break
     except: 
@@ -376,8 +374,6 @@ menu()
 print("Đang nhập video...")
 list_url = []
 list_channel = []
-def run_get_video(channel):
-    list_url+=get_video(channel)
 for i in list_open:
     if "/video/" in i or "/shorts/" in i or "/post/" in i or "/news/" in i or "/live/" in i:
         list_url.append(i)
@@ -387,11 +383,13 @@ os.system("cls")
 print("Đang tìm video, shorts...")
 threads = []
 for i in list_channel:
-    threads.append(threading.Thread(target=run_get_video, args=(i,)))
+    threads.append(threading.Thread(target=get_video, args=(i,)))
 for i in threads:
     i.start()
 for i in threads:
     i.join()
+    
+os.system("cls")
 
 while True:
     try:
