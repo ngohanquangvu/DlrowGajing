@@ -1,0 +1,55 @@
+h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
+try:
+    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+except: 
+    pass
+def buff_live(lock):
+    global uid
+    device_id = str(uuid.uuid4())
+    while True:
+        h = {
+            "Authorization":token
+        }
+        while True:
+            pr = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
+            p = {
+                "http": f"http://{pr}",
+                "https": f"http://{pr}"
+            }
+            try:
+                a = requests.post("https://livecount-us-west.ganjingworld.com/count/v1/livecount", json={"content_id":uid,"client_id":device_id}, headers=h, proxies=p).json()
+                break
+            except:
+                pass
+        with lock:
+            try:
+                    print(f'View: {a["live_count"]}', end="\r")
+            except:
+                print(a)
+        time.sleep(1)
+uid = input("Enter link: ").split("/")[-1]
+view = int(input("Enter view: "))
+threads = []
+lock = threading.Lock()
+for i in range(view):
+    threads.append(threading.Thread(target=buff_live, args=(lock,)))
+for i in threads:
+    i.start()
+for i in threads:
+    i.join()
