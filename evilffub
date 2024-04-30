@@ -20,31 +20,34 @@ try:
 except: 
     pass
 def buff_live(lock):
-    global uid
+    global uid, stop_threads
     device_id = str(uuid.uuid4())
-    while True:
+    while stop_threads==False:
         h = {
             "Authorization":token
         }
-        while True:
-            pr = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
-            p = {
-                "http": f"http://{pr}",
-                "https": f"http://{pr}"
-            }
-            try:
-                a = requests.post("https://livecount-us-west.ganjingworld.com/count/v1/livecount", json={"content_id":uid,"client_id":device_id}, headers=h, proxies=p).json()
-                break
-            except:
-                pass
+        a = requests.post("https://livecount-us-west.ganjingworld.com/count/v1/livecount", json={"content_id":uid,"client_id":device_id}, headers=h).json()
         with lock:
             try:
                     print(f'View: {a["live_count"]}', end="\r")
             except:
                 print(a)
         time.sleep(1)
+
+stop_threads = False
+
+def timer(minutes):
+    global stop_threads
+    time.sleep(minutes * 60)
+    stop_threads = True
+
+
 uid = input("Enter link: ").split("/")[-1]
 view = int(input("Enter view: "))
+minutes = int(input("Nhập vào số phút muốn chạy: "))
+
+t = threading.Thread(target=timer, args=(minutes,))
+t.start()
 threads = []
 lock = threading.Lock()
 for i in range(view):
@@ -53,3 +56,4 @@ for i in threads:
     i.start()
 for i in threads:
     i.join()
+t.join()
