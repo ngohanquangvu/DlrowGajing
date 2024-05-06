@@ -108,7 +108,7 @@ def crawl_data(url):
             if a == [] or a == None:
                 break
             for i in a:
-                ws.append([f'https://www.ganjingworld.com/short/{i["id"]}', i["title"], i["view_count"], convert_timestamp_to_date(i["created_at"]), "Short"])
+                ws.append([f'https://www.ganjingworld.com/shorts/{i["id"]}', i["title"], i["view_count"], convert_timestamp_to_date(i["created_at"]), "Short"])
                 while True:
                     try:
                         wb.save(f'Data_Video/{name_file}.xlsx')
