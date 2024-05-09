@@ -65,8 +65,8 @@ def get_login_token():
             'X-Cdk-Lrtm':'2024-03-15 20:48:30',
         }
         global_proxy = {
-            "http":"http://vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080",
-            "https":"http://vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080"
+            "http":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080",
+            "https":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
         }
         while True:
             if len(list_login_token) != 0:
@@ -102,7 +102,7 @@ except:
 
 def generate_random_email():
     # Tạo một chuỗi ngẫu nhiên gồm 10 ký tự
-    random_string = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(random.randint(7, 21)))
+    random_string = Faker("en").name().lower().replace(" ","")
     email = random_string + "@1secmail.com"
     return email
 
@@ -116,8 +116,8 @@ def RegAcc(index):
             running[index] = [email,"","Đang kiểm tra email..."]
             while True:
                 global_proxy = {
-                    "http":"http://vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080",
-                    "https":"http://vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080"
+                    "http":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080",
+                    "https":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
                 }
                 try:
                     check_email = requests.post("https://gw.ganjingworld.com/v1.0c/signupcheckname", json={"email":email,"create_new_user_id":True}, headers={'Authorization':token}, proxies=global_proxy).json()
@@ -173,8 +173,8 @@ def RegAcc(index):
             while True:
                 try:
                     login = requests.post("https://gw.ganjingworld.com/v1.0c/signup", headers={'Authorization':token}, json=x, proxies={
-                            "http":"http://vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080",
-                            "https":"http://vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080"
+                            "http":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080",
+                            "https":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
                         }).json()
                     if login["result"]["message"] == "Server internal error" or login["result"]["message"] == "Save User Information Failed.":
                         continue
@@ -196,8 +196,8 @@ def RegAcc(index):
                 if running[index][2] != "Đăng ký thất bại, không lấy được mã xác minh":
                     while True:
                         try:
-                            a = requests.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}, proxies={"http":"http://vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080",
-                                    "https":"http://vbFlPh51RVjY:0keVCpfWT2lD@ipv6.proxiware.com:8080"}).json()
+                            a = requests.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}, proxies={"http":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080",
+                                    "https":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"}).json()
                             break
                         except: pass
                     if (a["result"]["message"]=="Ok"):
