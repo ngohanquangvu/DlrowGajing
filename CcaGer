@@ -121,7 +121,6 @@ def RegAcc(index):
                 }
                 try:
                     check_email = requests.post("https://gw.ganjingworld.com/v1.0c/signupcheckname", json={"email":email,"create_new_user_id":True}, headers={'Authorization':token, "User-Agent": "GJWAndroid v2.0.4(20000004); Debug=false; DefEnv=prod; DevOpts=false; BuildType=release; OS=REL(28); Model=SM-G988N; Manu=samsung"}, proxies=global_proxy).json()
-                    open("log.txt","a",encoding="utf-8").write(f"{check_email}\n")
                     if check_email["result"]["message"]=="Ok":
                         break
                     else:
@@ -129,7 +128,6 @@ def RegAcc(index):
                         email = generate_random_email()
                         running[index] = [email,"","Đang kiểm tra email..."]
                 except Exception as e:
-                    open("log.txt","a",encoding="utf-8").write(f"{str(e)}\n")
                     pass
             running[index]= [email,"","Email Hợp lệ"]
 
