@@ -275,6 +275,8 @@ def get_homepage_content(language, page_size):
         for i in list_content:
             if i["type"] == "Video":
                 list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+                open("list.txt", "a").write(f"https://www.ganjingworld.com/{str(i['type']).lower()}/{i['id']}|{i["view_count"]}\n")
+
     else:
         while page_size > 20:
             url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size=100"
@@ -283,6 +285,8 @@ def get_homepage_content(language, page_size):
             for i in list_content:
                 if i["type"] == "Video":
                     list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+                    open("list.txt", "a").write(f"https://www.ganjingworld.com/{str(i['type']).lower()}/{i['id']}|{i["view_count"]}\n")
+
             page_size -= 20
         if page_size > 0:
             url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
@@ -291,6 +295,7 @@ def get_homepage_content(language, page_size):
             for i in list_content:
                 if i["type"] == "Video":
                     list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+                    open("list.txt", "a").write(f"https://www.ganjingworld.com/{str(i['type']).lower()}/{i['id']}|{i["view_count"]}\n")
     return list_rs
 
 list_open = []
@@ -344,8 +349,6 @@ def menu():
                 os.system("cls")
                 pass
         list_open = get_homepage_content(list_lang[lang_choice-1], page_size)
-        for i in list_open:
-            open("list.txt", "a").write(f"{i}\n")
 menu()
 print("Đang nhập video...")
 list_url = []
