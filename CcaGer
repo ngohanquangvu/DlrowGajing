@@ -102,7 +102,7 @@ except:
 
 def generate_random_email():
     # Tạo một chuỗi ngẫu nhiên gồm 10 ký tự
-    random_string = Faker("en").name().lower().replace(" ","")
+    random_string = random.choice([Faker("en").name().lower().replace(" ",""), Faker("en").name().lower().replace(" ","")+Faker("en").name().lower().replace(" ","")])
     email = random_string + "@1secmail.com"
     return email
 
@@ -116,17 +116,21 @@ def RegAcc(index):
             running[index] = [email,"","Đang kiểm tra email..."]
             while True:
                 global_proxy = {
-                    "http":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080",
-                    "https":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+                    "http":"http://0JeLKc:G69qYC@hub-us-10.litport.net:31682",
+                    "https":"http://0JeLKc:G69qYC@hub-us-10.litport.net:31682"
                 }
                 try:
-                    check_email = requests.post("https://gw.ganjingworld.com/v1.0c/signupcheckname", json={"email":email,"create_new_user_id":True}, headers={'Authorization':token}, proxies=global_proxy).json()
+                    check_email = requests.post("https://gw.ganjingworld.com/v1.0c/signupcheckname", json={"email":email,"create_new_user_id":True}, headers={'Authorization':token, "User-Agent": "GJWAndroid v2.0.4(20000004); Debug=false; DefEnv=prod; DevOpts=false; BuildType=release; OS=REL(28); Model=SM-G988N; Manu=samsung"}, proxies=global_proxy).json()
+                    open("log.txt","a",encoding="utf-8").write(f"{check_email}\n")
                     if check_email["result"]["message"]=="Ok":
                         break
                     else:
+                        open("log.txt","a",encoding="utf-8").write(f"{check_email}\n")
                         email = generate_random_email()
                         running[index] = [email,"","Đang kiểm tra email..."]
-                except: pass
+                except Exception as e:
+                    open("log.txt","a",encoding="utf-8").write(f"{str(e)}\n")
+                    pass
             running[index]= [email,"","Email Hợp lệ"]
 
             # Given values
@@ -173,8 +177,8 @@ def RegAcc(index):
             while True:
                 try:
                     login = requests.post("https://gw.ganjingworld.com/v1.0c/signup", headers={'Authorization':token}, json=x, proxies={
-                            "http":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080",
-                            "https":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+                            "http":"http://0JeLKc:G69qYC@hub-us-10.litport.net:31682",
+                            "https":"http://0JeLKc:G69qYC@hub-us-10.litport.net:31682"
                         }).json()
                     if login["result"]["message"] == "Server internal error" or login["result"]["message"] == "Save User Information Failed.":
                         continue
