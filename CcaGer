@@ -123,6 +123,7 @@ def RegAcc(index):
                     if check_email["result"]["message"]=="Ok":
                         break
                     else:
+                        open("email.txt", "a").write(str(check_email)+"\n")
                         email = generate_random_email()
                         running[index] = [email,"","Đang kiểm tra email..."]
                 except Exception as e:
@@ -196,8 +197,9 @@ def RegAcc(index):
                         custom+=1
                         break
                     code = str(get_code(email))
-                running[index]= [email,n,"Lấy mã thành công"]
                 if running[index][2] != "Đăng ký thất bại, không lấy được mã xác minh":
+                    running[index]= [email,n,"Lấy mã thành công"]
+                    data_verify = {"user_id":u,"code":code,"client_type":3}
                     while True:
                         try:
                             scraper = cloudscraper.create_scraper()
@@ -206,7 +208,7 @@ def RegAcc(index):
                                 "http":f"http://{p}",
                                 "https":f"http://{p}"
                             }
-                            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}, proxies=global_proxy)
+                            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json=data_verify, headers={'Authorization':token}, proxies=global_proxy)
                             a = a.json()
                             break
                         except Exception as e:
@@ -223,7 +225,7 @@ def RegAcc(index):
                             running[index]= [email,n,"Đặt tên thành công"]
                         running[index]= [email,n,"Đăng ký thành công"]
                     else:
-                        open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|{a}\n")
+                        open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|{a}|{str(data_verify)}\n")
                         running[index]= [email,n,"Đăng ký thất bại, không xác minh thành công"]
                         custom+=1
                         time.sleep(1)
