@@ -126,7 +126,6 @@ def RegAcc(index):
                         email = generate_random_email()
                         running[index] = [email,"","Đang kiểm tra email..."]
                 except Exception as e:
-                    open("log.txt","a").write(str(e)+"\n")
                     pass
             running[index]= [email,"","Email Hợp lệ"]
 
