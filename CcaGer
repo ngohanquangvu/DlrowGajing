@@ -101,10 +101,8 @@ except:
 
 
 def generate_random_email():
-    # Tạo một chuỗi ngẫu nhiên gồm 10 ký tự
-    random_string = random.choice([Faker("en").name().lower().replace(" ",""), Faker("en").name().lower().replace(" ","")+Faker("en").name().lower().replace(" ","")])
-    email = random_string + "@1secmail.com"
-    return email
+    random_string = random.choice([str(Faker().user_name()+string.digits), (Faker().name().lower().replace(" ", ""))])
+    return random_string + "@1secmail.com"
 
 def RegAcc(index):
     global running, success, custom, slg_acc
@@ -115,21 +113,21 @@ def RegAcc(index):
             email = generate_random_email()
             running[index] = [email,"","Đang kiểm tra email..."]
             while True:
+                p = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
                 global_proxy = {
-                    "http":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682",
-                    "https":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+                    "http":f"http://{p}",
+                    "https":f"http://{p}"
                 }
                 try:
                     check_email = requests.post("https://gw.ganjingworld.com/v1.0c/signupcheckname", json={"email":email,"create_new_user_id":True}, headers={'Authorization':token, "User-Agent": "GJWAndroid v2.0.4(20000004); Debug=false; DefEnv=prod; DevOpts=false; BuildType=release; OS=REL(28); Model=SM-G988N; Manu=samsung"}, proxies=global_proxy).json()
-
                     if check_email["result"]["message"]=="Ok":
                         break
                     else:
-
+                        open("email.txt", "a").write(str(check_email)+"\n")
                         email = generate_random_email()
                         running[index] = [email,"","Đang kiểm tra email..."]
                 except Exception as e:
-
+                    open("log.txt","a").write(str(e)+"\n")
                     pass
             running[index]= [email,"","Email Hợp lệ"]
 
@@ -176,14 +174,16 @@ def RegAcc(index):
 
             while True:
                 try:
-                    login = requests.post("https://gw.ganjingworld.com/v1.0c/signup", headers={'Authorization':token}, json=x, proxies={
-                            "http":"0JeLKc:G69qYC@hub-us-8.litport.net:31682",
-                            "https":"0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-                        }).json()
+                    p = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
+                    global_proxy = {
+                        "http":f"http://{p}",
+                        "https":f"http://{p}"
+                    }
+                    login = requests.post("https://gw.ganjingworld.com/v1.0c/signup", headers={'Authorization':token}, json=x, proxies=global_proxy).json()
                     if login["result"]["message"] == "Server internal error" or login["result"]["message"] == "Save User Information Failed.":
                         continue
                     else: break
-                except: pass
+                except : pass
             if login["result"]["message"] == "Ok":
                 running[index]= [email,n,"Đã tạo tài khoản"]
                 code = str(get_code(email))
@@ -198,26 +198,34 @@ def RegAcc(index):
                         custom+=1
                         break
                     code = str(get_code(email))
+                running[index]= [email,n,"Lấy mã thành công"]
                 if running[index][2] != "Đăng ký thất bại, không lấy được mã xác minh":
                     while True:
                         try:
-                            a = requests.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}, proxies={"http":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682",
-                                    "https":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"}).json()
+                            scraper = cloudscraper.create_scraper()
+                            p = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
+                            global_proxy = {
+                                "http":f"http://{p}",
+                                "https":f"http://{p}"
+                            }
+                            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signupverifycode", json={"user_id":u,"code":code,"client_type":3}, headers={'Authorization':token}, proxies=global_proxy)
+                            a = a.json()
                             break
-                        except: pass
+                        except Exception as e:
+                            pass
                     if (a["result"]["message"]=="Ok"):
                         running[index]= [email,n,"Đã xác minh tài khoản"]
                         access_token = a["data"]["token"]
                         data_profile = generate_vietnamese_names_and_genders().split("|")
                         uuid = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers={'Authorization':access_token}).json()["data"]["user_profile"]["profileId"]
-                        open("Result.txt","a",encoding="utf-8").write(f"{email}|{n}|https://www.ganjingworld.com/channel/{uuid}|{access_token}\n")
+                        open("Result.txt","a",encoding="utf-8").write(f"{email}|{n}|https://www.ganjingworld.com/channel/{uuid}\n")
                         success+=1
                         set_name = requests.post("https://gw.ganjingworld.com/v1.0c/uploaduserprofile",json={"user_id":u,"user_name":data_profile[0],"phone":"","gender":data_profile[1]}, headers={'Authorization':access_token}).json()
                         if set_name["result"]["message"]=="Ok":
                             running[index]= [email,n,"Đặt tên thành công"]
                         running[index]= [email,n,"Đăng ký thành công"]
                     else:
-                        open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không xác minh thành công\n")
+                        open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|{a}\n")
                         running[index]= [email,n,"Đăng ký thất bại, không xác minh thành công"]
                         custom+=1
                         time.sleep(1)
