@@ -123,7 +123,6 @@ def RegAcc(index):
                     if check_email["result"]["message"]=="Ok":
                         break
                     else:
-                        open("email.txt", "a").write(str(check_email)+"\n")
                         email = generate_random_email()
                         running[index] = [email,"","Đang kiểm tra email..."]
                 except Exception as e:
