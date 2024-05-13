@@ -101,8 +101,8 @@ except:
 
 
 def generate_random_email():
-    random_string = random.choice([str(Faker().user_name()+string.digits), (Faker().name().lower().replace(" ", ""))])
-    return random_string + "@1secmail.com"
+    random_string = random.choice([str(Faker().user_name()+str(random.randint(0, 9999))), (str(random.randint(0,999))+Faker().first_name().lower().replace(" ", "")), (Faker().email().split("@")[0]+str(random.randint(0,10000)))])
+    return random_string + "@1secmail.net"
 
 def RegAcc(index):
     global running, success, custom, slg_acc
@@ -113,7 +113,7 @@ def RegAcc(index):
             email = generate_random_email()
             running[index] = [email,"","Đang kiểm tra email..."]
             while True:
-                p = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
+                p = random.choice(['geonode_81x0CK99oH:e635aa52-ec45-4dba-b888-703ae52d55f4@shared-datacenter.geonode.com:9000'])
                 global_proxy = {
                     "http":f"http://{p}",
                     "https":f"http://{p}"
@@ -133,7 +133,7 @@ def RegAcc(index):
             # Given values
             n = generate_password(11)
             running[index]= [email,n,"Đang tạo tài khoản..."]
-            m = "U+tkGvBsXsy/bvCdwZGsmw9TFPDmcmVbfrU/FmMRnHI="
+            m = "GBmGsskS+Zq4SRZl/aPwHtRl8avpt4aCpuRnJhecp4g="
             t = email
             u = check_email["data"]["new_user_id"]
             d = check_email["data"]["uuid"]
@@ -173,7 +173,7 @@ def RegAcc(index):
 
             while True:
                 try:
-                    p = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
+                    p = random.choice(['geonode_81x0CK99oH:e635aa52-ec45-4dba-b888-703ae52d55f4@shared-datacenter.geonode.com:9000'])
                     global_proxy = {
                         "http":f"http://{p}",
                         "https":f"http://{p}"
@@ -203,7 +203,7 @@ def RegAcc(index):
                     while True:
                         try:
                             scraper = cloudscraper.create_scraper()
-                            p = random.choice(['resi-v4-targeted.whiteproxies.com:27000', 'resi-v4-targeted.whiteproxies.com:27001', 'resi-v4-targeted.whiteproxies.com:27002', 'resi-v4-targeted.whiteproxies.com:27003', 'resi-v4-targeted.whiteproxies.com:27004', 'resi-v4-targeted.whiteproxies.com:27005', 'resi-v4-targeted.whiteproxies.com:27006', 'resi-v4-targeted.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27007', 'resi-v4.whiteproxies.com:27008', 'resi-v4.whiteproxies.com:27009', 'resi-v4.whiteproxies.com:27010', 'resi-v4.whiteproxies.com:27011', 'resi-v4.whiteproxies.com:27012'])
+                            p = random.choice(['geonode_81x0CK99oH:e635aa52-ec45-4dba-b888-703ae52d55f4@shared-datacenter.geonode.com:9000'])
                             global_proxy = {
                                 "http":f"http://{p}",
                                 "https":f"http://{p}"
@@ -231,7 +231,7 @@ def RegAcc(index):
                         time.sleep(1)
             else:
                 running[index]= [email,n,"Đăng ký thất bại, không đăng ký thành công"]
-                open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không đăng ký thành công|{login}\n")
+                open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không đăng ký thành công|{login}|{x}\n")
                 custom+=1
                 time.sleep(1)
             running[index]= ["","",""]
