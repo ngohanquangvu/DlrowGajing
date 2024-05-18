@@ -23,16 +23,21 @@ def buff_live(lock):
     global uid, stop_threads
     device_id = str(uuid.uuid4())
     while stop_threads==False:
+        pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+        p = {
+            "http":f"http://{pr}",
+            "https":f"http://{pr}"
+        }
         h = {
             "Authorization":token
         }
-        a = requests.post("https://livecount-us-west.ganjingworld.com/count/v1/livecount", json={"content_id":uid,"client_id":device_id}, headers=h).json()
+        a = requests.post("https://livecount-us-west.ganjingworld.com/count/v1/livecount", json={"content_id":uid,"client_id":device_id}, headers=h, proxies=p).json()
         with lock:
             try:
                     print(f'View: {a["live_count"]}', end="\r")
             except:
                 print(a)
-        time.sleep(1)
+        time.sleep(random.randint(1,2))
 
 stop_threads = False
 
