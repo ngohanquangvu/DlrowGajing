@@ -355,7 +355,6 @@ menu()
 print("Đang nhập video...")
 list_url = []
 list_channel = []
-print(list_open)
 for i in list_open:
     if ("/video/" in i) or ("/shorts/" in i) or ("/post/" in i) or ("/news/" in i) or ("/live/" in i):
         list_url.append(i)
@@ -370,6 +369,7 @@ for i in threads:
     i.start()
 for i in threads:
     i.join()
+os.system("cls")
 
 
 while True:
