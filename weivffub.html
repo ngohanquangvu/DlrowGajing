@@ -78,7 +78,7 @@ def check_url(url, date):
 
 current_url_index = 0
 url_complete = 0
-
+scraper = cloudscraper.create_scraper()
 
 def buff_view(index, lock):
     global running, url_complete, view, list_uid, list_login_token, current_url_index
@@ -107,8 +107,7 @@ def buff_view(index, lock):
                     "id":uid,
                 }
                 running[index] = ["Sending view", url, f"{current_view} views"]
-                s = cloudscraper.create_scraper()
-                count = s.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                 target_view = count["data"]["view_count"]+view
                 current_view = count["data"]["view_count"]
                 break
@@ -129,8 +128,7 @@ def buff_view(index, lock):
                     "id":uid,
                 }
                 running[index] = ["Sending view", url, f"{current_view} views"]
-                s = cloudscraper.create_scraper()
-                count = s.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                 if count["data"]["view_count"]>current_view:
                     current_view = count["data"]["view_count"]
                     running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
@@ -355,6 +353,7 @@ menu()
 print("Đang nhập video...")
 list_url = []
 list_channel = []
+os.system("cls")
 for i in list_open:
     if ("/video/" in i) or ("/shorts/" in i) or ("/post/" in i) or ("/news/" in i) or ("/live/" in i):
         list_url.append(i)
