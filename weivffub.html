@@ -1,4 +1,3 @@
-
 list_login_token = []
 
 def get_login_token():
@@ -108,7 +107,8 @@ def buff_view(index, lock):
                     "id":uid,
                 }
                 running[index] = ["Sending view", url, f"{current_view} views"]
-                count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                s = cloudscraper.create_scraper()
+                count = s.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                 target_view = count["data"]["view_count"]+view
                 current_view = count["data"]["view_count"]
                 break
@@ -129,7 +129,8 @@ def buff_view(index, lock):
                     "id":uid,
                 }
                 running[index] = ["Sending view", url, f"{current_view} views"]
-                count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                s = cloudscraper.create_scraper()
+                count = s.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                 if count["data"]["view_count"]>current_view:
                     current_view = count["data"]["view_count"]
                     running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
@@ -313,7 +314,7 @@ def menu():
         while True:
             try:
                 a = input("Enter to import file")
-                list_open = open(filedialog.askopenfilename(title="Select file", filetypes=(("Text files", "*.txt"),("all files", "*.*"))), "r", encoding="utf-8", errors="replace").read().split("\n")
+                list_open = open(filedialog.askopenfilename(title="Select file", filetypes=(("Text files", "*.txt"),("all files", "*.*"))), "r", errors="ignore").read().split("\n")
                 break
             except:
                 os.system("cls")
@@ -354,12 +355,13 @@ menu()
 print("Đang nhập video...")
 list_url = []
 list_channel = []
+print(list_open)
 for i in list_open:
-    if "/video/" in i or "/shorts/" in i or "/post/" in i or "/news/" in i or "/live/" in i:
+    if ("/video/" in i) or ("/shorts/" in i) or ("/post/" in i) or ("/news/" in i) or ("/live/" in i):
         list_url.append(i)
     elif "/channel/" in i:
         list_channel.append(i)
-os.system("cls")
+
 print("Đang tìm video, shorts...")
 threads = []
 for i in list_channel:
@@ -368,8 +370,7 @@ for i in threads:
     i.start()
 for i in threads:
     i.join()
-    
-os.system("cls")
+
 
 while True:
     try:
