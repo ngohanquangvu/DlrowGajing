@@ -1,0 +1,286 @@
+if not os.path.exists('ImageData'):
+    os.makedirs('ImageData')
+
+def eaabw(cookie):
+    head = {
+        "cookie":cookie,
+        "Host":"m.facebook.com",
+        "cache-control":"max-age=0",
+        "upgrade-insecure-requests":"1",
+        "origin":"https://mbasic.facebook.com",
+        "content-type":"application/x-www-form-urlencoded",
+        "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
+        "accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "x-requested-with":"mark.via.gp",
+        "sec-fetch-site":"same-origin",
+        "sec-fetch-mode":"navigate",
+        "sec-fetch-user":"?1",
+        "sec-fetch-dest":"document",
+        "referer":"https://mbasic.facebook.com/dialog/oauth?encrypted_query_string=AeC8BVQ7ctjgpS9OzeGcgZu8VAHuuYRJlLKyB5NEYWlKsjPkU7BA5r0pbsXZLqw7Nlde8AWnp3Sa1XIq20qnPoHpzNEgb4qLpydMqy6CixrSTHOGiMs1-5_3j9tIeUcCV7vBUm1y_IQjy1dmjzrWzmAhtgz7scvu2CFVtSD1irg8j_73c8N4Bvpr9KxEmPgyHAcZMhhZ6zkw8Sl64BXgD1Gn8n3kPuSjQWRdCpBjqJbZyHkJuuI_fUeWrYNc6QdkdZPos3MkYQlUuEoZhFnXH7s_OytvqmIbLSHBpoPRXLSmv3UX6LNfWZp7pv0ZoOQ8v3opxbOuse0J-LvThFlu-i4mGKHHqA9TdCq2TLcAAAQzOcASfjFbs_H4E66168gYBHylPtHjsjAzUAo1ILy5p5TQvbZxrk4kpdOjhOoKj-pmOASDwXS6VH7Isup9j4eW1lAjDg-V2zo60W7Woi-HqPeliE5BiEib7lp7PBC0njUNZP8TXTD2XWUMgyO2wpHk5GYd1x1J1fSEzRzvfvQ4b8pz6f9qRfN1wXJk6Ls9wJBStJQViipbU3QGoo9v2LwuCNM9k4NHtv-1o7kPqXX0v5Vuuwbx6tN112i9_zJVbr7NafaatOR0cPt0k09wfvXdcOWOdBeAho28-aqGrwrZhga80JYJ5u5Jwxoajquxb8kEDdUjO8STzMv_9dDNUMSFyxuE-KKHdaYbnQB2AGHYQF_TkOL6Ck545wft9_dG0lMv9-XY4TOmlymzIGAG_Mt0wXM4G4wHuJ6uGzH3B0sOs0e2aVyk-Wzf14eZMs0vLIBdGyrSyt04BFupFMFAMu3WpMNJJhg87xG6_p9esk8O9Yl0kVve8CYudg-ZMZ7cXJTyXG4myoC-mJNyecUYitOdOFtShfY_WOv5-luqmbAic3nN8pWKvUdApO7uxodX-0iT1yrO26zkvZ5dkBOLkQUfEsDM-56sdOLEmKAeJXpAzuTl9cIHIlDgWHtq0iuYV48uz0ejcVovPzznIo-IwX36CAyPnlF7VvtTDec_9O1VFvWl25V56DaEunKr8A5Tx4CZPw2Z-EsGkKsW9eaGpHBgjMUHvr30vEKC8ShxthHdHN9EQhPrPyIIVGtw",
+        "accept-encoding":"gzip, deflate",
+        "accept-language":"vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        }
+    get = requests.get("https://mbasic.facebook.com/dialog/oauth?encrypted_query_string=AeC8BVQ7ctjgpS9OzeGcgZu8VAHuuYRJlLKyB5NEYWlKsjPkU7BA5r0pbsXZLqw7Nlde8AWnp3Sa1XIq20qnPoHpzNEgb4qLpydMqy6CixrSTHOGiMs1-5_3j9tIeUcCV7vBUm1y_IQjy1dmjzrWzmAhtgz7scvu2CFVtSD1irg8j_73c8N4Bvpr9KxEmPgyHAcZMhhZ6zkw8Sl64BXgD1Gn8n3kPuSjQWRdCpBjqJbZyHkJuuI_fUeWrYNc6QdkdZPos3MkYQlUuEoZhFnXH7s_OytvqmIbLSHBpoPRXLSmv3UX6LNfWZp7pv0ZoOQ8v3opxbOuse0J-LvThFlu-i4mGKHHqA9TdCq2TLcAAAQzOcASfjFbs_H4E66168gYBHylPtHjsjAzUAo1ILy5p5TQvbZxrk4kpdOjhOoKj-pmOASDwXS6VH7Isup9j4eW1lAjDg-V2zo60W7Woi-HqPeliE5BiEib7lp7PBC0njUNZP8TXTD2XWUMgyO2wpHk5GYd1x1J1fSEzRzvfvQ4b8pz6f9qRfN1wXJk6Ls9wJBStJQViipbU3QGoo9v2LwuCNM9k4NHtv-1o7kPqXX0v5Vuuwbx6tN112i9_zJVbr7NafaatOR0cPt0k09wfvXdcOWOdBeAho28-aqGrwrZhga80JYJ5u5Jwxoajquxb8kEDdUjO8STzMv_9dDNUMSFyxuE-KKHdaYbnQB2AGHYQF_TkOL6Ck545wft9_dG0lMv9-XY4TOmlymzIGAG_Mt0wXM4G4wHuJ6uGzH3B0sOs0e2aVyk-Wzf14eZMs0vLIBdGyrSyt04BFupFMFAMu3WpMNJJhg87xG6_p9esk8O9Yl0kVve8CYudg-ZMZ7cXJTyXG4myoC-mJNyecUYitOdOFtShfY_WOv5-luqmbAic3nN8pWKvUdApO7uxodX-0iT1yrO26zkvZ5dkBOLkQUfEsDM-56sdOLEmKAeJXpAzuTl9cIHIlDgWHtq0iuYV48uz0ejcVovPzznIo-IwX36CAyPnlF7VvtTDec_9O1VFvWl25V56DaEunKr8A5Tx4CZPw2Z-EsGkKsW9eaGpHBgjMUHvr30vEKC8ShxthHdHN9EQhPrPyIIVGtw", headers=head).text
+    fb = get.split('name="fb_dtsg" value="')[1].split('"')[0]
+    jazoest = get.split('name="jazoest" value="')[1].split('"')[0]
+    scope = get.split('name="scope" value="')[1].split('"')[0]
+    logger_id = get.split('name="logger_id" value="')[1].split('"')[0]
+    encrypted_post_body = get.split('name="encrypted_post_body" value="')[1].split('"')[0]
+    data = {
+	"cookie":cookie,
+	"fb_dtsg": fb,
+	"jazoest":"25480",
+	"scope":scope,
+	"display":"touch",
+	"sdk":"",
+	"sdk_version":"",
+	"domain":"",
+	"sso_device":"ios",
+	"state":"",
+	"user_code":"",
+	"nonce":"",
+	"logger_id":logger_id,
+	"auth_type":"",
+	"auth_nonce":"",
+	"code_challenge":"",
+	"code_challenge_method":"",
+	"encrypted_post_body":encrypted_post_body,
+	"return_format[]":"access_token"
+	}
+    get = requests.post("https://m.facebook.com/dialog/oauth/skip/submit/?paipv=0&eav=Afa2uLWDW0GTp9dR1Q9kn2mF90FWnFS6bk2nYDeGhRY_vS_DZOkGVLsNRVEQUHAp9VU", headers=head, data=data).text
+    token = get.split("#access_token=")[1].split("&")[0]
+    return f"{token}"
+
+
+def get_friend_info(cookie, list_id):
+    print("Đang lấy thông tin bạn bè...")
+    access_token = eaabw(cookie)
+    for user_id in list_id:
+        user_info_url = f'https://graph.facebook.com/{user_id}?fields=name,picture&access_token={access_token}'
+        response = requests.get(user_info_url)
+        user_info = response.json()
+        open("result.txt","a",encoding="utf-8").write(f'{user_info["name"]}|{user_info["picture"]["data"]["url"]}'+"\n")
+        friends_url = f'https://graph.facebook.com/{user_id}/friends?fields=id,picture,name&access_token={access_token}'
+        response = requests.get(friends_url)
+        friends_list = response.json()
+        for i in friends_list["data"]:
+            open("result.txt","a",encoding="utf-8").write(f'{i["name"]}|{i["picture"]["data"]["url"]}'+"\n")
+        while 'paging' in friends_list and 'after' in friends_list['paging']["cursors"]:
+            next_url = friends_list['paging'].get('cursors').get('after')
+            payload = {
+                    "access_token": access_token
+                }
+            response = requests.get(f"https://graph.facebook.com/v18.0/{user_id}/friends?fields=id,picture,name&after="+next_url, params=payload)
+            friends_list = response.json()
+            for i in friends_list["data"]:
+                open("result.txt","a",encoding="utf-8").write(f'{i["name"]}|{i["picture"]["data"]["url"]}'+"\n")
+
+def save_image(url):
+    try:
+        response = requests.get(url, stream=True)
+
+        if response.status_code == 200:
+            aaa = f'./ImageData/{time.time()}.jpg'
+            with open(aaa, 'wb') as f:
+                f.write(response.content)
+            return aaa
+    except: return None
+
+def get_webp_url(media_list):
+            for url in media_list:
+                if url.endswith('origin.webp'):
+                    return url
+            return None
+
+def get_webp_url(media_list):
+            for url in media_list:
+                if url.endswith('origin.webp'):
+                    return url
+            return None
+
+
+list_login_token = []
+def get_login_token():
+    global list_login_token
+    if len(list_login_token) != 0:
+        return random.choice(list_login_token)
+    else:
+        h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
+
+        token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+        list_login_token.append(token)
+        return token
+    
+def login(account):
+    email = account.split("|")[0]
+    password = account.split("|")[1]
+    while True:
+        try:
+            token_login = get_login_token()
+            d = {"user_email":email,"client_type":3}
+
+            h = {
+                'Authorization':token_login,
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+                'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+                'Accept':'application/json, text/plain, */*',
+                'Accept-Encoding':'gzip, deflate, br',
+                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                'Content-Length':'56',
+                'Origin':'https://www.ganjingworld.com',
+                'Referer':'https://www.ganjingworld.com/',
+                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                'Sec-Ch-Ua-Mobile':'?0',
+                'Sec-Ch-Ua-Platform':'"Windows"',
+            }
+            pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+            break
+        except Exception as e: 
+            continue
+    if "The user does not exist" in a.text:
+        return None
+    else:
+        open("log.txt", "a", encoding="utf-8").write(f"Result: {a.text} with account {email}:{password}\n")
+    server_salt = a.json()["data"]["server_salt"]
+    client_salt = a.json()["data"]["client_salt"]
+    def hash_password(pss, client_salt, server_salt):
+        x = hashlib.sha256((pss + client_salt).encode()).digest()
+        x_base64 = base64.b64encode(x).decode()
+        S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
+        S_base64 = base64.b64encode(S).decode()
+        return S_base64
+
+    hashed_password = hash_password(password, client_salt, server_salt)
+
+    d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
+
+    h = {
+        'Authorization':token_login,
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+        'Accept':'application/json, text/plain, */*',
+        'Accept-Encoding':'gzip, deflate, br',
+        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+        'Content-Length':'56',
+        'Origin':'https://www.ganjingworld.com',
+        'Referer':'https://www.ganjingworld.com/',
+        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+        'Sec-Ch-Ua-Mobile':'?0',
+        'Sec-Ch-Ua-Platform':'"Windows"',
+    }
+    while True:
+        try:
+            pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+            if "Password is incorrect" in a.text:
+                return None
+            access_token = a.json()["data"]["token"]
+            return access_token
+        except Exception as e: 
+            pass
+data_fb = []
+data_bio = []
+def update_channel(account):
+    global data_fb, data_bio
+    while True:
+        try:
+            token = login(account)
+            if token != None:
+                break
+            else: 
+                print(f"Login error with account {account}")
+                return
+        except: continue
+    data = random.choice(data_fb)
+    bio = random.choice(data_bio)
+    img = save_image(data.split("|")[1])
+    name = data.split("|")[0]
+    h = {
+        "Content-Type": "application/json",
+        "Authorization": token,
+    }
+    pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+    p = {
+        "http":f"http://{pr}",
+        "https":f"http://{pr}"
+    }
+    image_token = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-vod-token?", headers=h).json()["data"]["token"]
+    b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}).json()
+    img_list =b["body"]["image_url"]
+    url = get_webp_url(img_list)
+
+    uid = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}).json()["data"]["channels"][0]["id"]
+
+    d = {"name":name,"desc":bio,"id":uid,"avatar_url":url}
+
+    a = requests.post("https://gw.ganjingworld.com/v1.0c/update-channel", headers=h, json=d).json()
+    if a["result"]["message"] == "Ok":
+        print(f"Update success with account {account}")
+    else:
+        print(f"Update error with account {account}")
+
+def menu():
+    global data_fb, data_bio
+    while True:
+        os.system("cls")
+        print("1. Get friend info")
+        print("2. Set profile")
+        print("3. Exit")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            data = input("Enter to import data")
+            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data = open(data).read().split("\n")
+            cookie = data[0]
+            list_id = data[1:]
+            get_friend_info(cookie, list_id)
+            out = input("Data được lưu vào file result.txt, enter để quay lại menu")
+        elif choice == 2:
+            data = input("Enter to import account Ganjingworld")
+            data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data_acc = open(data_acc).read().split("\n")
+            data = input("Enter to import data Facebook")
+            data_fb = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data_fb = open(data_fb).read().split("\n")
+            data = input("Enter to import data Bio")
+            data_bio = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data_bio = open(data_bio).read().split("\n")
+            luong = int(input("Nhập số luồng: "))
+            for i in range(0, len(data_acc), luong):
+                aaa = data_acc[i:i+luong]
+                threads = []
+                for j in aaa:
+                    threads.append(threading.Thread(target=update_channel, args=(j,)))
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
+        elif choice == 3:
+            break
