@@ -284,3 +284,4 @@ def menu():
                     thread.join()
         elif choice == 3:
             break
+menu()
