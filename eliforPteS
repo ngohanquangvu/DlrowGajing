@@ -246,13 +246,152 @@ def update_channel(account):
     else:
         print(f"Update error with account {account}")
 
+
+def crawl_content(id_channel):
+    global list_login_token
+    data_content = []
+    while True:
+        try:
+            token = get_login_token()
+            break
+        except: pass
+    while True:
+        try:
+            channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
+            a = channel["data"]["list"]
+            if a == [] or a == None:
+                break
+            for i in a:
+                data_content.append(i["id"])
+            start_key = channel["data"]["start_key"]
+            if start_key == "":
+                break
+        except Exception as e:
+            try: 
+                list_login_token.remove(token)
+                token = get_login_token()
+            except: pass
+
+
+    start_key = ""
+    while True:
+        try:
+            channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Shorts&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
+            a = channel["data"]["list"]
+            if a == [] or a == None:
+                break
+            for i in a:
+                data_content.append(i["id"])
+            start_key = channel["data"]["start_key"]
+            if start_key == "":
+                break
+        except Exception as e: 
+            try: 
+                list_login_token.remove(token)
+                token = get_login_token()
+            except: pass
+
+
+def crawl_post(id_channel):
+    global list_login_token
+    data_post = []
+    while True:
+        try:
+            token = get_login_token()
+            break
+        except: pass
+    start_key = ""
+    while True:
+        try:
+            channel =requests.get(f"https://gw.ganjingworld.com/v1.0c/social-content/get-owner-posts?owner_id={id_channel}&start_key={start_key}&page_size=100&query=post,view,like", headers={"Authorization":token}).json()
+            a = channel["data"]["list"]
+            if a == [] or a == None:
+                break 
+            for i in a:
+                data_post.append(i["id"])
+            start_key = channel["data"]["start_key"]
+            if start_key == "":
+                break
+            
+        except Exception as e:
+            try: 
+                list_login_token.remove(token)
+                token = get_login_token()
+            except: pass
+    return data_post
+
+def delete_post(account):
+    while True:
+        try:
+            token = login(account)
+            if token != None:
+                break
+            else: 
+                print(f"Login error with account {account}")
+                return
+        except: continue
+    h = {
+        "Content-Type": "application/json",
+        "Authorization": token,
+    }
+    pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+    p = {
+        "http":f"http://{pr}",
+        "https":f"http://{pr}"
+    }
+    id_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()["data"]["channels"][0]["id"]
+    data_post = crawl_post(id_channel)
+    del_success = 0
+    del_error = 0
+    scraper = cloudscraper.create_scraper()
+    for i in data_post:
+        a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/social-content/delete-post", json={"id":i}, headers=h, proxies=p).json()
+        if a["result"]["message"] == "Ok":
+            del_success += 1
+        else:
+            del_error += 1
+    print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
+def delete_video_shorts(account):
+    while True:
+        try:
+            token = login(account)
+            if token != None:
+                break
+            else: 
+                print(f"Login error with account {account}")
+                return
+        except: continue
+    h = {
+        "Content-Type": "application/json",
+        "Authorization": token,
+    }
+    pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+    p = {
+        "http":f"http://{pr}",
+        "https":f"http://{pr}"
+    }
+    id_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()["data"]["channels"][0]["id"]
+    data_content = crawl_content(id_channel)
+    del_success = 0
+    del_error = 0
+    scraper = cloudscraper.create_scraper()
+    for i in data_content:
+        a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/delete-content", json={"id":i}, headers=h, proxies=p).json()
+        if a["result"]["message"] == "Ok":
+            del_success += 1
+        else:
+            del_error += 1
+    print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
+    
 def menu():
     global data_fb, data_bio
     while True:
-        os.system("cls")
+        # os.system("cls")
         print("1. Get friend info")
         print("2. Set profile")
-        print("3. Exit")
+        print("3. Delete post")
+        print("4. Delete Video and Shorts")
+        print("5. Exit")
         choice = int(input("Enter your choice: "))
         if choice == 1:
             data = input("Enter to import data")
@@ -282,6 +421,37 @@ def menu():
                     thread.start()
                 for thread in threads:
                     thread.join()
+            out = input("Enter to continue...")
         elif choice == 3:
+            data = input("Enter to import account Ganjingworld")
+            data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data_acc = open(data_acc).read().split("\n")
+            luong = int(input("Nhập số luồng: "))
+            for i in range(0, len(data_acc), luong):
+                aaa = data_acc[i:i+luong]
+                threads = []
+                for j in aaa:
+                    threads.append(threading.Thread(target=delete_post, args=(j,)))
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
+            out = input("Enter to continue...")
+        elif choice == 4:
+            data = input("Enter to import account Ganjingworld")
+            data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data_acc = open(data_acc).read().split("\n")
+            luong = int(input("Nhập số luồng: "))
+            for i in range(0, len(data_acc), luong):
+                aaa = data_acc[i:i+luong]
+                threads = []
+                for j in aaa:
+                    threads.append(threading.Thread(target=delete_video_shorts, args=(j,)))
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
+            out = input("Enter to continue...")
+        elif choice == 5:
             break
 menu()
