@@ -80,6 +80,7 @@ current_url_index = 0
 url_complete = 0
 scraper = cloudscraper.create_scraper()
 
+
 def buff_view(index, lock):
     global running, url_complete, view, list_uid, list_login_token, current_url_index
     while True:
@@ -132,6 +133,21 @@ def buff_view(index, lock):
                 if count["data"]["view_count"]>current_view:
                     current_view = count["data"]["view_count"]
                     running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
+                    try:
+                        h = {
+                            "Content-Type": "application/json",
+                            "Authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIxZ2h0NHMwaGoxazNsVVBrZm1SY3l3MVNSMTM2MHUiLCJhY2lkIjoiMWdodDR0MmxkcW8ybjdRaXlCVEkxQjFJRTFpajBjIiwicm9sZXMiOlsiY2hfb3duZXI6MWdodDR0MmxkcW8ybjdRaXlCVEkxQjFJRTFpajBjIl0sImV4cCI6MTcxODIwNzUyMiwiaWF0IjoxNzE3MzQzNTIyfQ.j9seCJBvanRcW8yVFHK3yX0T_RYX1c_bQ7oPxp4VMPM"
+                        }
+
+                        d = {"video_id":uid,"position_sec":delay,"lan":"en-US"}
+                        pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+                        p = {
+                            "http":f"http://{pr}",
+                            "https":f"http://{pr}"
+                        }
+                        a = scraper.post("https://gw.ganjingworld.com/v1.0c/put-watch-history", headers=h, json=d, proxies=p).json()
+                    except:
+                        pass
                 else:
                     running[index] = ["Sending view", url, f"{current_view} views"]
 
