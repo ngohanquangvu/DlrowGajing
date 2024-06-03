@@ -81,7 +81,7 @@ global_token = get_login_token()
 
 def generate_random_email():
     random_string = random.choice([str(Faker().user_name()+str(random.randint(0, 9999))), (str(random.randint(0,999))+Faker().first_name().lower().replace(" ", "")), (Faker().email().split("@")[0]+str(random.randint(0,10000)))])
-    return random_string + random.choice(["@vjuum.com","@dpptd.com","@txcct.com","@1secmail.com","@1secmail.net"])
+    return random_string + random.choice(["@vjuum.com","@dpptd.com","@txcct.com","@1secmail.com"])
 
 def RegAcc(index):
     global running, success, custom, slg_acc, global_token
@@ -92,7 +92,7 @@ def RegAcc(index):
             email = generate_random_email()
             running[index] = [email,"","Đang kiểm tra email..."]
             while True:
-                p = random.choice(['hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080'])
+                p = random.choice(['0JeLKc:G69qYC@hub-us-8.litport.net:31682'])
                 global_proxy = {
                     "http":f"http://{p}",
                     "https":f"http://{p}"
