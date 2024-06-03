@@ -109,7 +109,7 @@ def buff_view(index, lock):
                 }
                 running[index] = ["Sending view", url, f"{current_view} views"]
                 count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
-                target_view = count["data"]["view_count"]+view
+                target_view = count["data"]["view_count"]+int(view*random.uniform(1.9, 1.5))
                 current_view = count["data"]["view_count"]
                 break
             except:
