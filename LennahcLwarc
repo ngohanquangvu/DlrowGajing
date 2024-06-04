@@ -166,7 +166,7 @@ def crawl_data(url):
     wb.save(f'Data_Post/{name_file}.xlsx')
     while True:
         try:
-            channel =requests.get(f"https://gw.ganjingworld.com/v1.0c/social-content/get-owner-posts?owner_id={id_channel}&start_key={start_key}&page_size=100&post_image=true&query=post,view,like", headers={"Authorization":token}).json()
+            channel =requests.get(f"https://gw.ganjingworld.com/v1.0c/social-content/get-owner-posts?owner_id={id_channel}&start_key={start_key}&page_size=100&query=post,view,like", headers={"Authorization":token}).json()
             a = channel["data"]["list"]
             if a == [] or a == None:
                 break 
