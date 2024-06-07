@@ -66,8 +66,8 @@ def get_login_token():
             'X-Cdk-Lrtm':'2024-03-15 20:48:30',
         }
         global_proxy = {
-            "http":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080",
-            "https":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+            "http":"http://Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080",
+            "https":"http://Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
         }
         while True:
             if len(list_login_token) != 0:
@@ -81,7 +81,7 @@ global_token = get_login_token()
 
 def generate_random_email():
     random_string = random.choice([str(Faker().user_name()+str(random.randint(0, 9999))), (str(random.randint(0,999))+Faker().first_name().lower().replace(" ", "")), (Faker().email().split("@")[0]+str(random.randint(0,10000)))])
-    return random_string + random.choice(["@vjuum.com","@dpptd.com","@txcct.com","@1secmail.com"])
+    return random_string + random.choice(["@vjuum.com","@dpptd.com","@txcct.com","@1secmail.org"])
 
 def RegAcc(index):
     global running, success, custom, slg_acc, global_token
@@ -152,7 +152,7 @@ def RegAcc(index):
 
             while True:
                 try:
-                    p = random.choice(['hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080'])
+                    p = random.choice(['Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080'])
                     global_proxy = {
                         "http":f"http://{p}",
                         "https":f"http://{p}"
@@ -183,7 +183,7 @@ def RegAcc(index):
                     while True:
                         try:
                             scraper = cloudscraper.create_scraper()
-                            p = random.choice(['hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080'])
+                            p = random.choice(['Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080'])
                             global_proxy = {
                                 "http":f"http://{p}",
                                 "https":f"http://{p}"
@@ -199,8 +199,8 @@ def RegAcc(index):
                         data_profile = generate_vietnamese_names_and_genders().split("|")
                         scraper = cloudscraper.create_scraper()
                         global_proxy = {
-                            "http":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080",
-                            "https":"http://hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+                            "http":"http://Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080",
+                            "https":"http://Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
                         }
                         uuid = scraper.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers={'Authorization':access_token}, proxies=global_proxy).json()["data"]["user_profile"]["profileId"]
                         open("Result.txt","a",encoding="utf-8").write(f"{email}|{n}|https://www.ganjingworld.com/channel/{uuid}\n")
