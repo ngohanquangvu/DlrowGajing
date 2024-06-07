@@ -1,3 +1,4 @@
+
 if not os.path.exists('ImageData'):
     os.makedirs('ImageData')
 
@@ -150,7 +151,7 @@ def login(account):
                 'Sec-Ch-Ua-Mobile':'?0',
                 'Sec-Ch-Ua-Platform':'"Windows"',
             }
-            pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+            pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
@@ -193,7 +194,7 @@ def login(account):
     }
     while True:
         try:
-            pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+            pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
@@ -226,7 +227,7 @@ def update_channel(account):
         "Content-Type": "application/json",
         "Authorization": token,
     }
-    pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+    pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
     p = {
         "http":f"http://{pr}",
         "https":f"http://{pr}"
@@ -334,7 +335,7 @@ def delete_post(account):
         "Content-Type": "application/json",
         "Authorization": token,
     }
-    pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+    pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
     p = {
         "http":f"http://{pr}",
         "https":f"http://{pr}"
@@ -365,7 +366,7 @@ def delete_video_shorts(account):
         "Content-Type": "application/json",
         "Authorization": token,
     }
-    pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+    pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
     p = {
         "http":f"http://{pr}",
         "https":f"http://{pr}"
@@ -396,7 +397,7 @@ def menu():
         if choice == 1:
             data = input("Enter to import data")
             data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data).read().split("\n")
+            data = open(data, encoding="utf-8", errors="replace").read().split("\n")
             cookie = data[0]
             list_id = data[1:]
             get_friend_info(cookie, list_id)
@@ -404,13 +405,13 @@ def menu():
         elif choice == 2:
             data = input("Enter to import account Ganjingworld")
             data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_acc = open(data_acc).read().split("\n")
+            data_acc = open(data_acc, encoding="utf-8", errors="replace").read().split("\n")
             data = input("Enter to import data Facebook")
             data_fb = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_fb = open(data_fb).read().split("\n")
+            data_fb = open(data_fb, encoding="utf-8", errors="replace").read().split("\n")
             data = input("Enter to import data Bio")
             data_bio = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_bio = open(data_bio).read().split("\n")
+            data_bio = open(data_bio, encoding="utf-8", errors="replace").read().split("\n")
             luong = int(input("Nhập số luồng: "))
             for i in range(0, len(data_acc), luong):
                 aaa = data_acc[i:i+luong]
@@ -425,7 +426,7 @@ def menu():
         elif choice == 3:
             data = input("Enter to import account Ganjingworld")
             data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_acc = open(data_acc).read().split("\n")
+            data_acc = open(data_acc, encoding="utf-8", errors="replace").read().split("\n")
             luong = int(input("Nhập số luồng: "))
             for i in range(0, len(data_acc), luong):
                 aaa = data_acc[i:i+luong]
@@ -440,7 +441,7 @@ def menu():
         elif choice == 4:
             data = input("Enter to import account Ganjingworld")
             data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_acc = open(data_acc).read().split("\n")
+            data_acc = open(data_acc, encoding="utf-8", errors="replace").read().split("\n")
             luong = int(input("Nhập số luồng: "))
             for i in range(0, len(data_acc), luong):
                 aaa = data_acc[i:i+luong]
