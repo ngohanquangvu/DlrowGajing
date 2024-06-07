@@ -94,7 +94,7 @@ def buff_view(index, lock):
         running[index] = ["Loading", url, "Lấy thông tin thành công"]
         current_view = 0
         while True:
-            pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+            pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
@@ -115,7 +115,7 @@ def buff_view(index, lock):
             except:
                 pass
         while True:
-            pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+            pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
@@ -130,6 +130,10 @@ def buff_view(index, lock):
                 }
                 running[index] = ["Sending view", url, f"{current_view} views"]
                 count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                try:
+                    count["data"]["view_count"]
+                except:
+                    open("error.txt", "a").write(f"{count}\n")
                 if count["data"]["view_count"]>current_view:
                     current_view = count["data"]["view_count"]
                     running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
@@ -140,7 +144,7 @@ def buff_view(index, lock):
                         }
 
                         d = {"video_id":uid,"position_sec":delay,"lan":"en-US"}
-                        pr = "hNKpTvR0zNt9:1uVHID5Skhgw@ipv6.proxiware.com:8080"
+                        pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
                         p = {
                             "http":f"http://{pr}",
                             "https":f"http://{pr}"
@@ -157,7 +161,6 @@ def buff_view(index, lock):
 
                 time.sleep(delay)
             except Exception as e:
-                open("error.txt", "a").write(f"{str(e)}\n")
                 running[index] = ["Sent view unsuccessfully", url, f"{current_view} views"]
                 time.sleep(delay)
         running[index] = ["", "", ""]
