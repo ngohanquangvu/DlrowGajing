@@ -209,6 +209,7 @@ data_fb = []
 data_bio = []
 def update_channel(account):
     global data_fb, data_bio
+    print(f"Login with account {account}")
     while True:
         try:
             token = login(account)
@@ -218,6 +219,7 @@ def update_channel(account):
                 print(f"Login error with account {account}")
                 return
         except: continue
+    print(f"Login success with account {account}")
     data = random.choice(data_fb)
     bio = random.choice(data_bio)
     img = save_image(data.split("|")[1])
@@ -240,13 +242,16 @@ def update_channel(account):
         url = get_webp_url(img_list)
 
     uid = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}).json()["data"]["channels"][0]["id"]
-
-    d = {"name":name,"desc":bio,"id":uid,"avatar_url":url}
-
-    a = requests.post("https://gw.ganjingworld.com/v1.0c/update-channel", headers=h, json=d).json()
+    if url == "":
+        d = {"name":name,"desc":bio,"id":uid}
+    else:
+        d = {"name":name,"desc":bio,"id":uid,"avatar":url}
+    scraper = cloudscraper.create_scraper()
+    a = scraper.post("https://gw.ganjingworld.com/v1.0c/update-channel", headers=h, json=d, proxies=p).json()
     if a["result"]["message"] == "Ok":
         print(f"Update success with account {account}")
     else:
+        open("log.txt", "a", encoding="utf-8").write(f"Result: {str(a)} with account {account}\n")
         print(f"Update error with account {account}")
 
 
@@ -407,7 +412,8 @@ def menu():
         elif choice == 2:
             data = input("Enter to import account Ganjingworld")
             data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_acc = open(data_acc, encoding="utf-8", errors="replace").read().split("\n")
+            data_acc = open(data_acc, encoding="utf-8", errors="replace").readlines()
+            data_acc = [i.strip("\n") for i in data_acc]
             data = input("Enter to import data Facebook")
             data_fb = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
             data_fb = open(data_fb, encoding="utf-8", errors="replace").read().split("\n")
@@ -434,7 +440,7 @@ def menu():
                 aaa = data_acc[i:i+luong]
                 threads = []
                 for j in aaa:
-                    threads.append(threading.Thread(target=delete_post, args=(j,)))
+                    threads.append(threading.Thread(target=delete_post, args=(j.replace(" ",""),)))
                 for thread in threads:
                     thread.start()
                 for thread in threads:
@@ -449,7 +455,7 @@ def menu():
                 aaa = data_acc[i:i+luong]
                 threads = []
                 for j in aaa:
-                    threads.append(threading.Thread(target=delete_video_shorts, args=(j,)))
+                    threads.append(threading.Thread(target=delete_video_shorts, args=(j.replace(" ",""),)))
                 for thread in threads:
                     thread.start()
                 for thread in threads:
