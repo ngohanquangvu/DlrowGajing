@@ -150,7 +150,7 @@ def login(account):
                 'Sec-Ch-Ua-Mobile':'?0',
                 'Sec-Ch-Ua-Platform':'"Windows"',
             }
-            pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
@@ -193,7 +193,7 @@ def login(account):
     }
     while True:
         try:
-            pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
