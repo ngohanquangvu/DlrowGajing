@@ -171,7 +171,7 @@ def RegAcc(index):
                 while code == "False":
                     running[index]= [email,n,"Đang lấy mã xác minh..."]
                     dem+=1
-                    if dem==3:
+                    if dem==10:
                         running[index]= [email,n,"Đăng ký thất bại, không lấy được mã xác minh"]
                         open("Custom.txt","a",encoding="utf-8").write(f"{email}|{n}|Không lấy được mã xác minh\n")
                         custom+=1
