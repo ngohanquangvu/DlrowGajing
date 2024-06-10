@@ -152,7 +152,7 @@ def RegAcc(index):
 
             while True:
                 try:
-                    p = random.choice(['Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080'])
+                    p = random.choice(['0JeLKc:G69qYC@hub-us-8.litport.net:31682'])
                     global_proxy = {
                         "http":f"http://{p}",
                         "https":f"http://{p}"
