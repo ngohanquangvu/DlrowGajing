@@ -56,11 +56,11 @@ def get_friend_info(cookie, list_id):
     print("Đang lấy thông tin bạn bè...")
     access_token = eaabw(cookie)
     for user_id in list_id:
-        user_info_url = f'https://graph.facebook.com/{user_id}?fields=name,picture&access_token={access_token}'
+        user_info_url = f'https://graph.facebook.com/{user_id}?fields=name,picture.type(large)&access_token={access_token}'
         response = requests.get(user_info_url)
         user_info = response.json()
         open("result.txt","a",encoding="utf-8").write(f'{user_info["name"]}|{user_info["picture"]["data"]["url"]}'+"\n")
-        friends_url = f'https://graph.facebook.com/{user_id}/friends?fields=id,picture,name&access_token={access_token}'
+        friends_url = f'https://graph.facebook.com/{user_id}/friends?fields=id,picture.type(large),name&access_token={access_token}'
         response = requests.get(friends_url)
         friends_list = response.json()
         for i in friends_list["data"]:
