@@ -135,23 +135,14 @@ def buff_view(index, lock):
                 except:
                     open("error.txt", "a").write(f"{count}\n")
                 if count["data"]["view_count"]>current_view:
-                    current_view = count["data"]["view_count"]
-                    running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
                     try:
-                        h = {
-                            "Content-Type": "application/json",
-                            "Authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIxZ2h0NHMwaGoxazNsVVBrZm1SY3l3MVNSMTM2MHUiLCJhY2lkIjoiMWdodDR0MmxkcW8ybjdRaXlCVEkxQjFJRTFpajBjIiwicm9sZXMiOlsiY2hfb3duZXI6MWdodDR0MmxkcW8ybjdRaXlCVEkxQjFJRTFpajBjIl0sImV4cCI6MTcxODIwNzUyMiwiaWF0IjoxNzE3MzQzNTIyfQ.j9seCJBvanRcW8yVFHK3yX0T_RYX1c_bQ7oPxp4VMPM"
-                        }
-
-                        d = {"video_id":uid,"position_sec":delay,"lan":"en-US"}
-                        pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
-                        p = {
-                            "http":f"http://{pr}",
-                            "https":f"http://{pr}"
-                        }
-                        a = scraper.post("https://gw.ganjingworld.com/v1.0c/put-watch-history", headers=h, json=d, proxies=p).json()
+                        d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"v\":1,\"cid\":\"ef343da1-5e65-418c-850c-668aeb6234bf\",\"uid\":\"\",\"dl\":\"https://www.ganjingworld.com/video/"+uid+"\",\"cnt_type\":\"Video\",\"cnt_id\":\""+uid+"\",\"dt\":\"test time\",\"dr\":\"https://www.ganjingworld.com\",\"view_pct\":100,\"view_time\":"+str(delay)+",\"ugrp\":\"\",\"ga_cid\":\"4b3a2281e15a9cab\",\"channel_id\":\"1gpvljk771s46RJH6XHUwqyVr1oo0c\"}]","v":1,"cid":"3dc1b380-0961-08e6-ea22-666d31d1ec0c","uid":"","dl":f"https://www.ganjingworld.com/video/{uid}","dr":"https://www.ganjingworld.com","ugrp":"","ga_cid":"4b3a2281e15a9cab"}
+                        a = scraper.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies=p).json()
                     except:
                         pass
+                    current_view = count["data"]["view_count"]
+                    running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
+                    
                 else:
                     running[index] = ["Sending view", url, f"{current_view} views"]
 
