@@ -86,8 +86,8 @@ if os.path.exists("./ImageData")==False: os.mkdir("./ImageData")
 list_token = []
 
 global_proxy = {
-    "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
-    "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
+    "http":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682",
+    "https":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
 }
 
 list_fb_dtsg = []
@@ -351,6 +351,11 @@ def get_login_token():
         list_login_token.append(token)
         return token
 
+def get_webp_url(media_list):
+            for url in media_list:
+                if url.endswith('origin.webp'):
+                    return url
+            return None
 
 def login_and_post(email, password, data, access_token=None):
     global total
@@ -453,11 +458,6 @@ def login_and_post(email, password, data, access_token=None):
                 frame_text_box.configure(state = "disabled")
                 time.sleep(10)
                 login_and_post(email, password, data, None)
-        def get_webp_url(media_list):
-            for url in media_list:
-                if url.endswith('origin.webp'):
-                    return url
-            return None
 
         d = {
             'allowGuest': "true",
@@ -509,6 +509,149 @@ def login_and_post(email, password, data, access_token=None):
             login_and_post(email, password, data, None)
     print(f"Done with acc {email}:{password}")
 
+def login(email,password):
+    while True:
+        try:
+            token_login = get_login_token()
+            d = {"user_email":email,"client_type":3}
+
+            h = {
+                'Authorization':token_login,
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+                'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+                'Accept':'application/json, text/plain, */*',
+                'Accept-Encoding':'gzip, deflate, br',
+                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                'Content-Length':'56',
+                'Origin':'https://www.ganjingworld.com',
+                'Referer':'https://www.ganjingworld.com/',
+                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                'Sec-Ch-Ua-Mobile':'?0',
+                'Sec-Ch-Ua-Platform':'"Windows"',
+            }
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+            break
+        except Exception as e: 
+            continue
+    if "The user does not exist" in a.text:
+        return None
+    else:
+        open("log.txt", "a", encoding="utf-8").write(f"Result: {a.text} with account {email}:{password}\n")
+    server_salt = a.json()["data"]["server_salt"]
+    client_salt = a.json()["data"]["client_salt"]
+    def hash_password(pss, client_salt, server_salt):
+        x = hashlib.sha256((pss + client_salt).encode()).digest()
+        x_base64 = base64.b64encode(x).decode()
+        S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
+        S_base64 = base64.b64encode(S).decode()
+        return S_base64
+
+    hashed_password = hash_password(password, client_salt, server_salt)
+
+    d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
+
+    h = {
+        'Authorization':token_login,
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+        'Accept':'application/json, text/plain, */*',
+        'Accept-Encoding':'gzip, deflate, br',
+        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+        'Content-Length':'56',
+        'Origin':'https://www.ganjingworld.com',
+        'Referer':'https://www.ganjingworld.com/',
+        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+        'Sec-Ch-Ua-Mobile':'?0',
+        'Sec-Ch-Ua-Platform':'"Windows"',
+    }
+    while True:
+        try:
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            a = requests.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+            if "Password is incorrect" in a.text:
+                return None
+            access_token = a.json()["data"]["token"]
+            return access_token
+        except Exception as e: 
+            pass
+
+def login_and_post_reup_page():
+        global_fb
+        while True:
+            acc = random.choice(list_userpass)
+            email = acc.split("|")[0]
+            password = acc.split("|")[1]
+            while True:
+                try:
+                    access_token = login(email, password)
+                    if access_token!=None:
+                        break
+                    else:
+                        continue
+                except:    
+                    continue
+            data = get_content(global_fb, 1)
+            content = data[0].split("|")[0]
+            img = data[0].split("|")[1]
+            d = {
+                'allowGuest': "true",
+                'in_topic': "",
+                'lang': "vi-VN",
+                "media":[],
+                'mode': "ready",
+                'premium': 0,
+                'text': content,
+                'type': "Post",
+                'visibility': "public"
+            }
+
+            h = {
+                "Authorization":access_token
+            }
+            print(access_token)
+            try:
+                a = requests.post("https://gw.ganjingworld.com/v1.0c/social-content/add-post", json=d, headers=h).json()
+                data_post = a["data"]
+                try:
+                    image_token = requests.get(f"https://gw.ganjingworld.com/v1.1/get-vod-token?content_id={data_post['id']}", headers=h).json()["data"]["token"]
+                    if img!=None:
+                            try:
+                                b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}, proxies=global_proxy).json()
+                                img_list =b["body"]["image_url"]
+
+                                url = get_webp_url(img_list)
+                                data_post["media"] = [{"url":url,"id":"01ec6abc-a96c-4bfd-841f-d0ac576d4f13","width":745,"height":656,"ratio":0.8805369127516779,"type":"Image","analyzed_result":"{\"process_time\":\"0.0752 seconds\",\"result\":\"Good\"}\n"}]
+                                post_image = requests.post("https://gw.ganjingworld.com/v1.0c/social-content/update-post", headers=h, json=data_post).json()
+                            except (ConnectionError, ConnectionAbortedError):  
+                                print(str(e))
+                                continue
+                except:
+                    open("log.txt", "a", encoding="utf-8").write(f"Result: {a} with account {email}:{password}\n")
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Đăng {int(change_account.get())-dem+1} post thành công với account {email}:{password}\n')
+                total+=1
+                frame_text_box.configure(state = "disabled")
+                dem-=1
+                open("Result.txt", "a", encoding="utf-8").write(f"Post https://www.ganjingworld.com/post/{data_post['id']}, Image {img} with account {email}:{password}\n")
+                time.sleep(int(delay.get()))
+            except Exception as e:
+                open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} in add post with account {email}:{password}\n")
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Đăng post không thành công với account {email}:{password}\n')
+                frame_text_box.configure(state = "disabled")
+                login_and_post(email, password, data, None)
+
 def update_sl():
     global total
     while True:
@@ -516,20 +659,23 @@ def update_sl():
         time.sleep(1)
 
 def start():
-    global list_token
+    global list_token, global_fb
     def runn():
         if len(list_cookie_fb)>0:
             list_token.append(eaabw(random.choice(list_cookie_fb)))
-        for i in range(0, len(list_userpass), int(luong.get())):
-            threads = []
-            aaa = list_userpass[i:i+int(luong.get())]
-            for j in range(len(aaa)):
-                acc = aaa[j].split("|")
-                threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], acc[2])))
-            for thread in threads:
-                thread.start()
-            for thread in threads:
-                thread.join()
+        if global_fb==None:
+            for i in range(0, len(list_userpass), int(luong.get())):
+                    threads = []
+                    aaa = list_userpass[i:i+int(luong.get())]
+                    for j in range(len(aaa)):
+                        acc = aaa[j].split("|")
+                        threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], acc[2])))
+                    for thread in threads:
+                        thread.start()
+                    for thread in threads:
+                        thread.join()
+        else:
+            t = threading.Thread(target=login_and_post_reup_page)
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ')
         frame_text_box.configure(state = "disabled")
@@ -545,17 +691,26 @@ def start():
 
 
 list_userpass = []
+global_fb = None
 
 def open_file_userpass():
-    global list_userpass
+    global list_userpass, global_fb
     from tkinter import filedialog
     file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose data file")
     if file_text_path!="":
         a = open(file_text_path, "r").readlines()
-        for cell in a:
-            test = cell.strip("\n").split("|")
-            if len(test)==3 and test[0]!="" and test[1]!="" and test[2]!="":
-                list_userpass.append(cell.strip("\n"))
+        if ("https://www.facebook.com" in a[0].strip("\n").split("|")[0])==False:    
+                global_fb = None      
+                for cell in a:
+                    test = cell.strip("\n").split("|")
+                    if len(test)==3 and test[0]!="" and test[1]!="" and test[2]!="":
+                        list_userpass.append(cell.strip("\n"))
+        else:
+            global_fb = a[0].strip("\n")
+            for cell in a:
+                test = cell.strip("\n")
+                if len(test.split("|"))==2 and test.split("|")[0]!="" and test.split("|")[1]!="" and test.split("|")[2]!="":
+                    list_userpass.append(cell.strip("\n"))
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Import success {len(list_userpass)} Data\n')
         frame_text_box.configure(state = "disabled")
