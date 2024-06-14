@@ -207,8 +207,9 @@ def login(account):
             pass
 data_fb = []
 data_bio = []
+data_token = []
 def update_channel(account):
-    global data_fb, data_bio
+    global data_fb, data_bio, data_token
     print(f"Login with account {account}")
     while True:
         try:
@@ -228,31 +229,50 @@ def update_channel(account):
         "Content-Type": "application/json",
         "Authorization": token,
     }
-    pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
+    pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
     p = {
         "http":f"http://{pr}",
         "https":f"http://{pr}"
     }
+    print(f"Upload img with account {account}")
     if img == None:
         url = ""
     else:
-        image_token = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-vod-token?", headers=h).json()["data"]["token"]
-        b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}).json()
-        img_list =b["body"]["image_url"]
-        url = get_webp_url(img_list)
-
-    uid = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}).json()["data"]["channels"][0]["id"]
+        while True:
+            try:
+                if len(data_token) == 0:
+                    image_token = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-vod-token?", headers=h).json()["data"]["token"]
+                    data_token.append(image_token)
+                else:
+                    image_token = random.choice(data_token)
+                b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}).json()
+                img_list =b["body"]["image_url"]
+                url = get_webp_url(img_list)
+                break
+            except Exception as e:
+                continue
+    while True:
+        try:
+            uid = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}, proxies=p).json()["data"]["channels"][0]["id"]
+            break
+        except: continue
     if url == "":
         d = {"name":name,"desc":bio,"id":uid}
     else:
         d = {"name":name,"desc":bio,"id":uid,"avatar_url":url}
     scraper = cloudscraper.create_scraper()
-    a = scraper.post("https://gw.ganjingworld.com/v1.0c/update-channel", headers=h, json=d, proxies=p).json()
-    if a["result"]["message"] == "Ok":
-        print(f"Update success with account {account}")
-    else:
-        open("log.txt", "a", encoding="utf-8").write(f"Result: {str(a)} with account {account}\n")
-        print(f"Update error with account {account}")
+    print(f"Update channel with account {account}")
+    while True:
+        try:
+            a = scraper.post("https://gw.ganjingworld.com/v1.0c/update-channel", headers=h, json=d, proxies=p).json()
+            if a["result"]["message"] == "Ok":
+                print(f"Update success with account {account}")
+            else:
+                open("log.txt", "a", encoding="utf-8").write(f"Result: {str(a)} with account {account}\n")
+                print(f"Update error with account {account}")
+            break
+        except:
+            pass
 
 
 def crawl_content(id_channel):
@@ -431,6 +451,7 @@ def menu():
                 for thread in threads:
                     thread.join()
             out = input("Enter to continue...")
+            os.system("cls")
         elif choice == 3:
             data = input("Enter to import account Ganjingworld")
             data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
@@ -446,6 +467,7 @@ def menu():
                 for thread in threads:
                     thread.join()
             out = input("Enter to continue...")
+            os.system("cls")
         elif choice == 4:
             data = input("Enter to import account Ganjingworld")
             data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
@@ -461,6 +483,7 @@ def menu():
                 for thread in threads:
                     thread.join()
             out = input("Enter to continue...")
+            os.system("cls")
         elif choice == 5:
             break
 menu()
