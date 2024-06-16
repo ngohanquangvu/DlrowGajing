@@ -36,8 +36,8 @@ if os.path.exists("./VideoData")==False: os.mkdir("./VideoData")
 list_token = []
 
 global_proxy = {
-    "http":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337",
-    "https":"http://TgtdXU:fdNFnE@hub-us-8.litport.net:31337"
+    "http":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682",
+    "https":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
 }
 
 
