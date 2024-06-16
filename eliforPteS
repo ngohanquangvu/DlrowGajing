@@ -157,6 +157,7 @@ def login(account):
                 "https":f"http://{pr}"
             }
             a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+	    b = a.json()
             break
         except Exception as e: 
             continue
