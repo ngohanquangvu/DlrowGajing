@@ -255,7 +255,8 @@ def update_channel(account):
                 continue
     while True:
         try:
-            uid = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}, proxies=p).json()["data"]["channels"][0]["id"]
+            scraper = cloudscraper.create_scraper()
+            uid = scraper.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}, proxies=p).json()["data"]["channels"][0]["id"]
             break
         except: continue
     if url == "":
