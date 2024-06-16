@@ -436,9 +436,13 @@ def menu():
             out = input("Data được lưu vào file result.txt, enter để quay lại menu")
         elif choice == 2:
             data = input("Enter to import account Ganjingworld")
-            data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_acc = open(data_acc, encoding="utf-8", errors="replace").readlines()
-            data_acc = [i.strip("\n") for i in data_acc]
+            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data = open(data_acc, encoding="utf-8", errors="replace").readlines()
+            data_acc = []
+            for i in data:
+                i = i.strip("\n")
+                if (len(i.split("|")) == 2) and ("@" in i.split("|")[0] == True) and (i.split("|")[1] != "") and (i.split("|")[1] != ""):
+                    data_acc.append(i)
             data = input("Enter to import data Facebook")
             data_fb = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
             data_fb = open(data_fb, encoding="utf-8", errors="replace").read().split("\n")
@@ -459,8 +463,13 @@ def menu():
             os.system("cls")
         elif choice == 3:
             data = input("Enter to import account Ganjingworld")
-            data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_acc = open(data_acc, encoding="utf-8", errors="replace").read().split("\n")
+            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data = open(data_acc, encoding="utf-8", errors="replace").readlines()
+            data_acc = []
+            for i in data:
+                i = i.strip("\n")
+                if (len(i.split("|")) == 2) and ("@" in i.split("|")[0] == True) and (i.split("|")[1] != "") and (i.split("|")[1] != ""):
+                    data_acc.append(i)
             luong = int(input("Nhập số luồng: "))
             for i in range(0, len(data_acc), luong):
                 aaa = data_acc[i:i+luong]
@@ -475,8 +484,13 @@ def menu():
             os.system("cls")
         elif choice == 4:
             data = input("Enter to import account Ganjingworld")
-            data_acc = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_acc = open(data_acc, encoding="utf-8", errors="replace").read().split("\n")
+            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data = open(data_acc, encoding="utf-8", errors="replace").readlines()
+            data_acc = []
+            for i in data:
+                i = i.strip("\n")
+                if (len(i.split("|")) == 2) and ("@" in i.split("|")[0] == True) and (i.split("|")[1] != "") and (i.split("|")[1] != ""):
+                    data_acc.append(i)
             luong = int(input("Nhập số luồng: "))
             for i in range(0, len(data_acc), luong):
                 aaa = data_acc[i:i+luong]
