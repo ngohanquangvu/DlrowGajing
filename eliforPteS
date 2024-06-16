@@ -437,7 +437,7 @@ def menu():
         elif choice == 2:
             data = input("Enter to import account Ganjingworld")
             data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data_acc, encoding="utf-8", errors="replace").readlines()
+            data = open(data, encoding="utf-8", errors="replace").readlines()
             data_acc = []
             for i in data:
                 i = i.strip("\n")
@@ -464,7 +464,7 @@ def menu():
         elif choice == 3:
             data = input("Enter to import account Ganjingworld")
             data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data_acc, encoding="utf-8", errors="replace").readlines()
+            data = open(data, encoding="utf-8", errors="replace").readlines()
             data_acc = []
             for i in data:
                 i = i.strip("\n")
@@ -485,7 +485,7 @@ def menu():
         elif choice == 4:
             data = input("Enter to import account Ganjingworld")
             data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data_acc, encoding="utf-8", errors="replace").readlines()
+            data = open(data, encoding="utf-8", errors="replace").readlines()
             data_acc = []
             for i in data:
                 i = i.strip("\n")
