@@ -441,7 +441,7 @@ def menu():
             data_acc = []
             for i in data:
                 i = i.strip("\n")
-                if (len(i.split("|")) == 2) and ("@" in i.split("|")[0] == True) and (i.split("|")[1] != "") and (i.split("|")[1] != ""):
+                if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
                     data_acc.append(i)
             data = input("Enter to import data Facebook")
             data_fb = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
@@ -468,7 +468,7 @@ def menu():
             data_acc = []
             for i in data:
                 i = i.strip("\n")
-                if (len(i.split("|")) == 2) and ("@" in i.split("|")[0] == True) and (i.split("|")[1] != "") and (i.split("|")[1] != ""):
+                if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
                     data_acc.append(i)
             luong = int(input("Nhập số luồng: "))
             for i in range(0, len(data_acc), luong):
@@ -489,7 +489,7 @@ def menu():
             data_acc = []
             for i in data:
                 i = i.strip("\n")
-                if (len(i.split("|")) == 2) and ("@" in i.split("|")[0] == True) and (i.split("|")[1] != "") and (i.split("|")[1] != ""):
+                if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
                     data_acc.append(i)
             luong = int(input("Nhập số luồng: "))
             for i in range(0, len(data_acc), luong):
