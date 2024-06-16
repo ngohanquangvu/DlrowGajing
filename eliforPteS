@@ -245,11 +245,12 @@ def update_channel(account):
                     data_token.append(image_token)
                 else:
                     image_token = random.choice(data_token)
-                b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}).json()
+                b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}, proxies=p).json()
                 img_list =b["body"]["image_url"]
                 url = get_webp_url(img_list)
                 break
             except Exception as e:
+                open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} with account {account}\n")
                 continue
     while True:
         try:
