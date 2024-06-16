@@ -378,12 +378,15 @@ def delete_post(account):
     del_error = 0
     scraper = cloudscraper.create_scraper()
     for i in data_post:
-        a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/social-content/delete-post", json={"id":i}, headers=h, proxies=p).json()
-        if a["result"]["message"] == "Ok":
-            del_success += 1
-        else:
-            del_error += 1
-    print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
+        try:
+            a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/social-content/delete-post", json={"id":i}, headers=h, proxies=p).json()
+            if a["result"]["message"] == "Ok":
+                del_success += 1
+            else:
+                del_error += 1
+            print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
+        except:
+            data_post.append(i)
 def delete_video_shorts(account):
     while True:
         try:
@@ -409,12 +412,15 @@ def delete_video_shorts(account):
     del_error = 0
     scraper = cloudscraper.create_scraper()
     for i in data_content:
-        a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/delete-content", json={"id":i}, headers=h, proxies=p).json()
-        if a["result"]["message"] == "Ok":
-            del_success += 1
-        else:
-            del_error += 1
-    print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
+        try:
+            a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/delete-content", json={"id":i}, headers=h, proxies=p).json()
+            if a["result"]["message"] == "Ok":
+                del_success += 1
+            else:
+                del_error += 1
+            print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
+        except Exception as e:
+            data_content.append(i)
     
 def menu():
     global data_fb, data_bio
