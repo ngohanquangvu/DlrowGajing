@@ -592,17 +592,29 @@ def login_and_post_reup_page():
             acc = random.choice(list_userpass)
             email = acc.split("|")[0]
             password = acc.split("|")[1]
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đang đăng nhập account {email}:{password}\n')
+            frame_text_box.configure(state = "disabled")
             while True:
                 try:
                     access_token = login(email, password)
                     if access_token!=None:
                         break
                     else:
+                        frame_text_box.configure(state = "normal")
+                        frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
+                        frame_text_box.configure(state = "disabled")
                         acc = random.choice(list_userpass)
                         email = acc.split("|")[0]
                         password = acc.split("|")[1]
+                        frame_text_box.configure(state = "normal")
+                        frame_text_box.insert(customtkinter.END, f'Đang đăng nhập account {email}:{password}\n')
+                        frame_text_box.configure(state = "disabled")
                 except:    
                     continue
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'Đăng nhập thành công account {email}:{password}\n')
+            frame_text_box.configure(state = "disabled")
             data = get_content(global_fb, 1)
             content = data[0][0]
             img = data[0][1]
