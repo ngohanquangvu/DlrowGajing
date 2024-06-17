@@ -598,7 +598,9 @@ def login_and_post_reup_page():
                     if access_token!=None:
                         break
                     else:
-                        continue
+                        acc = random.choice(list_userpass)
+                        email = acc.split("|")[0]
+                        password = acc.split("|")[1]
                 except:    
                     continue
             data = get_content(global_fb, 1)
