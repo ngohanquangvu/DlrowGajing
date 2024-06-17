@@ -323,6 +323,7 @@ def crawl_content(id_channel):
                 list_login_token.remove(token)
                 token = get_login_token()
             except: pass
+    return data_content
 
 
 def crawl_post(id_channel):
@@ -373,7 +374,9 @@ def delete_post(account):
         "https":f"http://{pr}"
     }
     id_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()["data"]["channels"][0]["id"]
+    print(f"Get post with account {account}")
     data_post = crawl_post(id_channel)
+    print(f"Get post success with account {account}")
     del_success = 0
     del_error = 0
     scraper = cloudscraper.create_scraper()
@@ -407,7 +410,9 @@ def delete_video_shorts(account):
         "https":f"http://{pr}"
     }
     id_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()["data"]["channels"][0]["id"]
+    print(f"Get content with account {account}")
     data_content = crawl_content(id_channel)
+    print(f"Get content success with account {account}")
     del_success = 0
     del_error = 0
     scraper = cloudscraper.create_scraper()
