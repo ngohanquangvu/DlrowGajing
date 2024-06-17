@@ -355,6 +355,7 @@ def crawl_post(id_channel):
     return data_post
 
 def delete_post(account):
+    print(f"Login with account {account}")
     while True:
         try:
             token = login(account)
@@ -364,6 +365,7 @@ def delete_post(account):
                 print(f"Login error with account {account}")
                 return
         except: continue
+    print(f"Login success with account {account}")
     h = {
         "Content-Type": "application/json",
         "Authorization": token,
@@ -391,6 +393,7 @@ def delete_post(account):
         except:
             data_post.append(i)
 def delete_video_shorts(account):
+    print(f"Login with account {account}")
     while True:
         try:
             token = login(account)
@@ -400,6 +403,7 @@ def delete_video_shorts(account):
                 print(f"Login error with account {account}")
                 return
         except: continue
+    print(f"Login success with account {account}")
     h = {
         "Content-Type": "application/json",
         "Authorization": token,
