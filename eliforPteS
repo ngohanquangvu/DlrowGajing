@@ -283,11 +283,8 @@ def update_channel(account):
 def crawl_content(id_channel):
     global list_login_token
     data_content = []
-    while True:
-        try:
-            token = get_login_token()
-            break
-        except: pass
+    token = ""
+    start_key = ""
     while True:
         try:
             channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
@@ -329,11 +326,7 @@ def crawl_content(id_channel):
 def crawl_post(id_channel):
     global list_login_token
     data_post = []
-    while True:
-        try:
-            token = get_login_token()
-            break
-        except: pass
+    token  = ""
     start_key = ""
     while True:
         try:
