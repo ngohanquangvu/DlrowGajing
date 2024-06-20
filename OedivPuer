@@ -300,8 +300,6 @@ def login_and_post(email, password, data, access_token=None):
                     frame_text_box.insert(customtkinter.END, f'Đăng nhập không thành công account {email}:{password}\n')
                     frame_text_box.configure(state = "disabled")
                     return None
-                else:
-                    open("log.txt", "a", encoding="utf-8").write(f"Result: {a.text} with account {email}:{password}\n")
                 server_salt = a.json()["data"]["server_salt"]
                 client_salt = a.json()["data"]["client_salt"]
                 def hash_password(pss, client_salt, server_salt):
@@ -348,7 +346,6 @@ def login_and_post(email, password, data, access_token=None):
                         print(f"Error login {str(e)}") 
                         pass
             except Exception as e:
-                open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} with account {email}:{password}\n")
                 frame_text_box.configure(state = "normal")
                 frame_text_box.insert(customtkinter.END, f'IP bị block\n')
                 frame_text_box.configure(state = "disabled")
