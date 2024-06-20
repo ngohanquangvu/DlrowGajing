@@ -267,7 +267,7 @@ def login_and_post(email, password, data, access_token=None):
             try:
                 while True:
                     try:
-                        token_login = get_login_token()
+                        token_login = ""
                         d = {"user_email":email,"client_type":3}
 
                         h = {
