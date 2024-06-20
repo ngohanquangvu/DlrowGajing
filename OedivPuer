@@ -241,7 +241,11 @@ def upload_video(token, title, description, video_path, url_poster, email, passw
 def login_and_post(email, password, data, access_token=None):
     global total
     dem = int(change_account.get())
-    list_data = get_content(data, dem)
+    try:
+        list_data = get_content(data, dem)
+    except Exception as e:
+        open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password}|Lỗi {str(e)}\n")
+        return
     if list_data==None:
         open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password}|Lỗi channel {data}\n")
         return
