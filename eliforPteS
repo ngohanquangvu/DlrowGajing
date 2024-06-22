@@ -223,10 +223,14 @@ def update_channel(account):
                 return
         except: continue
     print(f"Login success with account {account}")
-    data = random.choice(data_fb)
-    bio = random.choice(data_bio)
-    img = save_image(data.split("|")[1])
-    name = data.split("|")[0]
+    try:
+        data = random.choice(data_fb)
+        bio = random.choice(data_bio)
+        img = save_image(data.split("|")[1])
+        name = data.split("|")[0]
+    except:
+        print(f"Data nhập vào bị thiếu với acc {account}")
+        return
     h = {
         "Content-Type": "application/json",
         "Authorization": token,
