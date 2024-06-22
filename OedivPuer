@@ -122,10 +122,32 @@ def get_webp_url(media_list):
                 if url.endswith('origin.webp'):
                     return url
             return None
+def get_language_code(language):
+    language_codes = {
+        "Vietnamese": "vi-VN",
+        "English": "en-US",
+        "Taiwanese": "zh-TW",
+        "Chinese": "zh-CN",
+        "Japanese": "ja-JP",
+        "Korean": "ko-KR",
+        "German": "de-DE",
+        "Spanish": "es-ES",
+        "French": "fr-FR",
+        "Indonesian": "id-ID",
+        "Italian": "it-IT",
+        "Russian": "ru-RU",
+    }
+    return language_codes.get(language, "vi-VN")
+def check_category(text):
+    if text in [f"cat{i}" for i in range(1, 31)]:
+        return text
+    return "cat10"
 
 
-def upload_video(token, title, description, video_path, url_poster, email, password):
+def upload_video(token, title, description, video_path, url_poster, lang, cat, email, password):
     global global_proxy
+    lang = get_language_code(lang)
+    cat = check_category(cat)
     h = {
         'Accept-Encoding':'gzip, deflate, br, zstd',
         'Authorization':token
@@ -133,7 +155,7 @@ def upload_video(token, title, description, video_path, url_poster, email, passw
 
     info = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers=h).json()
     profile_id = info["data"]["user_profile"]["profileId"]
-    d = '{"id":"","type":"Video","title":"'+title+'","description":"'+description+'","poster_url":"","poster_hd_url":"","meta":{"video_status":"uploading","video_id":"","video_url":"","video_filename":"a.mp4"},"price":0,"premium":0,"visibility":"public","category_id":"cat1","lang":"en-US","mode":"draft","version":0,"priority":"high","comment_disabled":false,"keywords":[],"liveRedirect":{},"livechat_disabled":true,"set_as_premiere":false,"profile":"fullbitrate","user_id2":"'+str(profile_id)+'","time_scheduled":'+str(int(time.time()*1000))+',"variant":{"default":{"buy_info":{"price":""},"rent_info":{"price":""}}}}'
+    d = '{"id":"","type":"Video","title":"'+title+'","description":"'+description+'","poster_url":"","poster_hd_url":"","meta":{"video_status":"uploading","video_id":"","video_url":"","video_filename":"a.mp4"},"price":0,"premium":0,"visibility":"public","category_id":"'+cat+'","lang":"'+lang+'","mode":"draft","version":0,"priority":"high","comment_disabled":false,"keywords":[],"liveRedirect":{},"livechat_disabled":true,"set_as_premiere":false,"profile":"fullbitrate","user_id2":"'+str(profile_id)+'","time_scheduled":'+str(int(time.time()*1000))+',"variant":{"default":{"buy_info":{"price":""},"rent_info":{"price":""}}}}'
     d = json.loads(d)
     a = requests.post("https://gw.ganjingworld.com/v1.0c/add-content", headers=h, json=d).json()
     if a["result"]["message"]!="Ok":
@@ -238,7 +260,7 @@ def upload_video(token, title, description, video_path, url_poster, email, passw
         frame_text_box.configure(state = "disabled")
         return True
 
-def login_and_post(email, password, data, access_token=None):
+def login_and_post(email, password, data, lang, cat, access_token=None):
     global total
     dem = int(change_account.get())
     try:
@@ -358,8 +380,8 @@ def login_and_post(email, password, data, access_token=None):
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đang tải video\n')
             frame_text_box.configure(state = "disabled")
             video = save_video(url_video)
-            upload_video(access_token, title, description, video, img, email, password)
-            if upload_video(access_token, title, description, video, img, email, password)==None:
+            upload_video(access_token, title, description, video, img, lang, cat, email, password)
+            if upload_video(access_token, title, description, video, img, lang, cat, email, password)==None:
                 break
 
             total+=1
@@ -390,7 +412,7 @@ def start():
             aaa = list_userpass[i:i+int(luong.get())]
             for j in range(len(aaa)):
                 acc = aaa[j].split("|")
-                threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], acc[2])))
+                threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], acc[2], acc[3], acc[4])))
             for thread in threads:
                 thread.start()
             for thread in threads:
@@ -421,7 +443,7 @@ def open_file_userpass():
         a = open(file_text_path, "r").readlines()
         for cell in a:
             test = cell.strip("\n").split("|")
-            if len(test)==3 and test[0]!="" and test[1]!="" and test[2]!="":
+            if len(test)==5 and test[0]!="" and test[1]!="" and test[2]!="" and test[3]!="" and test[4]!="":
                 list_userpass.append(cell.strip("\n"))
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Import success {len(list_userpass)} Data\n')
