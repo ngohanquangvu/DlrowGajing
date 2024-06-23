@@ -1,6 +1,3 @@
-
-list_login_token = []
-
 def get_login_token():
     global list_login_token
     if len(list_login_token) != 0:
@@ -23,12 +20,16 @@ def get_login_token():
             'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
             'X-Cdk-Lrtm':'2024-03-15 20:48:30',
         }
-        global_proxy = None
+        pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+        p = {
+            "http":f"http://{pr}",
+            "https":f"http://{pr}"
+        }
         while True:
             if len(list_login_token) != 0:
                 return random.choice(list_login_token)
             try:
-                token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=global_proxy).json()["data"]["accessToken"]
+                token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=p).json()["data"]["accessToken"]
                 list_login_token.append(token)
                 return token
             except: pass
@@ -50,7 +51,7 @@ h = {
             'X-Cdk-Lrtm':'2024-03-15 20:48:30',
         }
 try:
-    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
+    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies={"http":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682", "https":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"}).json()["data"]["accessToken"]
     list_login_token.append(token)
 except: 
     pass
@@ -137,7 +138,7 @@ def buff_view(index, lock):
                     open("error.txt", "a").write(f"{count}\n")
                 if count["data"]["view_count"]>current_view:
                     try:
-                        d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"v\":1,\"cid\":\"ef343da1-5e65-418c-850c-668aeb6234bf\",\"uid\":\"\",\"dl\":\"https://www.ganjingworld.com/video/"+uid+"\",\"cnt_type\":\"Video\",\"cnt_id\":\""+uid+"\",\"dt\":\"test time\",\"dr\":\"https://www.ganjingworld.com\",\"view_pct\":100,\"view_time\":"+str(int(delay)*10)+",\"ugrp\":\"\",\"ga_cid\":\"4b3a2281e15a9cab\",\"channel_id\":\"1gpvljk771s46RJH6XHUwqyVr1oo0c\"}]","v":1,"cid":"3dc1b380-0961-08e6-ea22-666d31d1ec0c","uid":"","dl":f"https://www.ganjingworld.com/video/{uid}","dr":"https://www.ganjingworld.com","ugrp":"","ga_cid":"4b3a2281e15a9cab"}
+                        d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"v\":1,\"cid\":\"ef343da1-5e65-418c-850c-668aeb6234bf\",\"uid\":\"\",\"dl\":\"https://www.ganjingworld.com/video/"+uid+"\",\"cnt_type\":\"Video\",\"cnt_id\":\""+uid+"\",\"dt\":\"test time\",\"dr\":\"https://www.ganjingworld.com\",\"view_pct\":100,\"view_time\":"+str(int(delay)*1200)+",\"ugrp\":\"\",\"ga_cid\":\"4b3a2281e15a9cab\",\"channel_id\":\"1gpvljk771s46RJH6XHUwqyVr1oo0c\"}]","v":1,"cid":"3dc1b380-0961-08e6-ea22-666d31d1ec0c","uid":"","dl":f"https://www.ganjingworld.com/video/{uid}","dr":"https://www.ganjingworld.com","ugrp":"","ga_cid":"4b3a2281e15a9cab"}
                         a = scraper.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies=p).json()
                     except Exception as e:
                         open("error.txt", "a").write(f"{e}\n")
