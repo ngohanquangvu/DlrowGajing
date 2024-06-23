@@ -285,12 +285,14 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
     
 
 
-
+    a = requests.get(upload_url, headers={'Authorization':f"Bearer {update_token}"}).json()
+    id_video = a['body']["video_id"]
     while True:
-        a = requests.get(upload_url, headers={'Authorization':f"Bearer {update_token}"}).json()
-        id_video = a['body']["video_id"]
-
-        wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}).json()
+        try:
+            wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}, proxies=global_proxy).json()
+        except:
+            time.sleep(5)
+            continue
 
         try:
             url_video = wait["body"]["url"]
