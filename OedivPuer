@@ -139,8 +139,10 @@ def get_language_code(language):
     }
     return language_codes.get(language, "vi-VN")
 def check_category(text):
-    if text in [f"cat{i}" for i in range(1, 31)]:
+    if text in [f"cat{i}" for i in range(1, 34)]:
         return text
+    elif text=="cat32":
+        return "cat10"
     return "cat10"
 
 
@@ -155,11 +157,58 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
 
     info = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers=h).json()
     profile_id = info["data"]["user_profile"]["profileId"]
-    d = '{"id":"","type":"Video","title":"'+title+'","description":"'+description+'","poster_url":"","poster_hd_url":"","meta":{"video_status":"uploading","video_id":"","video_url":"","video_filename":"a.mp4"},"price":0,"premium":0,"visibility":"public","category_id":"'+cat+'","lang":"'+lang+'","mode":"draft","version":0,"priority":"high","comment_disabled":false,"keywords":[],"liveRedirect":{},"livechat_disabled":true,"set_as_premiere":false,"profile":"fullbitrate","user_id2":"'+str(profile_id)+'","time_scheduled":'+str(int(time.time()*1000))+',"variant":{"default":{"buy_info":{"price":""},"rent_info":{"price":""}}}}'
-    d = json.loads(d)
-    a = requests.post("https://gw.ganjingworld.com/v1.0c/add-content", headers=h, json=d).json()
-    if a["result"]["message"]!="Ok":
+    try:
+        d = {
+            "id":"",
+            "type":"Video",
+            "title":title,
+            "description":description,
+            "poster_url":"",
+            "poster_hd_url":"",
+            "meta":{
+                "video_status":"uploading",
+                "video_id":"","video_url":"",
+                "video_filename":"a.mp4"
+                },
+            "price":0,
+            "premium":0,
+            "visibility":"public",
+            "category_id":cat,
+            "lang":lang,
+            "mode":"draft",
+            "version":0,
+            "priority":"high",
+            "comment_disabled":False,
+            "keywords":[],
+            "liveRedirect":{},
+            "livechat_disabled":True,
+            "set_as_premiere":False,
+            "profile":"fullbitrate",
+            "user_id2":str(profile_id),
+            "time_scheduled":str(int(time.time()*1000)),
+            "variant":{
+                "default":{
+                    "buy_info":{"price":""},
+                    "rent_info":{"price":""}
+                            }
+                        }
+            }
+    except Exception as e:
+        open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password}|Lỗi {str(e)}\n")
         return None
+    global_proxy = {
+    "http":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682",
+    "https":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+    }
+    while True:
+        try:
+            a = requests.post("https://gw.ganjingworld.com/v1.0c/add-content", headers=h, json=d, proxies=global_proxy).json()
+            if a["result"]["message"]!="Ok":
+                return None
+            break
+        except Exception as e:
+            print(f"Error add content {str(e)}")
+            pass
     frame_text_box.configure(state = "normal")
     frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Up draft thành công\n')
     frame_text_box.configure(state = "disabled")
