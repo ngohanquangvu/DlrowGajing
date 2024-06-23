@@ -106,7 +106,7 @@ def get_content(data, dem):
     video_links = []
     videos = scrapetube.get_channel(channel_id)
     for i in videos:
-        if (i in a)==False:
+        if (i['videoId'] in a)==False:
             dem-=1
             des = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text.split('"shortDescription":"')[1].split('"')[0]
             title = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text.split('"title":"')[1].split('"')[0]
@@ -160,6 +160,9 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
     a = requests.post("https://gw.ganjingworld.com/v1.0c/add-content", headers=h, json=d).json()
     if a["result"]["message"]!="Ok":
         return None
+    frame_text_box.configure(state = "normal")
+    frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Up draft thành công\n')
+    frame_text_box.configure(state = "disabled")
     content_id = a["data"]["id"]
     print(content_id)
     update_token = requests.get(f"https://gw.ganjingworld.com/v1.1/get-vod-token?content_id={content_id}", headers=h).json()["data"]["token"]
