@@ -394,12 +394,24 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             time.sleep(int(delay.get()))
         except Exception as e:
             os.remove(video)
-            open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} in add post with account {email}:{password}\n")
+            tb = e.__traceback__
+            error_message = f"Exception: {e} | "
+            while tb is not None:
+                filename = tb.tb_frame.f_code.co_filename
+                lineno = tb.tb_lineno
+                function_name = tb.tb_frame.f_code.co_name
+                error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+                tb = tb.tb_next
+            save_error_to_file(error_message)
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đăng video không thành công\n')
             frame_text_box.configure(state = "disabled")
     print(f"Done with acc {email}:{password}")
     open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password} reup {total_dem-dem} Video\n")
+
+def save_error_to_file(error_message):
+    with open("error_log.txt", 'a') as f:
+        f.write(error_message + '\n')
 
 def update_sl():
     global total
