@@ -197,8 +197,8 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             "livechat_disabled":True,
             "set_as_premiere":False,
             "profile":"fullbitrate",
-            "user_id2":str(profile_id),
-            "time_scheduled":str(int(time.time()*1000)),
+            "user_id2":profile_id,
+            "time_scheduled":int(time.time()*1000),
             "variant":{
                 "default":{
                     "buy_info":{"price":""},
