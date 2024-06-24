@@ -42,12 +42,24 @@ global_proxy = {
 
 
 def save_video(url):
-    aaa = f'./VideoData'
-    name_file = f'{time.time()}.mp4'
-    yt = YouTube(url)
-    stream = yt.streams.get_highest_resolution()
-    stream.download(output_path=aaa, filename=name_file)
-    return f'{aaa}/{name_file}'
+    try:
+        aaa = f'./VideoData'
+        name_file = f'{time.time()}.mp4'
+        yt = YouTube(url)
+        stream = yt.streams.get_highest_resolution()
+        stream.download(output_path=aaa, filename=name_file)
+        return f'{aaa}/{name_file}'
+    except Exception as e:
+        tb = e.__traceback__
+        error_message = f"Exception: {e} | "
+        while tb is not None:
+            filename = tb.tb_frame.f_code.co_filename
+            lineno = tb.tb_lineno
+            function_name = tb.tb_frame.f_code.co_name
+            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+            tb = tb.tb_next
+        save_error_to_file(error_message)
+        return None
 
 def remove_hashtags(text):
     return re.sub(r'#\S+', '', text)
@@ -451,6 +463,9 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đang tải video\n')
             frame_text_box.configure(state = "disabled")
             video = save_video(url_video)
+            if video==None:
+                os.remove(img)
+                time.sleep(5)
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
             frame_text_box.configure(state = "disabled")
