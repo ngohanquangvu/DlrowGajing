@@ -274,21 +274,25 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
                 'Tus-Resumable': '1.0.0',
             }
     while True:
-        response = requests.patch(
-            upload_url,
-            headers=h_update,
-            data=file_content  # Nội dung của file
-        )
-        print(response.headers["upload-offset"], len(file_content))
-        if int(response.headers["upload-offset"])==int(len(file_content)):
-            break
-        else:
-            h_update = {
-                'Authorization': f'Bearer {update_token}',
-                'Content-Type': 'application/offset+octet-stream',
-                'Upload-Offset': response.headers["upload-offset"],
-                'Tus-Resumable': '1.0.0',
-            }
+        try:
+            response = requests.patch(
+                upload_url,
+                headers=h_update,
+                data=file_content,
+                proxies=global_proxy
+            )
+            print(response.headers["upload-offset"], len(file_content))
+            if int(response.headers["upload-offset"])==int(len(file_content)):
+                break
+            else:
+                h_update = {
+                    'Authorization': f'Bearer {update_token}',
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': response.headers["upload-offset"],
+                    'Tus-Resumable': '1.0.0',
+                }
+        except Exception as e:
+            pass
 
     if response.status_code == 204:
         print('Upload successful')
@@ -303,7 +307,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             break
         except:
             pass
-    dem_percent = 10
+    dem_percent = 5
     old_progress = 0
     while True:
         try:
@@ -317,7 +321,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             print(url_video)
             break
         except:
-            if wait["body"]["progress"]>old_progress+dem_percent: dem_percent = 10
+            if wait["body"]["progress"]>old_progress: dem_percent = 5
             else: dem_percent-=1
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] video upload thành công {wait["body"]["progress"]}%\n')
