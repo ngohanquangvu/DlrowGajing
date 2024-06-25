@@ -580,7 +580,6 @@ def start():
         frame_text_box.configure(state = "disabled")
         threading.Thread(target=runn).start()
         threading.Thread(target=update_sl).start()
-        threading.Thread(target=hidden_run).start()
 
 
 
