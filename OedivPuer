@@ -296,9 +296,13 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
         print('Upload failed')
     
 
-
-    a = requests.get(upload_url, headers={'Authorization':f"Bearer {update_token}"}).json()
-    id_video = a['body']["video_id"]
+    while True:
+        try:
+            a = requests.get(upload_url, headers={'Authorization':f"Bearer {update_token}"}, proxies=global_proxy).json()
+            id_video = a['body']["video_id"]
+            break
+        except:
+            pass
     while True:
         try:
             wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}, proxies=global_proxy).json()
