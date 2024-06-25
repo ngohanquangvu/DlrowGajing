@@ -488,6 +488,7 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             if check==None:
                 break
             elif check == False:
+                dem-=1
                 os.remove(video)
                 os.remove(img)
                 time.sleep(int(delay.get()))
