@@ -159,7 +159,7 @@ def check_category(text):
 
 
 def upload_video(token, title, description, video_path, url_poster, lang, cat, email, password):
-    global global_proxy
+    global global_proxy, total
     lang = get_language_code(lang)
     cat = check_category(cat)
     h = {
@@ -303,6 +303,8 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             break
         except:
             pass
+    dem_percent = 3
+    old_progress = 0
     while True:
         try:
             wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}, proxies=global_proxy).json()
@@ -315,15 +317,22 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             print(url_video)
             break
         except:
+            if wait["body"]["progress"]>old_progress+dem_percent: dem_percent = 3
+            else: dem_percent-=1
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] video upload thành công {wait["body"]["progress"]}%\n')
             frame_text_box.configure(state = "disabled")
+            old_progress = wait["body"]["progress"]
+            if dem_percent==0: return False
             time.sleep(3)
             pass
     frame_text_box.configure(state = "normal")
     frame_text_box.insert(customtkinter.END, f'[{email}:{password}] upload thành công video\n')
     frame_text_box.configure(state = "disabled")
     print(url_poster)
+    frame_text_box.configure(state = "normal")
+    frame_text_box.insert(customtkinter.END, f'[{email}:{password}] đang upload thumbnail\n')
+    frame_text_box.configure(state = "disabled")
     while True:
         try:
             b =  requests.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (url_poster, open(url_poster, "rb"), f'image/{str(os.path.splitext(url_poster)[1]).replace(".","")}')}, headers={"Authorization":f"Bearer {update_token}"}, proxies=global_proxy).json()
@@ -334,9 +343,6 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
         except Exception as e:
             print(f"error upload image {str(e)}")
             pass
-    frame_text_box.configure(state = "normal")
-    frame_text_box.insert(customtkinter.END, f'[{email}:{password}] đang upload thumbnail\n')
-    frame_text_box.configure(state = "disabled")
     d = '{"id":"'+content_id+'","poster_url":"'+url_poster+'","meta":{"video_status":"ready","video_id":"'+str(id_video)+'","video_filename":"a.mp4","hidden":false,"video_url":"'+url_video+'","featured_video":"","encrypt_method":"","duration":0,"original_duration":0}}'
 
     up_video = requests.post("https://gw.ganjingworld.com/v1.0c/update-content", headers={'Authorization':token,"Accept":"application/json","Accept-Encoding":"gzip, deflate, br, zstd"}, json=json.loads(d))
@@ -345,6 +351,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Reup thành công video\n')
         frame_text_box.configure(state = "disabled")
+        total +=1
         return True
 
 def login_and_post(email, password, data, lang, cat, access_token=None):
@@ -473,11 +480,13 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
             frame_text_box.configure(state = "disabled")
-            upload_video(access_token, title, description, video, img, lang, cat, email, password)
-            if upload_video(access_token, title, description, video, img, lang, cat, email, password)==None:
+            check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
+            if check==None:
                 break
-
-            total+=1
+            elif check == False:
+                os.remove(video)
+                os.remove(img)
+                time.sleep(int(delay.get()))
             dem-=1
             os.remove(video)
             os.remove(img)
