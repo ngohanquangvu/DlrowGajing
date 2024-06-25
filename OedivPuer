@@ -481,7 +481,9 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             video = save_video(url_video)
             if video==None:
                 os.remove(img)
+                dem-=1
                 time.sleep(5)
+                continue
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
             frame_text_box.configure(state = "disabled")
@@ -553,7 +555,7 @@ def hidden_run():
         time.sleep(5)
 
 def start():
-    global list_token
+    global list_token, running
     def runn():
         for i in range(0, len(list_userpass), int(luong.get())):
             threads = []
