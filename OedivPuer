@@ -303,7 +303,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             break
         except:
             pass
-    dem_percent = 3
+    dem_percent = 10
     old_progress = 0
     while True:
         try:
@@ -317,7 +317,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             print(url_video)
             break
         except:
-            if wait["body"]["progress"]>old_progress+dem_percent: dem_percent = 3
+            if wait["body"]["progress"]>old_progress+dem_percent: dem_percent = 10
             else: dem_percent-=1
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] video upload thành công {wait["body"]["progress"]}%\n')
