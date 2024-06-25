@@ -522,7 +522,7 @@ def update_sl():
     global total
     while running:
         total_text_box.configure(text=f"Tổng số lượng Video đã đăng: {total}")
-        time.sleep(1)
+        time.sleep(3)
 
 def hidden_run():
     global list_hidden, total
@@ -548,6 +548,7 @@ def hidden_run():
                 continue
             os.remove(video)
             os.remove(img)
+        time.sleep(5)
 
 def start():
     global list_token
