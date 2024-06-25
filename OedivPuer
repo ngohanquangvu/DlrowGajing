@@ -279,7 +279,6 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
                 upload_url,
                 headers=h_update,
                 data=file_content,
-                proxies=global_proxy
             )
             print(response.headers["upload-offset"], len(file_content))
             if int(response.headers["upload-offset"])==int(len(file_content)):
@@ -359,7 +358,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
         return True
 
 def login_and_post(email, password, data, lang, cat, access_token=None):
-    global total
+    global total, list_hidden
     dem = int(change_account.get())
     try:
         list_data = get_content(data, dem)
@@ -489,8 +488,7 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
                 break
             elif check == False:
                 dem-=1
-                os.remove(video)
-                os.remove(img)
+                list_hidden.append([access_token, title, description, video, img, lang, cat, email, password])
                 time.sleep(int(delay.get()))
             dem-=1
             os.remove(video)
@@ -517,11 +515,39 @@ def save_error_to_file(error_message):
     with open("error_log.txt", 'a') as f:
         f.write(error_message + '\n')
 
+running = True
+list_hidden = []
+
 def update_sl():
     global total
-    while True:
+    while running:
         total_text_box.configure(text=f"Tổng số lượng Video đã đăng: {total}")
         time.sleep(1)
+
+def hidden_run():
+    global list_hidden, total
+    while running:
+        if len(list_hidden)>0:
+            data = list_hidden.pop(0)
+            access_token = data[0]
+            title = data[1]
+            description = data[2]
+            video = data[3]
+            img = data[4]
+            lang = data[5]
+            cat = data[6]
+            email = data[7]
+            password = data[8]
+
+            check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
+            if check==None:
+                continue
+            elif check == False:
+                list_hidden.append(data)
+                time.sleep(int(delay.get()))
+                continue
+            os.remove(video)
+            os.remove(img)
 
 def start():
     global list_token
@@ -539,6 +565,7 @@ def start():
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ\n')
         frame_text_box.configure(state = "disabled")
+        running = False
         os.system("rmdir /s /q ImageData")
         os.mkdir("./ImageData")  
         os.system("rmdir /s /q VideoData")
@@ -549,6 +576,7 @@ def start():
         frame_text_box.configure(state = "disabled")
         threading.Thread(target=runn).start()
         threading.Thread(target=update_sl).start()
+        threading.Thread(target=hidden_run).start()
 
 
 
