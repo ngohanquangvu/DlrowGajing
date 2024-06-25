@@ -561,10 +561,10 @@ def run_tool(lock):
         with lock:
             if len(list_userpass)>0:
                 data = list_userpass.pop(0)
-                acc = data.split("|")
-                login_and_post(acc[0], acc[1], acc[2], acc[3], acc[4])
             else: 
                 break
+        acc = data.split("|")
+        login_and_post(acc[0], acc[1], acc[2], acc[3], acc[4])
 def start():
     global list_token, running
     def runn():
