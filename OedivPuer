@@ -553,19 +553,28 @@ def hidden_run():
             os.remove(img)
         time.sleep(5)
 
+lock = threading.Lock()
+
+def run_tool(lock):
+    global list_userpass, running
+    while True:
+        with lock:
+            if len(list_userpass)>0:
+                data = list_userpass.pop(0)
+                acc = data.split("|")
+                login_and_post(acc[0], acc[1], acc[2], acc[3], acc[4])
+            else: 
+                break
 def start():
     global list_token, running
     def runn():
-        for i in range(0, len(list_userpass), int(luong.get())):
-            threads = []
-            aaa = list_userpass[i:i+int(luong.get())]
-            for j in range(len(aaa)):
-                acc = aaa[j].split("|")
-                threads.append(threading.Thread(target=login_and_post, args=(acc[0], acc[1], acc[2], acc[3], acc[4])))
-            for thread in threads:
-                thread.start()
-            for thread in threads:
-                thread.join()
+        threads = []
+        for j in range(int(luong.get())):
+            threads.append(threading.Thread(target=run_tool, args=(lock,)))
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Hoàn thành nhiệm vụ\n')
         frame_text_box.configure(state = "disabled")
@@ -580,6 +589,7 @@ def start():
         frame_text_box.configure(state = "disabled")
         threading.Thread(target=runn).start()
         threading.Thread(target=update_sl).start()
+        threading.Thread(target=hidden_run).start()
 
 
 
