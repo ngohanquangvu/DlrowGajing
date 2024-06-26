@@ -114,7 +114,7 @@ def buff_view(index, lock):
         current_view = 0
         token = get_login_token()
         while True:
-            pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
@@ -151,8 +151,9 @@ def buff_view(index, lock):
                 try:
                     count["data"]["view_count"]
                 except:
-                    open("error.txt", "a").write(f"{count}\n")
+                    continue
                 if count["data"]["view_count"]>current_view:
+                    running[index] = ["Sending time", url, f"{current_view} views"]
                     while True:
                         try:
                             d = {"en":"video_start","v":1,"cid":"28052bb4-fead-793b-deaf-7c0b6e762159","uid":"","dl":f"https://www.ganjingworld.com/video/{uid}","cnt_type":"Video","cnt_id":uid,"dt":"Chốt bầy dê hàm Kiệm, hàm Thuận Nam, bình thuận  đồng nai","dr":"https://www.ganjingworld.com","view_pct":0,"view_time":0,"source":"","ugrp":"","ga_cid":"ef296059a6deb0cc","channel_id":"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c"}
@@ -191,6 +192,9 @@ def checking():
                 print("")
             elif running[j][0]=="Sending view":
                 print(f"\033[33mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            elif running[j][0]=="Sending time":
+                print(f"\033[96mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
                 print("")
             elif running[j][0]=="Sent view unsuccessfully":
                 print(f"\033[31mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
