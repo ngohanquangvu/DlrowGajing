@@ -120,12 +120,13 @@ def get_content(data, dem):
     for i in videos:
         if (i['videoId'] in a)==False:
             dem-=1
+            info = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text
             try:
-                des = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text.split('"shortDescription":"')[1].split('"')[0]
+                des = info.split('"shortDescription":"')[1].split('"')[0]
             except:
                 des = ""
-                open("error_log.txt", 'a').write(f"Error get des https://www.youtube.com/watch?v={i['videoId']}\n")
-            title = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text.split('"title":"')[1].split('"')[0]
+                open("error_des.txt", 'a').write(f"Error get des https://www.youtube.com/watch?v={i['videoId']}\n")
+            title = info.split('"title":"')[1].split('"')[0]
             video_links.append([f'https://www.youtube.com/watch?v={i["videoId"]}', title, des, str(i["thumbnail"]["thumbnails"][-1].get("url")).split("?")[0]])
             a.append(i["videoId"])
             open(f"./SaveData/{channel_id}.txt", "a", encoding="utf-8").write(i["videoId"]+"\n")
