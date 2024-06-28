@@ -50,15 +50,6 @@ def save_video(url):
         stream.download(output_path=aaa, filename=name_file)
         return f'{aaa}/{name_file}'
     except Exception as e:
-        tb = e.__traceback__
-        error_message = f"Exception: {e} | "
-        while tb is not None:
-            filename = tb.tb_frame.f_code.co_filename
-            lineno = tb.tb_lineno
-            function_name = tb.tb_frame.f_code.co_name
-            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
-            tb = tb.tb_next
-        save_error_to_file(error_message)
         return None
 
 def remove_hashtags(text):
@@ -108,6 +99,7 @@ def get_id_channel(data):
     return requests.get(data).text.split('https://www.youtube.com/channel/')[1].split('"')[0]
     
 def get_content(data, dem):
+    global global_proxy
     try:
         channel_id = get_id_channel(data)
     except:
@@ -121,11 +113,12 @@ def get_content(data, dem):
         if (i['videoId'] in a)==False:
             dem-=1
             info = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text
-            try:
+            if '"shortDescription":' in info:
                 des = info.split('"shortDescription":"')[1].split('"')[0]
-            except:
+            elif '"attributedDescription":{"content":"{' in info:
+                des = info.split('"attributedDescription":{"content":"')[1].split('"')[0]
+            else:
                 des = ""
-                open("error_des.txt", 'a').write(f"Error get des https://www.youtube.com/watch?v={i['videoId']}\n")
             title = info.split('"title":"')[1].split('"')[0]
             video_links.append([f'https://www.youtube.com/watch?v={i["videoId"]}', title, des, str(i["thumbnail"]["thumbnails"][-1].get("url")).split("?")[0]])
             a.append(i["videoId"])
@@ -492,6 +485,9 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             frame_text_box.configure(state = "disabled")
             video = save_video(url_video)
             if video==None:
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Lỗi tải video\n')
+                frame_text_box.configure(state = "disabled")
                 os.remove(img)
                 dem-=1
                 time.sleep(5)
