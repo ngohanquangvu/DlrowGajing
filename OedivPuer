@@ -111,18 +111,31 @@ def get_content(data, dem):
     videos = scrapetube.get_channel(channel_id)
     for i in videos:
         if (i['videoId'] in a)==False:
-            dem-=1
-            info = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text
-            if '"shortDescription":' in info:
-                des = info.split('"shortDescription":"')[1].split('"')[0]
-            elif '"attributedDescription":{"content":"{' in info:
-                des = info.split('"attributedDescription":{"content":"')[1].split('"')[0]
-            else:
-                des = ""
-            title = info.split('"title":"')[1].split('"')[0]
-            video_links.append([f'https://www.youtube.com/watch?v={i["videoId"]}', title, des, str(i["thumbnail"]["thumbnails"][-1].get("url")).split("?")[0]])
-            a.append(i["videoId"])
-            open(f"./SaveData/{channel_id}.txt", "a", encoding="utf-8").write(i["videoId"]+"\n")
+            try:
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Đang tải video {f"https://www.youtube.com/watch?v={i["videoId"]}"}\n')
+                frame_text_box.configure(state = "disabled")
+                video = save_video(f"https://www.youtube.com/watch?v={i['videoId']}")
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Đã tải video {f"https://www.youtube.com/watch?v={i["videoId"]}"}\n')
+                frame_text_box.configure(state = "disabled")
+                dem-=1
+                info = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text
+                if '"shortDescription":' in info:
+                    des = info.split('"shortDescription":"')[1].split('"')[0]
+                elif '"attributedDescription":{"content":"{' in info:
+                    des = info.split('"attributedDescription":{"content":"')[1].split('"')[0]
+                else:
+                    des = ""
+                title = info.split('"title":"')[1].split('"')[0]
+                video_links.append([video, title, des, str(i["thumbnail"]["thumbnails"][-1].get("url")).split("?")[0]])
+                a.append(i["videoId"])
+                open(f"./SaveData/{channel_id}.txt", "a", encoding="utf-8").write(i["videoId"]+"\n")
+            except:
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'Lỗi tải video {f'https://www.youtube.com/watch?v={i["videoId"]}'}\n')
+                frame_text_box.configure(state = "disabled")
+                pass
             if dem==0:
                 return video_links
     return video_links
@@ -357,7 +370,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
         return True
 
 def login_and_post(email, password, data, lang, cat, access_token=None):
-    global total, list_hidden
+    global total, list_hidden, running
     dem = int(change_account.get())
     try:
         list_data = get_content(data, dem)
@@ -380,7 +393,7 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
     frame_text_box.configure(state = "normal")
     frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Reup {dem} Video\n')
     frame_text_box.configure(state = "disabled")
-    while dem>0:
+    while dem>0 or running==True:
         print(access_token)
         try:
             hehe = list_data[dem-1]
@@ -480,21 +493,7 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
 
         try:
             img = save_image(img)
-            frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đang tải video\n')
-            frame_text_box.configure(state = "disabled")
-            video = save_video(url_video)
-            if video==None:
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Lỗi tải video\n')
-                frame_text_box.configure(state = "disabled")
-                os.remove(img)
-                dem-=1
-                time.sleep(5)
-                continue
-            frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
-            frame_text_box.configure(state = "disabled")
+            video = url_video
             check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
             if check==None:
                 break
@@ -566,7 +565,7 @@ lock = threading.Lock()
 
 def run_tool(lock):
     global list_userpass, running
-    while True:
+    while running:
         with lock:
             if len(list_userpass)>0:
                 data = list_userpass.pop(0)
@@ -575,6 +574,7 @@ def run_tool(lock):
         acc = data.split("|")
         try:
             login_and_post(acc[0], acc[1], acc[2], acc[3], acc[4])
+            list_userpass.append(data)
         except Exception as e:
             tb = e.__traceback__
             error_message = f"Exception: {e} | "
@@ -586,6 +586,13 @@ def run_tool(lock):
                 tb = tb.tb_next
             save_error_to_file(error_message)
             pass
+
+def stop():
+    global running
+    def stopp():
+        running = False
+    threading.Thread(target=stopp).start()
+
 def start():
     global list_token, running
     def runn():
@@ -621,7 +628,7 @@ def open_file_userpass():
     from tkinter import filedialog
     file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose data file")
     if file_text_path!="":
-        a = open(file_text_path, "r").readlines()
+        a = open(file_text_path, "r", encoding="utf-8").readlines()
         for cell in a:
             test = cell.strip("\n").split("|")
             if len(test)==5 and test[0]!="" and test[1]!="" and test[2]!="" and test[3]!="" and test[4]!="":
@@ -645,7 +652,7 @@ button_frame.grid(row = 2, column = 0, pady = 10)
 start_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Start', command=start)
 start_button.grid(row = 0, column = 1, padx = (0,0))
 
-stop_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Custom Des')
+stop_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Stop', command=stop)
 stop_button.grid(row = 0, column = 2, padx = (10,10))
 
 file_button = customtkinter.CTkButton(button_frame, width = 80, height = 50, text = 'Data', command=open_file_userpass)
