@@ -50,6 +50,14 @@ def save_video(url):
         stream.download(output_path=aaa, filename=name_file)
         return f'{aaa}/{name_file}'
     except Exception as e:
+        tb = e.__traceback__
+        error_message = f"Exception: {e} | "
+        while tb is not None:
+            filename = tb.tb_frame.f_code.co_filename
+            lineno = tb.tb_lineno
+            function_name = tb.tb_frame.f_code.co_name
+            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+            tb = tb.tb_next
         return None
 
 def remove_hashtags(text):
@@ -305,8 +313,6 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             break
         except:
             pass
-    dem_percent = 5
-    old_progress = 0
     while True:
         try:
             wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}, proxies=global_proxy).json()
@@ -319,14 +325,9 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             print(url_video)
             break
         except:
-            if wait["body"]["progress"]>old_progress: dem_percent = 5
-            else: dem_percent-=1
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] video upload thành công {wait["body"]["progress"]}%\n')
             frame_text_box.configure(state = "disabled")
-            old_progress = wait["body"]["progress"]
-            if dem_percent==0: return False
-            time.sleep(3)
             pass
     frame_text_box.configure(state = "normal")
     frame_text_box.insert(customtkinter.END, f'[{email}:{password}] upload thành công video\n')
