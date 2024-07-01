@@ -58,6 +58,7 @@ def save_video(url):
             function_name = tb.tb_frame.f_code.co_name
             error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
             tb = tb.tb_next
+        save_error_to_file(error_message)
         return None
 
 def remove_hashtags(text):
