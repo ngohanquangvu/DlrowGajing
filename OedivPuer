@@ -45,7 +45,7 @@ def save_video(url):
     try:
         aaa = f'./VideoData'
         name_file = f'{time.time()}.mp4'
-        yt = YouTube(url, use_oauth=True, allow_oauth_cache=True)
+        yt = YouTube(url, use_oauth=True)
         stream = yt.streams.get_highest_resolution()
         stream.download(output_path=aaa, filename=name_file)
         return f'{aaa}/{name_file}'
