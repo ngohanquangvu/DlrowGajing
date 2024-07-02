@@ -120,7 +120,6 @@ def get_content(data, dem):
     videos = scrapetube.get_channel(channel_id)
     for i in videos:
         if (i['videoId'] in a)==False:
-            if i.get('liveBroadcastContent', 'none') == 'none' and not i.get('ageRestricted', False):
                 dem-=1
                 info = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text
                 if '"shortDescription":' in info:
@@ -491,9 +490,11 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
                 frame_text_box.configure(state = "normal")
                 frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Lỗi tải video\n')
                 frame_text_box.configure(state = "disabled")
-                list_data += get_content(data, 1)
-                os.remove(img)
-                time.sleep(5)
+                try:
+                    os.remove(img)
+                except: pass
+                dem-=1
+                time.sleep(3)
                 continue
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
@@ -582,6 +583,7 @@ def run_tool(lock):
         acc = data.split("|")
         try:
             login_and_post(acc[0], acc[1], acc[2], acc[3], acc[4])
+            list_userpass.append(data)
         except Exception as e:
             tb = e.__traceback__
             error_message = f"Exception: {e} | "
