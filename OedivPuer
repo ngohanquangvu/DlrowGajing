@@ -46,7 +46,7 @@ def save_video(url):
         aaa = f'./VideoData'
         name_file = f'{time.time()}.mp4'
         yt = YouTube(url)
-        stream = yt.streams.first() 
+        stream = yt.streams.first()
         stream.download(output_path=aaa, filename=name_file)
         return f'{aaa}/{name_file}'
     except Exception as e:
@@ -120,20 +120,21 @@ def get_content(data, dem):
     videos = scrapetube.get_channel(channel_id)
     for i in videos:
         if (i['videoId'] in a)==False:
-            dem-=1
-            info = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text
-            if '"shortDescription":' in info:
-                des = info.split('"shortDescription":"')[1].split('"')[0]
-            elif '"attributedDescription":{"content":"{' in info:
-                des = info.split('"attributedDescription":{"content":"')[1].split('"')[0]
-            else:
-                des = ""
-            title = info.split('"title":"')[1].split('"')[0]
-            video_links.append([f'https://www.youtube.com/watch?v={i["videoId"]}', title, des, str(i["thumbnail"]["thumbnails"][-1].get("url")).split("?")[0]])
-            a.append(i["videoId"])
-            open(f"./SaveData/{channel_id}.txt", "a", encoding="utf-8").write(i["videoId"]+"\n")
-            if dem==0:
-                return video_links
+            if i.get('liveBroadcastContent', 'none') == 'none' and not i.get('ageRestricted', False):
+                dem-=1
+                info = requests.get(f"https://www.youtube.com/watch?v={i['videoId']}").text
+                if '"shortDescription":' in info:
+                    des = info.split('"shortDescription":"')[1].split('"')[0]
+                elif '"attributedDescription":{"content":"{' in info:
+                    des = info.split('"attributedDescription":{"content":"')[1].split('"')[0]
+                else:
+                    des = ""
+                title = info.split('"title":"')[1].split('"')[0]
+                video_links.append([f'https://www.youtube.com/watch?v={i["videoId"]}', title, des, str(i["thumbnail"]["thumbnails"][-1].get("url")).split("?")[0]])
+                a.append(i["videoId"])
+                open(f"./SaveData/{channel_id}.txt", "a", encoding="utf-8").write(i["videoId"]+"\n")
+                if dem==0:
+                    return video_links
     return video_links
 
 def get_webp_url(media_list):
@@ -509,7 +510,6 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             os.remove(img)
             time.sleep(int(delay.get()))
         except Exception as e:
-            os.remove(video)
             tb = e.__traceback__
             error_message = f"Exception: {e} | "
             while tb is not None:
