@@ -111,7 +111,16 @@ def get_content(data, dem):
     global global_proxy
     try:
         channel_id = get_id_channel(data)
-    except:
+    except Exception as e:
+        tb = e.__traceback__
+        error_message = f"Exception: {e} | "
+        while tb is not None:
+            filename = tb.tb_frame.f_code.co_filename
+            lineno = tb.tb_lineno
+            function_name = tb.tb_frame.f_code.co_name
+            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+            tb = tb.tb_next
+        save_error_to_file(error_message)
         return None
     if not os.path.isfile(f"./SaveData/{channel_id}.txt"):
         open(f"./SaveData/{channel_id}.txt", 'a', encoding="utf-8").close()
