@@ -95,21 +95,6 @@ def buff_view(index, lock):
             current_url_index+=1
         running[index] = [f"Loading", url, "Đang lấy thông tin video"]
         uid = url.split("/")[-1].split("?")[0]
-        while True:
-            try:
-                pr = "http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-                p = {
-                    "http":f"http://{pr}",
-                    "https":f"http://{pr}"
-                }
-                duration = requests.get(f"https://gw.ganjingworld.com/v1.1/content/query?query=basic&ids={uid}").json()["data"]["list"][0]["duration"]
-                break
-            except: pass
-        if delay>=duration:
-            percent = "100"
-        else:
-            percent = str(int((delay/duration)*100))
-            duration = delay
         running[index] = ["Loading", url, "Lấy thông tin thành công"]
         current_view = 0
         token = get_login_token()
@@ -154,16 +139,9 @@ def buff_view(index, lock):
                     continue
                 if count["data"]["view_count"]>current_view:
                     running[index] = ["Sending time", url, f"{current_view} views"]
-                    while True:
-                        try:
-                            d = {"en":"video_start","v":1,"cid":"28052bb4-fead-793b-deaf-7c0b6e762159","uid":"","dl":f"https://www.ganjingworld.com/video/{uid}","cnt_type":"Video","cnt_id":uid,"dt":"Chốt bầy dê hàm Kiệm, hàm Thuận Nam, bình thuận  đồng nai","dr":"https://www.ganjingworld.com","view_pct":0,"view_time":0,"source":"","ugrp":"","ga_cid":"ef296059a6deb0cc","channel_id":"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c"}
-                            a = scraper.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies={"http": f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682", "https": f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"}).json()
-                            break
-                        except:
-                            pass
                     for time_view in range(int(delay)):
                         try:
-                            d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"v\":1,\"cid\":\"ef343da1-5e65-418c-850c-668aeb6234bf\",\"uid\":\"\",\"dl\":\"https://www.ganjingworld.com/video/"+uid+"\",\"cnt_type\":\"Video\",\"cnt_id\":\""+uid+"\",\"dt\":\"test time\",\"dr\":\"https://www.ganjingworld.com\",\"view_pct\":"+percent+",\"view_time\":"+str(int(duration)*6000)+",\"ugrp\":\"\",\"ga_cid\":\"4b3a2281e15a9cab\",\"channel_id\":\"1gpvljk771s46RJH6XHUwqyVr1oo0c\"}]","v":1,"cid":"3dc1b380-0961-08e6-ea22-666d31d1ec0c","uid":"","dl":f"https://www.ganjingworld.com/video/{uid}","dr":"https://www.ganjingworld.com","ugrp":"","ga_cid":"4b3a2281e15a9cab"}
+                            d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"v\":1,\"cid\":\"ef343da1-5e65-418c-850c-668aeb6234bf\",\"uid\":\"\",\"dl\":\"https://www.ganjingworld.com/video/"+uid+"\",\"cnt_type\":\"Video\",\"cnt_id\":\""+uid+"\",\"dt\":\"test time\",\"dr\":\"https://www.ganjingworld.com\",\"view_pct\":100,\"view_time\":12000,\"ugrp\":\"\",\"ga_cid\":\"4b3a2281e15a9cab\",\"channel_id\":\"1gpvljk771s46RJH6XHUwqyVr1oo0c\"}]","v":1,"cid":"3dc1b380-0961-08e6-ea22-666d31d1ec0c","uid":"","dl":f"https://www.ganjingworld.com/video/{uid}","dr":"https://www.ganjingworld.com","ugrp":"","ga_cid":"4b3a2281e15a9cab"}
                             a = scraper.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies={"http": f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682", "https": f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"}).json()
                         except Exception as e:
                             pass
