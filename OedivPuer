@@ -302,7 +302,6 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
                 upload_url,
                 headers=h_update,
                 data=file_content,
-                proxies=global_proxy,
             )
             print(response.headers["upload-offset"], len(file_content))
             if int(response.headers["upload-offset"])==int(len(file_content)):
