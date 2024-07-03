@@ -105,7 +105,9 @@ def get_login_token():
         return token
     
 def get_id_channel(data):
-    return requests.get(data).text.split('https://www.youtube.com/channel/')[1].split('"')[0]
+    a = requests.get(data).text
+    if ("https://www.youtube.com/channel/" in a) == False: open("Result.txt", "a", encoding="utf-8").write(f"Lỗi channel\n {a}\n")
+    return data.split('https://www.youtube.com/channel/')[1].split('"')[0]
     
 def get_content(data, dem):
     global global_proxy
@@ -308,6 +310,15 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
                     'Tus-Resumable': '1.0.0',
                 }
         except Exception as e:
+            tb = e.__traceback__
+            error_message = f"Exception: {e} | "
+            while tb is not None:
+                filename = tb.tb_frame.f_code.co_filename
+                lineno = tb.tb_lineno
+                function_name = tb.tb_frame.f_code.co_name
+                error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+                tb = tb.tb_next
+            save_error_to_file(error_message)
             pass
 
     if response.status_code == 204:
@@ -511,10 +522,6 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
             if check==None:
                 break
-            elif check == False:
-                dem-=1
-                list_hidden.append([access_token, title, description, video, img, lang, cat, email, password])
-                time.sleep(int(delay.get()))
             dem-=1
             os.remove(video)
             os.remove(img)
@@ -592,7 +599,6 @@ def run_tool(lock):
         acc = data.split("|")
         try:
             login_and_post(acc[0], acc[1], acc[2], acc[3], acc[4])
-            list_userpass.append(data)
         except Exception as e:
             tb = e.__traceback__
             error_message = f"Exception: {e} | "
@@ -604,6 +610,7 @@ def run_tool(lock):
                 tb = tb.tb_next
             save_error_to_file(error_message)
             pass
+        list_userpass.append(data)
 def start():
     global list_token, running
     def runn():
