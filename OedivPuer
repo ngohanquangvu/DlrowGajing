@@ -105,9 +105,14 @@ def get_login_token():
         return token
     
 def get_id_channel(data):
-    a = requests.get(data).text
+    global global_proxy
+    while True:
+        try:
+            a = requests.get(data, proxies=global_proxy).text
+            break
+        except: pass
     if ("https://www.youtube.com/channel/" in a) == False: open("Result.txt", "a", encoding="utf-8").write(f"Lỗi channel\n {a}\n")
-    return data.split('https://www.youtube.com/channel/')[1].split('"')[0]
+    return a.split('https://www.youtube.com/channel/')[1].split('"')[0]
     
 def get_content(data, dem):
     global global_proxy
