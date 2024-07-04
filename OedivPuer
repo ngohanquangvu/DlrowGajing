@@ -1,3 +1,7 @@
+import pytube
+pytube.innertube._default_clients["ANDROID_MUSIC"] = pytube.innertube._default_clients["ANDROID_CREATOR"] 
+
+
 app = customtkinter.CTk()
 app.title("GanJingWorld Reup Video")
 app.geometry("350x420")
