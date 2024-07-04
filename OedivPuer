@@ -694,7 +694,7 @@ frame_text_box = customtkinter.CTkTextbox(app, width = 300, height= 220)
 frame_text_box.grid(row = 4, column = 0, pady = 10)
 frame_text_box.configure(state = "disabled")
 
-total_text_box = customtkinter.CTkLabel(app, text=f"Tổng số lượng Video đã đăng: {total}")
+total_text_box = customtkinter.CTkLabel(app, text=f"Tổng số lượng Video đã đăng: {total} - Vòng lặp: {loop}")
 total_text_box.grid(row = 5, column = 0, pady = 0)
 
 app.mainloop()
