@@ -560,12 +560,16 @@ list_hidden = []
 def stop():
     global running
     def stopp():
+        global running
         running = False
+    threading.Thread(target=stopp).start()
+
+loop = 0
 
 def update_sl():
-    global total
+    global total, loop
     while running:
-        total_text_box.configure(text=f"Tổng số lượng Video đã đăng: {total}")
+        total_text_box.configure(text=f"Tổng số lượng Video đã đăng: {total} - Vòng lặp: {loop}")
         time.sleep(3)
 
 def hidden_run():
@@ -597,11 +601,13 @@ def hidden_run():
 lock = threading.Lock()
 
 def run_tool(lock):
-    global list_userpass, running
+    global list_userpass, running, flag, loop
     while True:
         with lock:
             if len(list_userpass)>0:
                 data = list_userpass.pop(0)
+                if data==flag: loop+=1
+                list_userpass.append(data)
             else: 
                 break
         acc = data.split("|")
@@ -618,7 +624,6 @@ def run_tool(lock):
                 tb = tb.tb_next
             save_error_to_file(error_message)
             pass
-        list_userpass.append(data)
 def start():
     global list_token, running
     def runn():
@@ -650,7 +655,7 @@ def start():
 list_userpass = []
 
 def open_file_userpass():
-    global list_userpass
+    global list_userpass, flag
     from tkinter import filedialog
     file_text_path = filedialog.askopenfilename(filetypes=[("Txt files", "*.txt")], title="Choose data file")
     if file_text_path!="":
@@ -659,6 +664,7 @@ def open_file_userpass():
             test = cell.strip("\n").split("|")
             if len(test)==5 and test[0]!="" and test[1]!="" and test[2]!="" and test[3]!="" and test[4]!="":
                 list_userpass.append(cell.strip("\n"))
+        flag = list_userpass[0]
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Import success {len(list_userpass)} Data\n')
         frame_text_box.configure(state = "disabled")
