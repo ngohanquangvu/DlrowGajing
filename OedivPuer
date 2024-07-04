@@ -50,7 +50,7 @@ def save_video(url):
         aaa = f'./VideoData'
         name_file = f'{time.time()}.mp4'
         yt = YouTube(url)
-        stream = yt.streams.first()
+        stream = yt.streams.get_highest_resolution()
         stream.download(output_path=aaa, filename=name_file)
         return f'{aaa}/{name_file}'
     except Exception as e:
@@ -694,7 +694,7 @@ frame_text_box = customtkinter.CTkTextbox(app, width = 300, height= 220)
 frame_text_box.grid(row = 4, column = 0, pady = 10)
 frame_text_box.configure(state = "disabled")
 
-total_text_box = customtkinter.CTkLabel(app, text=f"Tổng số lượng Video đã đăng: {total} - Vòng lặp: {loop}")
+total_text_box = customtkinter.CTkLabel(app, text=f"Tổng số lượng Video đã đăng: {total}")
 total_text_box.grid(row = 5, column = 0, pady = 0)
 
 app.mainloop()
