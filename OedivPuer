@@ -1,4 +1,4 @@
-import pytube
+import pytube, moviepy.editor
 pytube.innertube._default_clients["ANDROID_MUSIC"] = pytube.innertube._default_clients["ANDROID_CREATOR"] 
 
 
