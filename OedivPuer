@@ -45,13 +45,30 @@ global_proxy = {
 }
 
 
-def save_video(url):
+def save_video(url, email, password):
     try:
         aaa = f'./VideoData'
-        name_file = f'{time.time()}.mp4'
+        name_file = f'{time.time()}'
+        name_audio = f'{name_file}_audio'
+        name_video_temp = f'{name_file}_video'
+        name_file = f'{name_file}.mp4'
         yt = YouTube(url)
-        stream = yt.streams.get_highest_resolution()
-        stream.download(output_path=aaa, filename=name_file)
+        video_stream = yt.streams.filter(progressive=False, file_extension='mp4').order_by('resolution').desc().first()
+        video_path = video_stream.download(filename=name_video_temp, output_path=aaa)
+        audio_stream = yt.streams.filter(only_audio=True).first()
+        audio_path = audio_stream.download(filename=name_audio, output_path=aaa)
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Đang ghép audio vào video\n')
+        frame_text_box.configure(state = "disabled")
+        video_clip = moviepy.editor.VideoFileClip(video_path)
+        audio_clip = moviepy.editor.AudioFileClip(audio_path)
+        final_clip = video_clip.set_audio(audio_clip)
+        final_clip.write_videofile(f'{aaa}/{name_file}')
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'Ghép audio vào video thành công\n')
+        frame_text_box.configure(state = "disabled")
+        os.remove(video_path)
+        os.remove(audio_path)
         return f'{aaa}/{name_file}'
     except Exception as e:
         tb = e.__traceback__
@@ -513,7 +530,7 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             frame_text_box.configure(state = "normal")
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đang tải video\n')
             frame_text_box.configure(state = "disabled")
-            video = save_video(url_video)
+            video = save_video(url_video, email, password)
             if video==None:
                 frame_text_box.configure(state = "normal")
                 frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Lỗi tải video\n')
