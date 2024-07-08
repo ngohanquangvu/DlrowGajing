@@ -71,7 +71,7 @@ def save_video(url, email, password):
         return f'{aaa}/{name_file}'
     except Exception as e:
         tb = e.__traceback__
-        error_message = f"Exception: {e} | "
+        error_message = f" {url}| Exception: {e} | "
         while tb is not None:
             filename = tb.tb_frame.f_code.co_filename
             lineno = tb.tb_lineno
