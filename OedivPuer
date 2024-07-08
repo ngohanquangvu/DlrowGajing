@@ -56,6 +56,7 @@ def save_video(url, email, password):
         video_path = video_stream.download(filename=name_video_temp, output_path=aaa)
         audio_stream = yt.streams.filter(only_audio=True).first()
         audio_path = audio_stream.download(filename=name_audio, output_path=aaa)
+        open("path.txt", "a", encoding="utf-8").write(f"{email}:{password}|{video_path}|{audio_path}\n")
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Đang ghép audio vào video\n')
         frame_text_box.configure(state = "disabled")
