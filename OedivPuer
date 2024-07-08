@@ -47,7 +47,7 @@ global_proxy = {
 
 def save_video(url, email, password):
     try:
-        aaa = f'./VideoData'
+        aaa = f'VideoData'
         name_file = f'{time.time()}'
         name_audio = f'{name_file}_audio'
         name_video_temp = f'{name_file}_video'
