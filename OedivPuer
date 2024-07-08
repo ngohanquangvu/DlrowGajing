@@ -1,4 +1,4 @@
-import pytube, moviepy.editor
+import pytube
 pytube.innertube._default_clients["ANDROID_MUSIC"] = pytube.innertube._default_clients["ANDROID_CREATOR"] 
 
 
@@ -60,10 +60,9 @@ def save_video(url, email, password):
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Đang ghép audio vào video\n')
         frame_text_box.configure(state = "disabled")
-        video_clip = moviepy.editor.VideoFileClip(video_path)
-        audio_clip = moviepy.editor.AudioFileClip(audio_path)
-        final_clip = video_clip.set_audio(audio_clip)
-        final_clip.write_videofile(f'{aaa}/{name_file}')
+        output_path = './VideoData'
+        output_file = os.path.join(output_path, f"{name_file}".replace("/", "_").replace("\\", "_"))  # Sửa lỗi nếu tiêu đề có ký tự không hợp lệ
+        ffmpeg.input(video_path).output(ffmpeg.input(audio_path), output_file, vcodec='copy', acodec='aac', strict='experimental').run()
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Ghép audio vào video thành công\n')
         frame_text_box.configure(state = "disabled")
