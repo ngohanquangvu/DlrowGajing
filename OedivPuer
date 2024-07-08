@@ -51,7 +51,6 @@ def save_video(url, email, password):
         name_file = f'{time.time()}'
         name_audio = f'{name_file}_audio'
         name_video_temp = f'{name_file}_video'
-        name_file = f'{name_file}.mp4'
         yt = YouTube(url)
         video_stream = yt.streams.filter(only_video=True).order_by('resolution').desc().first()
         video_path = video_stream.download(filename=name_video_temp, output_path=aaa)
@@ -61,7 +60,7 @@ def save_video(url, email, password):
         frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Đang ghép audio vào video\n')
         frame_text_box.configure(state = "disabled")
         output_path = './VideoData'
-        output_file = os.path.join(output_path, f"{name_file}".replace("/", "_").replace("\\", "_"))  # Sửa lỗi nếu tiêu đề có ký tự không hợp lệ
+        output_file = f"{output_path}/{name_file}.mp4"  # Sửa lỗi nếu tiêu đề có ký tự không hợp lệ
         ffmpeg.input(video_path).output(ffmpeg.input(audio_path), output_file, vcodec='copy', acodec='aac', strict='experimental').run()
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'Ghép audio vào video thành công\n')
