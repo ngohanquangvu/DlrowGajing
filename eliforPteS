@@ -427,6 +427,90 @@ def delete_video_shorts(account):
             print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
         except Exception as e:
             data_content.append(i)
+
+def check_acc(account):
+    email = account.split("|")[0]
+    password = account.split("|")[1]
+    scraper = cloudscraper.create_scraper()
+    while True:
+        try:
+            token_login = get_login_token()
+            d = {"user_email":email,"client_type":3}
+
+            h = {
+                'Authorization':token_login,
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+                'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+                'Accept':'application/json, text/plain, */*',
+                'Accept-Encoding':'gzip, deflate, br',
+                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                'Content-Length':'56',
+                'Origin':'https://www.ganjingworld.com',
+                'Referer':'https://www.ganjingworld.com/',
+                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                'Sec-Ch-Ua-Mobile':'?0',
+                'Sec-Ch-Ua-Platform':'"Windows"',
+            }
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+            b = a.json()
+            break
+        except Exception as e: 
+            continue
+    if "The user does not exist" in a.text:
+        open("Die.txt", "a", encoding="utf-8").write(f"{email}|{password}\n")
+        return
+    else:
+        open("log.txt", "a", encoding="utf-8").write(f"Result: {a.text} with account {email}:{password}\n")
+    server_salt = a.json()["data"]["server_salt"]
+    client_salt = a.json()["data"]["client_salt"]
+    def hash_password(pss, client_salt, server_salt):
+        x = hashlib.sha256((pss + client_salt).encode()).digest()
+        x_base64 = base64.b64encode(x).decode()
+        S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
+        S_base64 = base64.b64encode(S).decode()
+        return S_base64
+
+    hashed_password = hash_password(password, client_salt, server_salt)
+
+    d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
+
+    h = {
+        'Authorization':token_login,
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+        'Accept':'application/json, text/plain, */*',
+        'Accept-Encoding':'gzip, deflate, br',
+        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+        'Content-Length':'56',
+        'Origin':'https://www.ganjingworld.com',
+        'Referer':'https://www.ganjingworld.com/',
+        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+        'Sec-Ch-Ua-Mobile':'?0',
+        'Sec-Ch-Ua-Platform':'"Windows"',
+    }
+    while True:
+        try:
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+            if "Password is incorrect" in a.text:
+                open("Die.txt", "a", encoding="utf-8").write(f"{email}|{password}\n")
+            user_id = a.json()["data"]["user_id"]
+            open("Live.txt", "a", encoding="utf-8").write(f"{email}|{password}|https://www.ganjingworld.com/channel/{user_id}\n")
+            return True
+        except Exception as e: 
+            pass
+
     
 def menu():
     global data_fb, data_bio
@@ -436,7 +520,7 @@ def menu():
         print("2. Set profile")
         print("3. Delete post")
         print("4. Delete Video and Shorts")
-        print("5. Exit")
+        print("6. Exit")
         choice = int(input("Enter your choice: "))
         if choice == 1:
             data = input("Enter to import data")
@@ -516,5 +600,26 @@ def menu():
             out = input("Enter to continue...")
             os.system("cls")
         elif choice == 5:
+            data = input("Enter to import account Ganjingworld")
+            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data = open(data, encoding="utf-8", errors="replace").readlines()
+            data_acc = []
+            for i in data:
+                i = i.strip("\n")
+                if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
+                    data_acc.append(i)
+            luong = int(input("Nhập số luồng: "))
+            for i in range(0, len(data_acc), luong):
+                aaa = data_acc[i:i+luong]
+                threads = []
+                for j in aaa:
+                    threads.append(threading.Thread(target=check_acc, args=(j.replace(" ",""),)))
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
+            out = input("Enter to continue...")
+            os.system("cls")
+        elif choice == 6:
             break
 menu()
