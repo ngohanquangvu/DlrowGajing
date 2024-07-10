@@ -71,6 +71,8 @@ def save_video(url, email, password):
         os.remove(audio_path)
         return f'./{aaa}/{name_file}.mp4'
     except Exception as e:
+        if "streaming live and cannot be loaded" in str(e):
+            return False
         aaa = f'{time.time()}.mp4'
         yt = YouTube(url)
         video_stream = yt.streams.get_highest_resolution()
@@ -534,6 +536,9 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
                 try:
                     os.remove(img)
                 except: pass
+                dem-=1
+                time.sleep(3)
+            elif video==False:
                 dem-=1
                 time.sleep(3)
             else:
