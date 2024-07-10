@@ -63,7 +63,7 @@ def save_video(url, email, password):
         output_file = f"{aaa}/{name_file}.mp4"  # Sửa lỗi nếu tiêu đề có ký tự không hợp lệ
         input_audio = ffmpeg.input(audio_path)
         input_video = ffmpeg.input(video_path)
-        input_video.output(input_audio, output_file, vcodec='copy', acodec='aac', strict='experimental').run(capture_stdout=True, capture_stderr=True)
+        input_video.output(input_audio, output_file, vcodec='copy', acodec='aac', strict='experimental', threads = "10").run(capture_stdout=True, capture_stderr=True)
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Ghép audio vào video thành công\n')
         frame_text_box.configure(state = "disabled")
@@ -71,6 +71,10 @@ def save_video(url, email, password):
         os.remove(audio_path)
         return f'./{aaa}/{name_file}.mp4'
     except Exception as e:
+        aaa = f'{time.time()}.mp4'
+        yt = YouTube(url)
+        video_stream = yt.streams.get_highest_resolution()
+        video_path = video_stream.download(filename=f"{aaa}", output_path="VideoData")
         tb = e.__traceback__
         error_message = f" {url}| Exception: {e} | "
         while tb is not None:
@@ -80,7 +84,7 @@ def save_video(url, email, password):
             error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
             tb = tb.tb_next
         save_error_to_file(error_message)
-        return None
+        return f'./VideoData/{aaa}'
 
 def remove_hashtags(text):
     return re.sub(r'#\S+', '', text)
@@ -353,6 +357,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
     while True:
         try:
             wait = requests.get(f"https://vodapi.cloudokyo.cloud/api/v1/status/{id_video}", headers={'Authorization':f"Bearer {update_token}"}, proxies=global_proxy).json()
+            wait["body"]
         except:
             time.sleep(5)
             continue
