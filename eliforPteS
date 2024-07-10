@@ -367,18 +367,27 @@ def delete_post(account):
         "Content-Type": "application/json",
         "Authorization": token,
     }
-    pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
-    p = {
-        "http":f"http://{pr}",
-        "https":f"http://{pr}"
-    }
-    id_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()["data"]["channels"][0]["id"]
+    while True:
+        try:
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            id_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, proxies=p).json()["data"]["channels"][0]["id"]
+            break
+        except: continue
     print(f"Get post with account {account}")
     data_post = crawl_post(id_channel)
     print(f"Get post success with account {account}")
     del_success = 0
     del_error = 0
     scraper = cloudscraper.create_scraper()
+    pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+    p = {
+        "http":f"http://{pr}",
+        "https":f"http://{pr}"
+    }
     for i in data_post:
         try:
             a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/social-content/delete-post", json={"id":i}, headers=h, proxies=p).json()
@@ -405,7 +414,7 @@ def delete_video_shorts(account):
         "Content-Type": "application/json",
         "Authorization": token,
     }
-    pr = "Eya6PSY2Jecb:ZHnY07wUhwRt@ipv6.proxiware.com:8080"
+    pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
     p = {
         "http":f"http://{pr}",
         "https":f"http://{pr}"
