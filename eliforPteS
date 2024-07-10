@@ -529,6 +529,7 @@ def menu():
         print("2. Set profile")
         print("3. Delete post")
         print("4. Delete Video and Shorts")
+        print("5. Check account")
         print("6. Exit")
         choice = int(input("Enter your choice: "))
         if choice == 1:
