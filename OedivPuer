@@ -63,7 +63,7 @@ def save_video(url, email, password):
         output_file = f"{aaa}/{name_file}.mp4"  # Sửa lỗi nếu tiêu đề có ký tự không hợp lệ
         input_audio = ffmpeg.input(audio_path)
         input_video = ffmpeg.input(video_path)
-        input_video.output(input_audio, output_file, vcodec='copy', acodec='aac', strict='experimental', threads = "10").run(capture_stdout=True, capture_stderr=True)
+        input_video.output(input_audio, output_file, vcodec='copy', acodec='aac', strict='experimental', threads = "10", preset = 'ultrafast').run(capture_stdout=True, capture_stderr=True)
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Ghép audio vào video thành công\n')
         frame_text_box.configure(state = "disabled")
