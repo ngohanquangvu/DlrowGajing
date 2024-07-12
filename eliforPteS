@@ -443,7 +443,8 @@ def delete_video_shorts(account):
         except Exception as e:
             data_content.append(i)
 
-def check_acc(account, good, bad, total):
+def check_acc(account, total):
+    global good, bad
     email = account.split("|")[0]
     password = account.split("|")[1]
     scraper = cloudscraper.create_scraper()
@@ -642,11 +643,13 @@ def menu():
                 if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
                     data_acc.append(i)
             luong = int(input("Nhập số luồng: "))
+            bad = 0
+            good = 0
             for i in range(0, len(data_acc), luong):
                 aaa = data_acc[i:i+luong]
                 threads = []
                 for j in aaa:
-                    threads.append(threading.Thread(target=check_acc, args=(j.replace(" ",""),)))
+                    threads.append(threading.Thread(target=check_acc, args=(j.replace(" ",""),len(data_acc),)))
                 for thread in threads:
                     thread.start()
                 for thread in threads:
