@@ -553,7 +553,9 @@ def check_acc(account, total):
                         "http":f"http://{pr}",
                         "https":f"http://{pr}"
                     }
-                    data_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, proxies=p).json()["data"]["channels"][0]
+                    data_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, proxies=p).json()
+                    open("log.txt", "a", encoding="utf-8").write(f"{email}|{password}|{str(data_channel)}\n")
+                    data_channel = data_channel["data"]["channels"][0]
                     break
                 except Exception as e:
                     open("Error_Log.txt", "a", encoding="utf-8").write(f"{email}|{password}|{str(e)}\n")
