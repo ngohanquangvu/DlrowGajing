@@ -560,7 +560,6 @@ def check_acc(account, total):
                     data_channel = data_channel["data"]["channels"][0]
                     break
                 except Exception as e:
-                    open("Error_Log.txt", "a", encoding="utf-8").write(f"{email}|{password}|{str(e)}\n")
                     continue
             good += 1
             print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
@@ -568,8 +567,7 @@ def check_acc(account, total):
             name = data_channel["name"]
             open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{uid}|{name}\n")
             return
-        except Exception as e:
-            open("Error_Log.txt", "a", encoding="utf-8").write(f"{email}|{password}|{str(e)}\n") 
+        except Exception as e: 
             pass
 
     
