@@ -210,7 +210,7 @@ def login(account):
 data_fb = []
 data_bio = []
 data_token = []
-def update_channel(account, set_avt, set_bio):
+def update_channel(account, set_avt, set_bio, set_name):
     global data_fb, data_bio, data_token
     print(f"Login with account {account}")
     while True:
@@ -222,18 +222,31 @@ def update_channel(account, set_avt, set_bio):
                 print(f"Login error with account {account}")
                 return
         except: continue
+    while True:
+        try:
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            data_channel = scraper.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}, proxies=p).json()["data"]["channels"][0]
+            break
+        except: continue
     print(f"Login success with account {account}")
     try:
         data = random.choice(data_fb)
         if set_bio == True:
             bio = random.choice(data_bio)
         else:
-            bio = ""
+            bio = data_channel["desc"]
         if set_avt == True:
             img = save_image(data.split("|")[1])
         else:
-            img = None
-        name = data.split("|")[0]
+            img = data_channel["icon"]
+        if set_name == True:
+            name = data.split("|")[0]
+        else:
+            name = data_channel["name"]
     except:
         print(f"Data nhập vào bị thiếu với acc {account}")
         return
@@ -247,8 +260,8 @@ def update_channel(account, set_avt, set_bio):
         "https":f"http://{pr}"
     }
     print(f"Upload img with account {account}")
-    if img == None:
-        url = ""
+    if set_avt == False:
+        pass
     else:
         while True:
             try:
@@ -271,8 +284,8 @@ def update_channel(account, set_avt, set_bio):
             uid = scraper.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}, proxies=p).json()["data"]["channels"][0]["id"]
             break
         except: continue
-    if url == "":
-        d = {"name":name,"desc":bio,"id":uid}
+    if set_avt == False:
+        d = {"name":name,"desc":bio,"id":uid, "avatar_url":img}
     else:
         d = {"name":name,"desc":bio,"id":uid,"avatar_url":url}
     scraper = cloudscraper.create_scraper()
@@ -573,16 +586,20 @@ def menu():
             luong = int(input("Nhập số luồng: "))
             set_avt = True
             set_bio = True
+            set_name = True
             while True:
                 print("1. Set avatar: ", set_avt)
                 print("2. Set bio: ", set_bio)
-                print("3. Run")
+                print("3. Set name")
+                print("4. Run")
                 choice = int(input("Enter your choice: "))
                 if choice == 1:
                     set_avt = not set_avt
                 elif choice == 2:
                     set_bio = not set_bio
                 elif choice == 3:
+                    set_name = not set_name
+                elif choice == 4:
                     break
                 else:
                     os.system("cls")
@@ -590,7 +607,7 @@ def menu():
                 aaa = data_acc[i:i+luong]
                 threads = []
                 for j in aaa:
-                    threads.append(threading.Thread(target=update_channel, args=(j,set_avt, set_bio,)))
+                    threads.append(threading.Thread(target=update_channel, args=(j,set_avt, set_bio,set_name,)))
                 for thread in threads:
                     thread.start()
                 for thread in threads:
