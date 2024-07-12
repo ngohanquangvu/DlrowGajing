@@ -579,9 +579,9 @@ def menu():
                 print("3. Run")
                 choice = int(input("Enter your choice: "))
                 if choice == 1:
-                    set_avt = False
+                    set_avt = not set_avt
                 elif choice == 2:
-                    set_bio = False
+                    set_bio = not set_bio
                 elif choice == 3:
                     break
                 else:
