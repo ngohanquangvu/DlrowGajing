@@ -443,6 +443,9 @@ def delete_video_shorts(account):
         except Exception as e:
             data_content.append(i)
 
+good = 0
+bad = 0
+
 def check_acc(account, total):
     global good, bad
     email = account.split("|")[0]
@@ -479,8 +482,9 @@ def check_acc(account, total):
         except Exception as e: 
             continue
     if "The user does not exist" in a.text:
-        open("Result.txt", "a", encoding="utf-8").write(f"{email}|{password}|Email doesnt exist\n")
+        open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Email doesnt exist\n")
         print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Email doesnt exist") 
+        bad += 1
         return
     server_salt = a.json()["data"]["server_salt"]
     client_salt = a.json()["data"]["client_salt"]
@@ -519,13 +523,15 @@ def check_acc(account, total):
             }
             a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
             if "Password is incorrect" in a.text:
-                open("Die.txt", "a", encoding="utf-8").write(f"{email}|{password}|Wrong password\n")
+                open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Wrong password\n")
+                bad += 1
                 print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Wrong password")
-                return False
+                return
             user_id = a.json()["data"]["user_id"]
-            open("Live.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{user_id}\n")
             print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
-            return True
+            good += 1
+            open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{user_id}\n")
+            return
         except Exception as e: 
             pass
 
@@ -637,14 +643,13 @@ def menu():
             data = input("Enter to import account Ganjingworld")
             data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
             data = open(data, encoding="utf-8", errors="replace").readlines()
+            print(f"Import {len(data)} account")
             data_acc = []
             for i in data:
                 i = i.strip("\n")
                 if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
                     data_acc.append(i)
             luong = int(input("Nhập số luồng: "))
-            bad = 0
-            good = 0
             for i in range(0, len(data_acc), luong):
                 aaa = data_acc[i:i+luong]
                 threads = []
