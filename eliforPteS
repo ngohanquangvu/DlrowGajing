@@ -551,7 +551,7 @@ def check_acc(account, total):
                         "http":f"http://{pr}",
                         "https":f"http://{pr}"
                     }
-                    data_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, proxies=p).json()
+                    data_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()
                     if data_channel["data"]["my_channel_is_deleted"] == True:
                         open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Channel is deleted\n")
                         bad += 1
