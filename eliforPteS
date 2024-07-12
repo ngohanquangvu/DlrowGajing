@@ -545,7 +545,7 @@ def check_acc(account, total):
                     "Content-Type": "application/json",
                     "Authorization": a.json()["data"]["token"],
                     }
-            data_channel = s.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h)
+            data_channel = s.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"})
             while True:
                 try:
                     data_channel = data_channel.json()
