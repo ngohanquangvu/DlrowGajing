@@ -1,0 +1,164 @@
+def login(account):
+    email = account.split("|")[0]
+    password = account.split("|")[1]
+    scraper = cloudscraper.create_scraper()
+    while True:
+        try:
+            token_login = ""
+            d = {"user_email":email,"client_type":3}
+
+            h = {
+                'Authorization':token_login,
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+                'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+                'Accept':'application/json, text/plain, */*',
+                'Accept-Encoding':'gzip, deflate, br',
+                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+                'Content-Length':'56',
+                'Origin':'https://www.ganjingworld.com',
+                'Referer':'https://www.ganjingworld.com/',
+                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+                'Sec-Ch-Ua-Mobile':'?0',
+                'Sec-Ch-Ua-Platform':'"Windows"',
+            }
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+            b = a.json()
+            break
+        except Exception as e: 
+            continue
+    if "The user does not exist" in a.text:
+        return None
+    else:
+        open("log.txt", "a", encoding="utf-8").write(f"Result: {a.text} with account {email}:{password}\n")
+    server_salt = a.json()["data"]["server_salt"]
+    client_salt = a.json()["data"]["client_salt"]
+    def hash_password(pss, client_salt, server_salt):
+        x = hashlib.sha256((pss + client_salt).encode()).digest()
+        x_base64 = base64.b64encode(x).decode()
+        S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
+        S_base64 = base64.b64encode(S).decode()
+        return S_base64
+
+    hashed_password = hash_password(password, client_salt, server_salt)
+
+    d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
+
+    h = {
+        'Authorization':token_login,
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
+        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
+        'Accept':'application/json, text/plain, */*',
+        'Accept-Encoding':'gzip, deflate, br',
+        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+        'Content-Length':'56',
+        'Origin':'https://www.ganjingworld.com',
+        'Referer':'https://www.ganjingworld.com/',
+        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+        'Sec-Ch-Ua-Mobile':'?0',
+        'Sec-Ch-Ua-Platform':'"Windows"',
+    }
+    while True:
+        try:
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
+            if "Password is incorrect" in a.text:
+                return None
+            access_token = a.json()["data"]["token"]
+            return access_token
+        except Exception as e: 
+            pass
+
+def buff_like(url, sl_like):
+    uid = url.split("/")[-1].split("?")[0]
+    h  = {
+        "Content-Type": "application/json",
+    }
+    pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+    p = {
+        "http":f"http://{pr}",
+        "https":f"http://{pr}"
+    }
+    dem_like = 0
+    while dem_like < sl_like:
+        try:
+            d = {"id":uid,"is_like":True}
+
+            like = requests.post("https://gw.ganjingworld.com/v1.0c/like-content", json=d, headers=h, proxies=p).json()
+            if like["data"]["Status"] == 'added':
+                print(f"\033[92m[+] Tăng like thành công cho {url}\033[0m")
+            dem_like += 1
+            time.sleep(3)
+        except: pass
+
+lisst_account = []
+
+def buff_follow(url):
+    global list_account
+
+    account = random.choice(open("account.txt", "r", encoding="utf-8").read().split("\n"))
+
+    while True:
+        try:
+            token = login(account)
+            break
+        except: pass
+
+    h = {
+        "Content-Type": "application/json",
+        "Authorization": token
+    }
+    uid = url.split("/")[-1].split("?")[0]
+    d = {"profile_id":uid}
+    fl = requests.post("https://gw.ganjingworld.com/v1.1/timeline/follow", json=d, headers=h).json()
+    print(fl)
+    
+def menu():
+    global data_fb, data_bio
+    while True:
+        # os.system("cls")
+        print("1. Buff like")
+        print("2. Buff follow")
+        print("3. Buff comment")
+        print("4. Exit")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            data = input("Enter to import data account")
+            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data = open(data, encoding="utf-8", errors="replace").read().split("\n")
+            link = input("Enter to import data link")
+            link = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            link = open(link, encoding="utf-8", errors="replace").read().split("\n")
+            luong = int(input("Nhập số luồng: "))
+            sl_like = int(input("Nhập số like: "))
+            for i in range(0, len(link), luong):
+                aaa = link[i:i+luong]
+                threads = []
+                for j in aaa:
+                    threads.append(threading.Thread(target=buff_like, args=(j,sl_like)))
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
+            out = input("Enter to continue...")
+        elif choice == 2:
+            print("Chức năng đang bảo trì")
+            out = input("Enter to continue...")
+            os.system("cls")
+        elif choice == 3:
+            print("Chức năng đang bảo trì")
+            out = input("Enter to continue...")
+            os.system("cls")
+        elif choice == 4:
+            break
+menu()
