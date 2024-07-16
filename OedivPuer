@@ -331,6 +331,7 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
                     'Upload-Offset': response.headers["upload-offset"],
                     'Tus-Resumable': '1.0.0',
                 }
+            time.sleep(5)
         except Exception as e:
             tb = e.__traceback__
             error_message = f"Exception: {e} | "
@@ -546,11 +547,11 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
                 frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
                 frame_text_box.configure(state = "disabled")
                 check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
+                os.remove(video)
+                os.remove(img)
                 if check==None:
                     break
                 dem-=1
-                os.remove(video)
-                os.remove(img)
                 time.sleep(int(delay.get()))
         except Exception as e:
             tb = e.__traceback__
