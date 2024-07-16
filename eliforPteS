@@ -1,105 +1,5 @@
-if not os.path.exists('ImageData'):
-    os.makedirs('ImageData')
-
-def eaabw(cookie):
-	head = {
-	"Cookie":cookie,
-	"Host":"m.facebook.com",
-	"cache-control":"max-age=0",
-	"upgrade-insecure-requests":"1",
-	"origin":"https://m.facebook.com",
-	"content-type":"application/x-www-form-urlencoded",
-	"user-agent":"Mozilla/5.0 (Linux; Android 12; SM-A217F Build/SP1A.210812.016) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.104 Mobile Safari/537.36",
-	"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-	"x-requested-with":"mark.via.gp",
-	"sec-fetch-site":"same-origin",
-	"sec-fetch-mode":"navigate",
-	"sec-fetch-user":"?1",
-	"sec-fetch-dest":"document",
-	"referer":"https://m.facebook.com/dialog/oauth?client_id=124024574287414&redirect_uri=https://www.instagram.com/accounts/signup/&&scope=email&response_type=token",
-	"accept-encoding":"gzip, deflate",
-	"accept-language":"vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
-	}
-	get = requests.get("https://m.facebook.com/dialog/oauth?client_id=124024574287414&redirect_uri=https://www.instagram.com/accounts/signup/&&scope=email&response_type=token", headers=head).text
-	fb = get.split('name="fb_dtsg" value="')[1].split('"')[0]
-	jazoest = get.split('name="jazoest" value="')[1].split('"')[0]
-	scope = get.split('name="scope" value="')[1].split('"')[0]
-	logger_id = get.split('name="logger_id" value="')[1].split('"')[0]
-	encrypted_post_body = get.split('name="encrypted_post_body" value="')[1].split('"')[0]
-	data = {
-	"Cookie":cookie,
-	"fb_dtsg": fb,
-	"jazoest":"25480",
-	"scope":scope,
-	"display":"touch",
-	"sdk":"",
-	"sdk_version":"",
-	"domain":"",
-	"sso_device":"ios",
-	"state":"",
-	"user_code":"",
-	"nonce":"",
-	"logger_id":logger_id,
-	"auth_type":"",
-	"auth_nonce":"",
-	"code_challenge":"",
-	"code_challenge_method":"",
-	"encrypted_post_body":encrypted_post_body,
-	"return_format[]":"access_token"
-	}
-	get = requests.post("https://m.facebook.com/dialog/oauth?client_id=124024574287414&redirect_uri=https://www.instagram.com/accounts/signup/&&scope=email&response_type=token", headers=head, data=data)
-	a = requests.get("https://m.facebook.com/dialog/oauth?client_id=124024574287414&redirect_uri=https://www.instagram.com/accounts/signup/&&scope=email&response_type=token", headers={"Cookie":cookie}).url
-	return a.split("#access_token=")[1].split("&")[0]
-
-
-def get_friend_info(cookie, list_id):
-    print("Đang lấy thông tin bạn bè...")
-    access_token = eaabw(cookie)
-    for user_id in list_id:
-        user_info_url = f'https://graph.facebook.com/{user_id}?fields=name,picture.type(large)&access_token={access_token}'
-        response = requests.get(user_info_url)
-        user_info = response.json()
-        open("result.txt","a",encoding="utf-8").write(f'{user_info["name"]}|{user_info["picture"]["data"]["url"]}'+"\n")
-        friends_url = f'https://graph.facebook.com/{user_id}/friends?fields=id,picture.type(large),name&access_token={access_token}'
-        response = requests.get(friends_url)
-        friends_list = response.json()
-        for i in friends_list["data"]:
-            open("result.txt","a",encoding="utf-8").write(f'{i["name"]}|{i["picture"]["data"]["url"]}'+"\n")
-        while 'paging' in friends_list and 'after' in friends_list['paging']["cursors"]:
-            next_url = friends_list['paging'].get('cursors').get('after')
-            payload = {
-                    "access_token": access_token
-                }
-            response = requests.get(f"https://graph.facebook.com/v18.0/{user_id}/friends?fields=id,picture.type(large),name&after="+next_url, params=payload)
-            friends_list = response.json()
-            for i in friends_list["data"]:
-                open("result.txt","a",encoding="utf-8").write(f'{i["name"]}|{i["picture"]["data"]["url"]}'+"\n")
-
-def save_image(url):
-    try:
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            aaa = f'./ImageData/{time.time()}.jpg'
-            with open(aaa, 'wb') as f:
-                f.write(response.content)
-            return aaa
-    except: return None
-
-def get_webp_url(media_list):
-            for url in media_list:
-                if url.endswith('origin.webp'):
-                    return url
-            return None
-
-def get_webp_url(media_list):
-            for url in media_list:
-                if url.endswith('origin.webp'):
-                    return url
-            return None
-
-
 list_login_token = []
+
 def get_login_token():
     global list_login_token
     if len(list_login_token) != 0:
@@ -122,582 +22,395 @@ def get_login_token():
             'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
             'X-Cdk-Lrtm':'2024-03-15 20:48:30',
         }
-
-        token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h).json()["data"]["accessToken"]
-        list_login_token.append(token)
-        return token
-    
-def login(account):
-    email = account.split("|")[0]
-    password = account.split("|")[1]
-    scraper = cloudscraper.create_scraper()
-    while True:
-        try:
-            token_login = get_login_token()
-            d = {"user_email":email,"client_type":3}
-
-            h = {
-                'Authorization':token_login,
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
-                'X-Cdk-Lrtm':'2024-03-15 20:57:36',
-                'Accept':'application/json, text/plain, */*',
-                'Accept-Encoding':'gzip, deflate, br',
-                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-                'Content-Length':'56',
-                'Origin':'https://www.ganjingworld.com',
-                'Referer':'https://www.ganjingworld.com/',
-                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-                'Sec-Ch-Ua-Mobile':'?0',
-                'Sec-Ch-Ua-Platform':'"Windows"',
-            }
-            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-            p = {
-                "http":f"http://{pr}",
-                "https":f"http://{pr}"
-            }
-            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
-            b = a.json()
-            break
-        except Exception as e: 
-            continue
-    if "The user does not exist" in a.text:
-        return None
-    else:
-        open("log.txt", "a", encoding="utf-8").write(f"Result: {a.text} with account {email}:{password}\n")
-    server_salt = a.json()["data"]["server_salt"]
-    client_salt = a.json()["data"]["client_salt"]
-    def hash_password(pss, client_salt, server_salt):
-        x = hashlib.sha256((pss + client_salt).encode()).digest()
-        x_base64 = base64.b64encode(x).decode()
-        S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
-        S_base64 = base64.b64encode(S).decode()
-        return S_base64
-
-    hashed_password = hash_password(password, client_salt, server_salt)
-
-    d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
-
-    h = {
-        'Authorization':token_login,
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
-        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
-        'Accept':'application/json, text/plain, */*',
-        'Accept-Encoding':'gzip, deflate, br',
-        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-        'Content-Length':'56',
-        'Origin':'https://www.ganjingworld.com',
-        'Referer':'https://www.ganjingworld.com/',
-        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-        'Sec-Ch-Ua-Mobile':'?0',
-        'Sec-Ch-Ua-Platform':'"Windows"',
-    }
-    while True:
-        try:
-            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-            p = {
-                "http":f"http://{pr}",
-                "https":f"http://{pr}"
-            }
-            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
-            if "Password is incorrect" in a.text:
-                return None
-            access_token = a.json()["data"]["token"]
-            return access_token
-        except Exception as e: 
-            pass
-data_fb = []
-data_bio = []
-data_token = []
-def update_channel(account, set_avt, set_bio, set_name):
-    global data_fb, data_bio, data_token
-    print(f"Login with account {account}")
-    while True:
-        try:
-            token = login(account)
-            if token != None:
-                break
-            else: 
-                print(f"Login error with account {account}")
-                return
-        except: continue
-    while True:
-        try:
-            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-            p = {
-                "http":f"http://{pr}",
-                "https":f"http://{pr}"
-            }
-            data_channel = scraper.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}, proxies=p).json()["data"]["channels"][0]
-            break
-        except: continue
-    print(f"Login success with account {account}")
-    try:
-        data = random.choice(data_fb)
-        if set_bio == True:
-            bio = random.choice(data_bio)
-        else:
-            bio = data_channel["desc"]
-        if set_avt == True:
-            img = save_image(data.split("|")[1])
-        else:
-            img = data_channel["icon"]
-        if set_name == True:
-            name = data.split("|")[0]
-        else:
-            name = data_channel["name"]
-    except:
-        print(f"Data nhập vào bị thiếu với acc {account}")
-        return
-    h = {
-        "Content-Type": "application/json",
-        "Authorization": token,
-    }
-    pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-    p = {
-        "http":f"http://{pr}",
-        "https":f"http://{pr}"
-    }
-    print(f"Upload img with account {account}")
-    if set_avt == False:
-        pass
-    else:
+        pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+        p = {
+            "http":f"http://{pr}",
+            "https":f"http://{pr}"
+        }
         while True:
+            if len(list_login_token) != 0:
+                return random.choice(list_login_token)
             try:
-                if len(data_token) == 0:
-                    image_token = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-vod-token?", headers=h).json()["data"]["token"]
-                    data_token.append(image_token)
-                else:
-                    image_token = random.choice(data_token)
-                scraper = cloudscraper.create_scraper()
-                b =  scraper.post("https://imgapi.cloudokyo.cloud/api/v1/image", files={'file': (img, open(img, "rb"), 'image/png')}, headers={"Authorization":f"Bearer {image_token}"}, proxies=p).json()
-                img_list =b["body"]["image_url"]
-                url = get_webp_url(img_list)
+                token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=p).json()["data"]["accessToken"]
+                list_login_token.append(token)
+                return token
+            except: pass
+h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
+try:
+    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies={"http":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682", "https":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"}).json()["data"]["accessToken"]
+    list_login_token.append(token)
+except: 
+    pass
+
+list_uid = []
+list_duration = []
+            
+def check_url(url, date):
+    uid = url.split("/")[-1]
+    timestamp = requests.get(f"https://gw.ganjingworld.com/v1.1/content/query?id={uid}&lang=vi-VN&ids={uid}&with_desc=true&query=basic&include_unlisted=true").json()["data"]["list"][0].get("time_scheduled")
+    timestamp = timestamp/1000
+    def timestamp_to_date(timestamp):
+        time_struct = time.localtime(timestamp)
+        date_str = time.strftime("%d/%m/%Y", time_struct)
+        
+        return date_str
+
+    day, month, year = date.split("/")
+    day = day.zfill(2)
+    month = month.zfill(2)
+    
+    date =  f"{day}/{month}/{year}"
+    if date == timestamp_to_date(timestamp):
+        return True
+    return False
+
+current_url_index = 0
+url_complete = 0
+scraper = cloudscraper.create_scraper()
+
+
+def buff_view(index, lock):
+    global running, url_complete, view, list_uid, list_login_token, current_url_index
+    while True:
+        with lock:
+            if current_url_index>=len(list_url):
+                break
+            url = list_url[current_url_index]
+            current_url_index+=1
+        running[index] = [f"Loading", url, "Đang lấy thông tin video"]
+        uid = url.split("/")[-1].split("?")[0]
+        running[index] = ["Loading", url, "Lấy thông tin thành công"]
+        current_view = 0
+        token = ""
+        while True:
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            try:
+                h = {
+                    "Authorization":token
+                }
+                d = {
+                    "id":uid,
+                }
+                running[index] = ["Sending view", url, f"{current_view} views"]
+                count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                target_view = count["data"]["view_count"]+int(view*random.uniform(1.9, 1.5))
+                current_view = count["data"]["view_count"]
                 break
             except Exception as e:
-                open("log.txt", "a", encoding="utf-8").write(f"Error: {str(e)} with account {account}\n")
-                continue
-    while True:
-        try:
-            scraper = cloudscraper.create_scraper()
-            uid = scraper.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"}, proxies=p).json()["data"]["channels"][0]["id"]
-            break
-        except: continue
-    if set_avt == False:
-        d = {"name":name,"desc":bio,"id":uid, "avatar_url":img}
-    else:
-        d = {"name":name,"desc":bio,"id":uid,"avatar_url":url}
-    scraper = cloudscraper.create_scraper()
-    print(f"Update channel with account {account}")
-    while True:
-        try:
-            a = scraper.post("https://gw.ganjingworld.com/v1.0c/update-channel", headers=h, json=d, proxies=p).json()
-            if a["result"]["message"] == "Ok":
-                print(f"Update success with account {account}")
-            else:
-                open("log.txt", "a", encoding="utf-8").write(f"Result: {str(a)} with account {account}\n")
-                print(f"Update error with account {account}")
-            break
-        except:
-            pass
-
-
-def crawl_content(id_channel):
-    global list_login_token
-    data_content = []
-    token = ""
-    start_key = ""
-    while True:
-        try:
-            channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
-            a = channel["data"]["list"]
-            if a == [] or a == None:
-                break
-            for i in a:
-                data_content.append(i["id"])
-            start_key = channel["data"]["start_key"]
-            if start_key == "":
-                break
-        except Exception as e:
-            try: 
-                list_login_token.remove(token)
-                token = get_login_token()
-            except: pass
-
-
-    start_key = ""
-    while True:
-        try:
-            channel =requests.get(f'https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={start_key}&channel_id={id_channel}&page_size=100&content_type=Shorts&include_hidden=true&query=basic,view&visibility=public&mode=ready', headers={"Authorization":token}).json()
-            a = channel["data"]["list"]
-            if a == [] or a == None:
-                break
-            for i in a:
-                data_content.append(i["id"])
-            start_key = channel["data"]["start_key"]
-            if start_key == "":
-                break
-        except Exception as e: 
-            try: 
-                list_login_token.remove(token)
-                token = get_login_token()
-            except: pass
-    return data_content
-
-
-def crawl_post(id_channel):
-    global list_login_token
-    data_post = []
-    token  = ""
-    start_key = ""
-    while True:
-        try:
-            channel =requests.get(f"https://gw.ganjingworld.com/v1.0c/social-content/get-owner-posts?owner_id={id_channel}&start_key={start_key}&page_size=100&query=post,view,like", headers={"Authorization":token}).json()
-            a = channel["data"]["list"]
-            if a == [] or a == None:
-                break 
-            for i in a:
-                data_post.append(i["id"])
-            start_key = channel["data"]["start_key"]
-            if start_key == "":
-                break
-            
-        except Exception as e:
-            try: 
-                list_login_token.remove(token)
-                token = get_login_token()
-            except: pass
-    return data_post
-
-def delete_post(account):
-    print(f"Login with account {account}")
-    while True:
-        try:
-            token = login(account)
-            if token != None:
-                break
-            else: 
-                print(f"Login error with account {account}")
-                return
-        except: continue
-    print(f"Login success with account {account}")
-    h = {
-        "Content-Type": "application/json",
-        "Authorization": token,
-    }
-    while True:
-        try:
+                open("error.txt", "a").write(f"{str(e)}\n")
+                pass
+        while True:
             pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
             }
-            id_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, proxies=p).json()["data"]["channels"][0]["id"]
-            break
-        except: continue
-    print(f"Get post with account {account}")
-    data_post = crawl_post(id_channel)
-    print(f"Get post success with account {account}")
-    del_success = 0
-    del_error = 0
-    scraper = cloudscraper.create_scraper()
-    pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-    p = {
-        "http":f"http://{pr}",
-        "https":f"http://{pr}"
-    }
-    for i in data_post:
-        try:
-            a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/social-content/delete-post", json={"id":i}, headers=h, proxies=p).json()
-            if a["result"]["message"] == "Ok":
-                del_success += 1
-            else:
-                del_error += 1
-            print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
-        except:
-            data_post.append(i)
-def delete_video_shorts(account):
-    print(f"Login with account {account}")
-    while True:
-        try:
-            token = login(account)
-            if token != None:
-                break
-            else: 
-                print(f"Login error with account {account}")
-                return
-        except: continue
-    print(f"Login success with account {account}")
-    h = {
-        "Content-Type": "application/json",
-        "Authorization": token,
-    }
-    pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-    p = {
-        "http":f"http://{pr}",
-        "https":f"http://{pr}"
-    }
-    id_channel = requests.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h).json()["data"]["channels"][0]["id"]
-    print(f"Get content with account {account}")
-    data_content = crawl_content(id_channel)
-    print(f"Get content success with account {account}")
-    del_success = 0
-    del_error = 0
-    scraper = cloudscraper.create_scraper()
-    for i in data_content:
-        try:
-            a = scraper.post(f"https://gw.ganjingworld.com/v1.0c/delete-content", json={"id":i}, headers=h, proxies=p).json()
-            if a["result"]["message"] == "Ok":
-                del_success += 1
-            else:
-                del_error += 1
-            print(f"Delete success: {del_success} - Delete error: {del_error} with account {account}")
-        except Exception as e:
-            data_content.append(i)
-
-good = 0
-bad = 0
-
-def check_acc(account, total):
-    global good, bad
-    email = account.split("|")[0]
-    password = account.split("|")[1]
-    scraper = cloudscraper.create_scraper()
-    while True:
-        try:
-            token_login = get_login_token()
-            d = {"user_email":email,"client_type":3}
-
-            h = {
-                'Authorization':token_login,
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-                'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
-                'X-Cdk-Lrtm':'2024-03-15 20:57:36',
-                'Accept':'application/json, text/plain, */*',
-                'Accept-Encoding':'gzip, deflate, br',
-                'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-                'Content-Length':'56',
-                'Origin':'https://www.ganjingworld.com',
-                'Referer':'https://www.ganjingworld.com/',
-                'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-                'Sec-Ch-Ua-Mobile':'?0',
-                'Sec-Ch-Ua-Platform':'"Windows"',
-            }
-            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-            p = {
-                "http":f"http://{pr}",
-                "https":f"http://{pr}"
-            }
-            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
-            b = a.json()
-            break
-        except Exception as e: 
-            continue
-    if "The user does not exist" in a.text:
-        open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Email doesnt exist\n")
-        bad += 1
-        print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Email doesnt exist") 
-        return
-    server_salt = a.json()["data"]["server_salt"]
-    client_salt = a.json()["data"]["client_salt"]
-    def hash_password(pss, client_salt, server_salt):
-        x = hashlib.sha256((pss + client_salt).encode()).digest()
-        x_base64 = base64.b64encode(x).decode()
-        S = hashlib.sha256((x_base64 + server_salt).encode()).digest()
-        S_base64 = base64.b64encode(S).decode()
-        return S_base64
-
-    hashed_password = hash_password(password, client_salt, server_salt)
-
-    d = {"user_email":email,"password_hash":hashed_password,"client_type":3}
-
-    h = {
-        'Authorization':token_login,
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-        'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',    
-        'X-Cdk-Lrtm':'2024-03-15 20:57:36',
-        'Accept':'application/json, text/plain, */*',
-        'Accept-Encoding':'gzip, deflate, br',
-        'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-        'Content-Length':'56',
-        'Origin':'https://www.ganjingworld.com',
-        'Referer':'https://www.ganjingworld.com/',
-        'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-        'Sec-Ch-Ua-Mobile':'?0',
-        'Sec-Ch-Ua-Platform':'"Windows"',
-    }
-    while True:
-        try:
-            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-            p = {
-                "http":f"http://{pr}",
-                "https":f"http://{pr}"
-            }
-            a = scraper.post("https://gw.ganjingworld.com/v1.0c/signinpw", headers=h, json=d, proxies=p)
-            if "Password is incorrect" in a.text:
-                open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Wrong password\n")
-                bad += 1
-                print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Wrong password")
-                return
-            while True:
-                s = cloudscraper.create_scraper()
+            try:
                 h = {
-                        "Content-Type": "application/json",
-                        "Authorization": a.json()["data"]["token"],
-                        }
-                data_channel = s.post("https://gw.ganjingworld.com/v1.0c/get-my-channels", headers=h, json={"lan":"en-US"})
+                    "Authorization":token
+                }
+                d = {
+                    "id":uid,
+                }
+                running[index] = ["Sending view", url, f"{current_view} views"]
+                count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                 try:
-                    data_channel = data_channel.json()
-                    if data_channel["data"]["my_channel_is_deleted"] == True:
-                        open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Channel is deleted\n")
-                        bad += 1
-                        print(f"\033[91m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Channel is deleted")
-                        return
-                    data_channel = data_channel["data"]["channels"][0]
-                    break
-                except Exception as e:
-                    open("log.txt", "a", encoding="utf-8").write(f"{email}:{password}|{data_channel.text}\n")
+                    count["data"]["view_count"]
+                except:
                     continue
-            good += 1
-            print(f"\033[92m[Good: {good} Bad: {bad} | Total: {total}]{email}|{password}|Login success")
-            uid = data_channel["id"]
-            name = data_channel["name"]
-            open("Result_check_acc.txt", "a", encoding="utf-8").write(f"{email}|{password}|Login success|https://www.ganjingworld.com/channel/{uid}|{name}\n")
-            return
-        except Exception as e:
-            pass
-
-    
-def menu():
-    global data_fb, data_bio
-    while True:
-        # os.system("cls")
-        print("1. Get friend info")
-        print("2. Set profile")
-        print("3. Delete post")
-        print("4. Delete Video and Shorts")
-        print("5. Check account")
-        print("6. Exit")
-        choice = int(input("Enter your choice: "))
-        if choice == 1:
-            data = input("Enter to import data")
-            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data, encoding="utf-8", errors="replace").read().split("\n")
-            cookie = data[0]
-            list_id = data[1:]
-            get_friend_info(cookie, list_id)
-            out = input("Data được lưu vào file result.txt, enter để quay lại menu")
-        elif choice == 2:
-            data = input("Enter to import account Ganjingworld")
-            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data, encoding="utf-8", errors="replace").readlines()
-            data_acc = []
-            for i in data:
-                i = i.strip("\n")
-                if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
-                    data_acc.append(i)
-            data = input("Enter to import data Facebook")
-            data_fb = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_fb = open(data_fb, encoding="utf-8", errors="replace").read().split("\n")
-            data = input("Enter to import data Bio")
-            data_bio = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data_bio = open(data_bio, encoding="utf-8", errors="replace").read().split("\n")
-            luong = int(input("Nhập số luồng: "))
-            set_avt = True
-            set_bio = True
-            set_name = True
-            while True:
-                print("1. Set avatar: ", set_avt)
-                print("2. Set bio: ", set_bio)
-                print("3. Set name")
-                print("4. Run")
-                choice = int(input("Enter your choice: "))
-                if choice == 1:
-                    set_avt = not set_avt
-                elif choice == 2:
-                    set_bio = not set_bio
-                elif choice == 3:
-                    set_name = not set_name
-                elif choice == 4:
-                    break
+                if count["data"]["view_count"]>current_view:
+                    running[index] = ["Sending time", url, f"{current_view} views"]
+                    for time_view in range(int(delay)):
+                        try:
+                            d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"v\":1,\"cid\":\"ef343da1-5e65-418c-850c-668aeb6234bf\",\"uid\":\"\",\"dl\":\"https://www.ganjingworld.com/video/"+uid+"\",\"cnt_type\":\"Video\",\"cnt_id\":\""+uid+"\",\"dt\":\"test time\",\"dr\":\"https://www.ganjingworld.com\",\"view_pct\":100,\"view_time\":12000,\"ugrp\":\"\",\"ga_cid\":\"4b3a2281e15a9cab\",\"channel_id\":\"1gpvljk771s46RJH6XHUwqyVr1oo0c\"}]","v":1,"cid":"3dc1b380-0961-08e6-ea22-666d31d1ec0c","uid":"","dl":f"https://www.ganjingworld.com/video/{uid}","dr":"https://www.ganjingworld.com","ugrp":"","ga_cid":"4b3a2281e15a9cab"}
+                            a = scraper.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies={"http": f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682", "https": f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"}).json()
+                        except Exception as e:
+                            pass
+                    current_view = count["data"]["view_count"]
+                    running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
+                    time.sleep(5)
                 else:
-                    os.system("cls")
-            for i in range(0, len(data_acc), luong):
-                aaa = data_acc[i:i+luong]
-                threads = []
-                for j in aaa:
-                    threads.append(threading.Thread(target=update_channel, args=(j,set_avt, set_bio,set_name,)))
-                for thread in threads:
-                    thread.start()
-                for thread in threads:
-                    thread.join()
-            out = input("Enter to continue...")
-            os.system("cls")
-        elif choice == 3:
-            data = input("Enter to import account Ganjingworld")
-            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data, encoding="utf-8", errors="replace").readlines()
-            data_acc = []
-            for i in data:
-                i = i.strip("\n")
-                if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
-                    data_acc.append(i)
-            luong = int(input("Nhập số luồng: "))
-            for i in range(0, len(data_acc), luong):
-                aaa = data_acc[i:i+luong]
-                threads = []
-                for j in aaa:
-                    threads.append(threading.Thread(target=delete_post, args=(j.replace(" ",""),)))
-                for thread in threads:
-                    thread.start()
-                for thread in threads:
-                    thread.join()
-            out = input("Enter to continue...")
-            os.system("cls")
-        elif choice == 4:
-            data = input("Enter to import account Ganjingworld")
-            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data, encoding="utf-8", errors="replace").readlines()
-            data_acc = []
-            for i in data:
-                i = i.strip("\n")
-                if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
-                    data_acc.append(i)
-            luong = int(input("Nhập số luồng: "))
-            for i in range(0, len(data_acc), luong):
-                aaa = data_acc[i:i+luong]
-                threads = []
-                for j in aaa:
-                    threads.append(threading.Thread(target=delete_video_shorts, args=(j.replace(" ",""),)))
-                for thread in threads:
-                    thread.start()
-                for thread in threads:
-                    thread.join()
-            out = input("Enter to continue...")
-            os.system("cls")
-        elif choice == 5:
-            data = input("Enter to import account Ganjingworld")
-            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
-            data = open(data, encoding="utf-8", errors="replace").readlines()
-            data_acc = []
-            for i in data:
-                i = i.strip("\n")
-                if (len(i.split("|")) >= 2) and (("@" in i.split("|")[0]) == True) and (i.split("|")[1] != "") and (i.split("|")[0] != ""):
-                    data_acc.append(i)
-            print(f"Import {len(data_acc)} account")
-            luong = int(input("Nhập số luồng: "))
-            for i in range(0, len(data_acc), luong):
-                aaa = data_acc[i:i+luong]
-                threads = []
-                for j in aaa:
-                    threads.append(threading.Thread(target=check_acc, args=(j.replace(" ",""),len(data_acc),)))
-                for thread in threads:
-                    thread.start()
-                for thread in threads:
-                    thread.join()
-            out = input("Enter to continue...")
-            os.system("cls")
-        elif choice == 6:
-            break
+                    running[index] = ["Sending view", url, f"{current_view} views"]
+
+                if target_view<=current_view:
+                    running[index]=["Send view complete", url, f"{current_view} views"]
+                    break
+            except Exception as e:
+                running[index] = ["Sent view unsuccessfully", url, f"{current_view} views"]
+                open("error.txt", "a").write(f"{e}\n")
+        running[index] = ["", "", ""]
+        url_complete+=1
+    running[index] = [f"Hoàn thành buff view tại luồng {index+1}", "", ""]
+
+def checking():
+    global running, success, custom, slg_acc, start_time, status, current_url_index, url_complete
+    while status:
+        for j in range(len(running)):
+            if running[j][0]=="Sent view successfully":
+                print(f"\033[32mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            elif running[j][0]=="Sending view":
+                print(f"\033[33mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            elif running[j][0]=="Sending time":
+                print(f"\033[96mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            elif running[j][0]=="Sent view unsuccessfully":
+                print(f"\033[31mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+            else:
+                print(f"\033[36mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
+                print("")
+        end_time = time.time()
+
+        execution_time = end_time - start_time
+        hours, rem = divmod(execution_time, 3600)
+        minutes, seconds = divmod(rem, 60)
+        formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
+
+        print(f"\033[33mProcess: {formatted_time} - Url complete: {url_complete}\033[0m")
+        time.sleep(1)
+        os.system('cls')
+    
+
+list_token = []
+
+def get_video(channel):
+    global list_token, list_url
+
+    channel_id = channel.split('/')[-1].split('?')[0]
+
+    token = ""
+    url  = f"https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key=&channel_id={channel_id}&page_size=8&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready"
+    try:
+        h = {
+            "Authorization":token
+        }
+
+
+        while True:
+            try:
+                a = requests.get(url, headers=h).json().get("data")
+                j = a["list"]
+                for i in j:
+                    uid = i["id"]
+                    list_url.append(f"https://www.ganjingworld.com/video/{uid}")
+                if a["start_key"]!="":
+                    url  = f"https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={a["start_key"]}&channel_id={channel_id}&page_size=8&content_type=Video&include_hidden=true&query=basic,view&visibility=public&mode=ready"
+                else: break
+            except: break
+    except: 
+        try: list_token.remove(token)
+        except: pass
+
+    url  = f"https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key=&channel_id={channel_id}&page_size=8&content_type=Shorts&include_hidden=true&query=basic,view&visibility=public&mode=ready"
+    try:
+        h = {
+            "Authorization":token
+        }
+
+        while True:
+            try:
+                a = requests.get(url, headers=h).json().get("data")
+                j = a["list"]
+                for i in j:
+                    uid = i["id"]
+                    list_url.append(f"https://www.ganjingworld.com/shorts/{uid}")
+                if a["start_key"]!="":
+                    url  = f"https://gw.ganjingworld.com/v1.1/content/get-by-channel?lang=en-US&start_key={a["start_key"]}&channel_id={channel_id}&page_size=8&content_type=Shorts&include_hidden=true&query=basic,view&visibility=public&mode=ready"
+                else: break
+            except: break
+    except: 
+        try: list_token.remove(token)
+        except: pass
+    
+    
+def get_language_code(language):
+    language_codes = {
+        "Vietnamese": "vi-VN",
+        "English": "en-US",
+        "Taiwanese": "zh-TW",
+        "Chinese": "zh-CN",
+        "Japanese": "ja-JP",
+        "Korean": "ko-KR",
+        "German": "de-DE",
+        "Spanish": "es-ES",
+        "French": "fr-FR",
+        "Indonesian": "id-ID",
+        "Italian": "it-IT",
+        "Russian": "ru-RU",
+    }
+    return language_codes.get(language, "en-US")
+
+def get_homepage_content(language, page_size):
+    list_rs = []
+    language_code = get_language_code(language)
+    if page_size <=20:
+        url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
+        response = requests.get(url)
+        list_content = response.json()["data"]["list"]
+        list_rs = []
+        for i in list_content:
+            if i["type"] == "Video":
+                list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+                open("list.txt", "a").write(f"https://www.ganjingworld.com/{str(i['type']).lower()}/{i['id']}|{i["view_count"]}\n")
+
+    else:
+        while page_size > 20:
+            url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size=100"
+            response = requests.get(url)
+            list_content = response.json()["data"]["list"]
+            for i in list_content:
+                if i["type"] == "Video":
+                    list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+                    open("list.txt", "a").write(f"https://www.ganjingworld.com/{str(i['type']).lower()}/{i['id']}|{i["view_count"]}\n")
+
+            page_size -= 20
+        if page_size > 0:
+            url = f"https://gw.ganjingworld.com/v1.1/content/get-homepage?lan={language_code}&lang={language_code}&page_size={page_size}"
+            response = requests.get(url)
+            list_content = response.json()["data"]["list"]
+            for i in list_content:
+                if i["type"] == "Video":
+                    list_rs.append(f"https://www.ganjingworld.com/{str(i["type"]).lower()}/{i["id"]}")
+                    open("list.txt", "a").write(f"https://www.ganjingworld.com/{str(i['type']).lower()}/{i['id']}|{i["view_count"]}\n")
+    return list_rs
+
+list_open = []
+
+def menu():
+    global list_open
+    os.system("cls")
+    print("1. Import file")
+    print("2. Crawl Post")
+    print("")
+    choice = input("Enter your choice: ")
+    os.system("cls")
+    if choice == "1":
+        while True:
+            try:
+                a = input("Enter to import file")
+                list_open = open(filedialog.askopenfilename(title="Select file", filetypes=(("Text files", "*.txt"),("all files", "*.*"))), "r", errors="ignore").read().split("\n")
+                break
+            except:
+                os.system("cls")
+                pass
+    elif choice == "2":
+        while True:
+            try:
+                list_lang = [
+                    "Vietnamese",
+                    "English",
+                    "Taiwanese",
+                    "Chinese",
+                    "Japanese",
+                    "Korean",
+                    "German",
+                    "Spanish",
+                    "French",
+                    "Indonesian",
+                    "Italian",
+                    "Russian",
+                ]
+                for i in list_lang:
+                    print(f"{int(list_lang.index(i)+1)}. {i}")
+                lang_choice = int(input("Enter the language: "))
+                break
+            except:
+                os.system("cls")
+                pass
+        while True:
+            try:
+                page_size = int(input("Enter the number of videos: "))
+                break
+            except:
+                os.system("cls")
+                pass
+        list_open = get_homepage_content(list_lang[lang_choice-1], page_size)
 menu()
+print("Đang nhập video...")
+list_url = []
+list_channel = []
+os.system("cls")
+for i in list_open:
+    if ("/video/" in i) or ("/shorts/" in i) or ("/post/" in i) or ("/news/" in i) or ("/live/" in i):
+        list_url.append(i)
+    elif "/channel/" in i:
+        list_channel.append(i)
+
+print("Đang tìm video, shorts...")
+threads = []
+for i in list_channel:
+    threads.append(threading.Thread(target=get_video, args=(i,)))
+for i in threads:
+    i.start()
+for i in threads:
+    i.join()
+os.system("cls")
+
+
+while True:
+    try:
+        print(f"Đã tìm thấy {len(list_url)} video")
+        print("1. Filter date (để trống nếu không cần, định dạng ngày/tháng/năm): ")
+        print("2. Continue")
+        print("")
+        choice = input("Enter your choice: ")
+        if choice == "1":
+            date = input("Enter the date: ")
+            list_url = [i for i in list_url if check_url(i, date)]
+            os.system("cls")
+            break
+        else:
+            os.system("cls")
+            break
+    except:
+        os.system("cls")
+print(f"Đã tìm thấy {len(list_url)} video")
+view = int(input("Enter the number of views: "))
+delay = int(input("Enter the delay time (s): "))
+luong = int(input("Enter the number of threads: "))
+os.system("cls")
+running = [['','',''] for _ in range(luong)]
+status = True
+start_time = time.time()
+t = threading.Thread(target=checking)
+t.start()
+lock = threading.Lock()
+threads = []
+for i in range(luong):
+    threads.append(threading.Thread(target=buff_view, args=(i,lock)))
+for j in threads:
+    j.start()
+for j in threads:
+    j.join()
+status = False
+t.join()
+end_time = time.time()
+
+execution_time = end_time - start_time
+hours, rem = divmod(execution_time, 3600)
+minutes, seconds = divmod(rem, 60)
+formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
+print(f"\033[32mProcess: {formatted_time}\033[0m  | Sent view complete")
+end = input("Press Enter to exit")
