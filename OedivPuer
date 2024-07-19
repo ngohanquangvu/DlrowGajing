@@ -104,6 +104,7 @@ def save_video(url, email, password):
                 error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
                 tb = tb.tb_next
             save_error_to_file(error_message)
+            pytube.innertube._default_clients[ "ANDROID_CREATOR"] = pytube.innertube._default_clients[ "ANDROID_MUSIC"]
             return save_video(url, email, password)
 
 def remove_hashtags(text):
