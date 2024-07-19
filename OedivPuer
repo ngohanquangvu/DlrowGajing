@@ -67,7 +67,7 @@ def save_video(url, email, password):
         output_file = f"{aaa}/{name_file}.mp4" 
         input_audio = ffmpeg.input(audio_path)
         input_video = ffmpeg.input(video_path)
-        input_video.output(input_audio, output_file, vcodec='libx264', acodec='aac', strict='experimental', threads = "10", preset = 'ultrafast').run(capture_stdout=True, capture_stderr=True)
+        input_video.output(input_audio, output_file, vcodec='libx264', acodec='aac', strict='experimental', threads = "10", preset = 'ultrafast').run()
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Ghép audio vào video thành công\n')
         frame_text_box.configure(state = "disabled")
@@ -94,7 +94,7 @@ def save_video(url, email, password):
             'outtmpl': os.path.join("./VideoData", f'{aaa}.mp4'),
             }
             
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
         except Exception as e:
             tb = e.__traceback__
@@ -355,6 +355,8 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
                     'Upload-Offset': response.headers["upload-offset"],
                     'Tus-Resumable': '1.0.0',
                 }
+                upload_proxy = None
+            time.sleep(5)
         except Exception as e:
             pass
 
