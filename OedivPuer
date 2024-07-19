@@ -1,5 +1,10 @@
 import pytube
-pytube.innertube._default_clients["ANDROID_MUSIC"] = pytube.innertube._default_clients["ANDROID_CREATOR"] 
+pytube.innertube._default_clients[ "ANDROID"][ "context"]["client"]["clientVersion"] = "19.08.35"
+pytube.innertube._default_clients["IOS"]["context"]["client"]["clientVersion"] = "19.08.35"
+pytube.innertube._default_clients[ "ANDROID_EMBED"][ "context"][ "client"]["clientVersion"] = "19.08.35"
+pytube.innertube._default_clients[ "IOS_EMBED"][ "context"]["client"]["clientVersion"] = "19.08.35"
+pytube.innertube._default_clients["IOS_MUSIC"][ "context"]["client"]["clientVersion"] = "6.41"
+pytube.innertube._default_clients[ "ANDROID_MUSIC"] = pytube.innertube._default_clients[ "ANDROID_CREATOR" ]
 
 
 app = customtkinter.CTk()
@@ -60,7 +65,7 @@ def save_video(url, email, password):
         frame_text_box.configure(state = "normal")
         frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Đang ghép audio vào video\n')
         frame_text_box.configure(state = "disabled")
-        output_file = f"{aaa}/{name_file}.mp4"  # Sửa lỗi nếu tiêu đề có ký tự không hợp lệ
+        output_file = f"{aaa}/{name_file}.mp4"
         input_audio = ffmpeg.input(audio_path)
         input_video = ffmpeg.input(video_path)
         input_video.output(input_audio, output_file, vcodec='copy', acodec='aac', strict='experimental', threads = "10", preset = 'ultrafast').run(capture_stdout=True, capture_stderr=True)
@@ -74,19 +79,21 @@ def save_video(url, email, password):
         if "streaming live and cannot be loaded" in str(e):
             return False
         aaa = f'{time.time()}.mp4'
-        yt = YouTube(url)
-        video_stream = yt.streams.get_highest_resolution()
-        video_path = video_stream.download(filename=f"{aaa}", output_path="VideoData")
-        tb = e.__traceback__
-        error_message = f" {url}| Exception: {e} | "
-        while tb is not None:
-            filename = tb.tb_frame.f_code.co_filename
-            lineno = tb.tb_lineno
-            function_name = tb.tb_frame.f_code.co_name
-            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
-            tb = tb.tb_next
-        save_error_to_file(error_message)
-        return f'./VideoData/{aaa}'
+        try:
+            yt = YouTube(url)
+            video_stream = yt.streams.get_highest_resolution()
+            video_path = video_stream.download(filename=f"{aaa}", output_path="VideoData")
+            return f'./VideoData/{aaa}'
+        except Exception as e:
+            tb = e.__traceback__
+            error_message = f" {url}| Exception: {e} | "
+            while tb is not None:
+                filename = tb.tb_frame.f_code.co_filename
+                lineno = tb.tb_lineno
+                function_name = tb.tb_frame.f_code.co_name
+                error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+                tb = tb.tb_next
+            save_error_to_file(error_message)
 
 def remove_hashtags(text):
     return re.sub(r'#\S+', '', text)
@@ -342,9 +349,14 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
             pass
 
     if response.status_code == 204:
-        print('Upload successful')
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Upload video thành công\n')
+        frame_text_box.configure(state = "disabled")
     else:
-        print('Upload failed')
+        frame_text_box.configure(state = "normal")
+        frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Upload video thất bại\n')
+        frame_text_box.configure(state = "disabled")
+        return False
     
 
     while True:
@@ -529,8 +541,9 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             video = save_video(url_video, email, password)
             if video==None:
                 frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Lỗi tải video\n')
+                frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Tải video không thành công\n')
                 frame_text_box.configure(state = "disabled")
+                open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password}|Lỗi video {url_video}\n")
                 try:
                     os.remove(img)
                 except: pass
