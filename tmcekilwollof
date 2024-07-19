@@ -101,27 +101,47 @@ def buff_like(url, sl_like):
             time.sleep(3)
         except: pass
 
-lisst_account = []
 
-def buff_follow(url):
-    global list_account
-
-    account = random.choice(open("account.txt", "r", encoding="utf-8").read().split("\n"))
-
-    while True:
-        try:
-            token = login(account)
+def buff_follow(url, list_acc, sl_follow):
+    dem_fl = 0
+    while dem_fl < sl_follow:
+        if len(list_acc) == 0:
             break
-        except: pass
+        account = random.choice(list_acc)
+        list_acc.remove(account)
 
-    h = {
-        "Content-Type": "application/json",
-        "Authorization": token
-    }
-    uid = url.split("/")[-1].split("?")[0]
-    d = {"profile_id":uid}
-    fl = requests.post("https://gw.ganjingworld.com/v1.1/timeline/follow", json=d, headers=h).json()
-    print(fl)
+        while True:
+            try:
+                token = login(account)
+                break
+            except: pass
+
+        h = {
+            "Content-Type": "application/json",
+            "Authorization": token
+        }
+        pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+        p = {
+            "http":f"http://{pr}",
+            "https":f"http://{pr}"
+        }
+        while True:
+            try:
+                check = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-channel-detail?id={uid}", headers=h, proxies=p).json()
+                break
+            except: pass
+        if check["data"]["is_follow"] == False:
+            uid = url.split("/")[-1].split("?")[0]
+            d = {"profile_id":uid}
+            while True:
+                try:
+                    fl = requests.post("https://gw.ganjingworld.com/v1.1/timeline/follow", json=d, headers=h, proxies=p).json()
+                    if fl["result"]["message"] == "Ok":
+                        print(f"\033[92m[+] Follow thành công cho {url}\033[0m")
+                    break
+                except: pass
+            dem_fl += 1
+        
     
 def menu():
     global data_fb, data_bio
@@ -152,9 +172,24 @@ def menu():
                     thread.join()
             out = input("Enter to continue...")
         elif choice == 2:
-            print("Chức năng đang bảo trì")
+            data = input("Enter to import data account")
+            data = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            data = open(data, encoding="utf-8", errors="replace").read().split("\n")
+            link = input("Enter to import data link")
+            link = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            link = open(link, encoding="utf-8", errors="replace").read().split("\n")
+            luong = int(input("Nhập số luồng: "))
+            sl_like = int(input("Nhập số Follow: "))
+            for i in range(0, len(link), luong):
+                aaa = link[i:i+luong]
+                threads = []
+                for j in aaa:
+                    threads.append(threading.Thread(target=buff_follow, args=(j,data,sl_like)))
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
             out = input("Enter to continue...")
-            os.system("cls")
         elif choice == 3:
             print("Chức năng đang bảo trì")
             out = input("Enter to continue...")
