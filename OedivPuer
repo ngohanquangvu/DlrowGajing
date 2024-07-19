@@ -1,10 +1,9 @@
-import pytube
 pytube.innertube._default_clients[ "ANDROID"][ "context"]["client"]["clientVersion"] = "19.08.35"
 pytube.innertube._default_clients["IOS"]["context"]["client"]["clientVersion"] = "19.08.35"
 pytube.innertube._default_clients[ "ANDROID_EMBED"][ "context"][ "client"]["clientVersion"] = "19.08.35"
 pytube.innertube._default_clients[ "IOS_EMBED"][ "context"]["client"]["clientVersion"] = "19.08.35"
 pytube.innertube._default_clients["IOS_MUSIC"][ "context"]["client"]["clientVersion"] = "6.41"
-pytube.innertube._default_clients[ "ANDROID_MUSIC"] = pytube.innertube._default_clients[ "IOS" ]
+pytube.innertube._default_clients[ "ANDROID_MUSIC"] = pytube.innertube._default_clients[ "ANDROID_CREATOR"]
 
 
 app = customtkinter.CTk()
@@ -90,10 +89,13 @@ def save_video(url, email, password):
         save_error_to_file(error_message)
 
         try:
-            yt = YouTube(url)
-            video_stream = yt.streams.get_highest_resolution()
-            video_path = video_stream.download(filename=f"{aaa}", output_path="VideoData")
-            return f'./VideoData/{aaa}'
+            ydl_opts = {
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'outtmpl': os.path.join("./VideoData", f'{aaa}.mp4'),
+            }
+            
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
         except Exception as e:
             tb = e.__traceback__
             error_message = f" {url}| Exception: {e} | "
