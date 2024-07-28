@@ -102,45 +102,58 @@ def buff_like(url, sl_like):
         except: pass
 
 
-def buff_follow(url, list_acc, sl_follow):
-    dem_fl = 0
-    while dem_fl < sl_follow:
-        if len(list_acc) == 0:
-            break
-        account = random.choice(list_acc)
-        list_acc.remove(account)
-
-        while True:
-            try:
-                token = login(account)
-                break
-            except: pass
-
-        h = {
-            "Content-Type": "application/json",
-            "Authorization": token
-        }
-        pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-        p = {
-            "http":f"http://{pr}",
-            "https":f"http://{pr}"
-        }
-        while True:
-            try:
-                check = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-channel-detail?id={uid}", headers=h, proxies=p).json()
-                break
-            except: pass
-        if check["data"]["is_follow"] == False:
-            uid = url.split("/")[-1].split("?")[0]
-            d = {"profile_id":uid}
+def buff_follow(url, list_acc, sl_follow, luong_per_link):
+    uid = url.split("/")[-1].split("?")[0]
+    def run_buff_fl(uid, lock):
+        dem_follow = 0
+        while dem_follow < sl_follow:
+            with lock:
+                account = random.choice(list_acc)
+                list_acc.remove(account)
             while True:
                 try:
-                    fl = requests.post("https://gw.ganjingworld.com/v1.1/timeline/follow", json=d, headers=h, proxies=p).json()
-                    if fl["result"]["message"] == "Ok":
-                        print(f"\033[92m[+] Follow thành công cho {url}\033[0m")
+                    token = login(account)
                     break
                 except: pass
-            dem_fl += 1
+
+            h = {
+                "Content-Type": "application/json",
+                "Authorization": token
+            }
+            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            while True:
+                try:
+                    check = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-channel-detail?id={uid}", headers=h, proxies=p).json()
+                    check["data"]["is_follow"]
+                    break
+                except Exception as e: 
+                    pass
+            if check["data"]["is_follow"] == False:
+                d = {"profile_id":uid}
+                while True:
+                    try:
+                        fl = requests.post("https://gw.ganjingworld.com/v1.1/timeline/follow", json=d, headers=h, proxies=p).json()
+                        if fl["result"]["message"] == "Ok":
+                            print(f"\033[92m[+] Follow thành công cho {url}\033[0m")
+                        break
+                    except: pass
+                dem_follow += 1
+        print(f"\033[92mHOÀN THÀNH BUFF {dem_follow} FOLLOW CHO {url}\033[0m")
+    if len(list_acc)<=sl_follow: sl_follow = len(list_acc)
+    threads = []
+    lock = threading.Lock()
+    for j in range(luong_per_link):
+        threads.append(threading.Thread(target=run_buff_fl, args=(uid, lock)))
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    print(f"\033[92mHOÀN THÀNH BUFF FOLLOW CHO {url}\033[0m")
+    
         
     
 def menu():
@@ -178,13 +191,14 @@ def menu():
             link = input("Enter to import data link")
             link = filedialog.askopenfilename(title="Select file data", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
             link = open(link, encoding="utf-8", errors="replace").read().split("\n")
-            luong = int(input("Nhập số luồng: "))
+            luong = int(input("Nhập số luồng chạy tool: "))
+            luong_per_link = int(input("Nhập số luồng chạy mỗi kênh: "))
             sl_like = int(input("Nhập số Follow: "))
             for i in range(0, len(link), luong):
                 aaa = link[i:i+luong]
                 threads = []
                 for j in aaa:
-                    threads.append(threading.Thread(target=buff_follow, args=(j,data,sl_like)))
+                    threads.append(threading.Thread(target=buff_follow, args=(j,data,sl_like, luong_per_link)))
                 for thread in threads:
                     thread.start()
                 for thread in threads:
