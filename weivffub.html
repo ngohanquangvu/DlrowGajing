@@ -35,28 +35,6 @@ def get_login_token():
                 list_login_token.append(token)
                 return token
             except: pass
-h = {
-            'Accept-Encoding':'gzip, deflate, br',
-            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-            'Content-Length':'2',
-            'Content-Type':'application/json',
-            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
-            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
-            'Gjw-Ts':'1710510510579',
-            'Origin':'https://www.ganjingworld.com',
-            'Referer':'https://www.ganjingworld.com/',
-            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-            'Sec-Ch-Ua-Mobile':'?0',
-            'Sec-Ch-Ua-Platform':'"Windows"',
-            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
-            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
-        }
-try:
-    token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies={"http":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682", "https":"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"}).json()["data"]["accessToken"]
-    list_login_token.append(token)
-except: 
-    pass
 
 list_uid = []
 list_duration = []
@@ -111,13 +89,12 @@ def buff_view(index, lock):
                 d = {
                     "id":uid,
                 }
-                running[index] = ["Sending view", url, f"{current_view} views"]
                 count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                open("error.txt", "a").write(f"{count}\n")
                 target_view = count["data"]["view_count"]+int(view*random.uniform(1.9, 1.5))
                 current_view = count["data"]["view_count"]
                 break
             except Exception as e:
-                open("error.txt", "a").write(f"{str(e)}\n")
                 pass
         while True:
             pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
@@ -126,18 +103,19 @@ def buff_view(index, lock):
                 "https":f"http://{pr}"
             }
             try:
-                h = {
-                    "Authorization":token
-                }
-                d = {
-                    "id":uid,
-                }
-                running[index] = ["Sending view", url, f"{current_view} views"]
-                count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
-                try:
-                    count["data"]["view_count"]
-                except:
-                    continue
+                with lock:
+                    h = {
+                        "Authorization":token
+                    }
+                    d = {
+                        "id":uid,
+                    }
+                    running[index] = ["Sending view", url, f"{current_view} views"]
+                    count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                    try:
+                        count["data"]["view_count"]
+                    except Exception as e:
+                        continue
                 if count["data"]["view_count"]>current_view:
                     running[index] = ["Sending time", url, f"{current_view} views"]
                     for time_view in range(10):
