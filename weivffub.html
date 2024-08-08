@@ -77,7 +77,7 @@ def buff_view(index, lock):
         current_view = 0
         token = ""
         while True:
-            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            pr = "KfsWpR3SLoa1:daT4LSoli3JR@ipv6.proxiware.com:8080"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
@@ -97,25 +97,24 @@ def buff_view(index, lock):
             except Exception as e:
                 pass
         while True:
-            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            pr = "KfsWpR3SLoa1:daT4LSoli3JR@ipv6.proxiware.com:8080"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
             }
             try:
-                with lock:
-                    h = {
-                        "Authorization":token
-                    }
-                    d = {
-                        "id":uid,
-                    }
-                    running[index] = ["Sending view", url, f"{current_view} views"]
-                    count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
-                    try:
-                        count["data"]["view_count"]
-                    except Exception as e:
-                        continue
+                h = {
+                    "Authorization":token
+                }
+                d = {
+                    "id":uid,
+                }
+                running[index] = ["Sending view", url, f"{current_view} views"]
+                count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                try:
+                    count["data"]["view_count"]
+                except Exception as e:
+                    continue
                 if count["data"]["view_count"]>current_view:
                     running[index] = ["Sending time", url, f"{current_view} views"]
                     for time_view in range(10):
