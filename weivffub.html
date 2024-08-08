@@ -90,7 +90,6 @@ def buff_view(index, lock):
                     "id":uid,
                 }
                 count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
-                open("error.txt", "a").write(f"{count}\n")
                 target_view = count["data"]["view_count"]+int(view*random.uniform(1.9, 1.5))
                 current_view = count["data"]["view_count"]
                 break
@@ -110,8 +109,8 @@ def buff_view(index, lock):
                     "id":uid,
                 }
                 running[index] = ["Sending view", url, f"{current_view} views"]
-                count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                 try:
+                    count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                     count["data"]["view_count"]
                 except Exception as e:
                     continue
