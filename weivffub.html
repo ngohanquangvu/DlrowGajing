@@ -116,19 +116,18 @@ def buff_view(index, lock):
                     continue
                 if count["data"]["view_count"]>current_view:
                     running[index] = ["Sending time", url, f"{current_view} views"]
-                    for time_view in range(1):
-                        s = cloudscraper.create_scraper()
-                        id_view = uid
-                        try:
-                            d = {"en":"impressions","extra":"[{\"en\":\"video_start\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"source\":\"\",\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
-                            a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content",json=d, headers={"Authorization":token}, proxies=p).json()
-                            d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"view_time\":"+delay+",\"view_pct\":50,\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"source\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
-                            a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies=p).json()
-                        except Exception as e:
-                            pass
+                    s = cloudscraper.create_scraper()
+                    id_view = uid
+                    try:
+                        d = {"en":"impressions","extra":"[{\"en\":\"video_start\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"source\":\"\",\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
+                        a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content",json=d, headers={"Authorization":token}, proxies=p).json()
+                        d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"view_time\":"+delay+",\"view_pct\":50,\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"source\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
+                        a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies=p).json()
+                    except Exception as e:
+                        pass
                     current_view = count["data"]["view_count"]
                     running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
-                    time.sleep(5)
+                    time.sleep(1)
                 else:
                     running[index] = ["Sending view", url, f"{current_view} views"]
 
