@@ -116,7 +116,7 @@ def buff_view(index, lock):
                     continue
                 if count["data"]["view_count"]>current_view:
                     running[index] = ["Sending time", url, f"{current_view} views"]
-                    for time_view in range(10):
+                    for time_view in range(1):
                         s = cloudscraper.create_scraper()
                         id_view = uid
                         try:
