@@ -63,7 +63,81 @@ url_complete = 0
 scraper = cloudscraper.create_scraper()
 
 
-def buff_view(index, lock):
+def run_view(url, index, target_view, thread_per_link):
+        global running
+        token = ""
+        maxx_view_per_thread = 0
+        def runn(target_view):
+            nonlocal maxx_view_per_thread
+            global running
+            while True:
+                uid = url.split("/")[-1].split("?")[0]
+                pr = "KfsWpR3SLoa1:daT4LSoli3JR@ipv6.proxiware.com:8080"
+                p = {
+                    "http":f"http://{pr}",
+                    "https":f"http://{pr}"
+                }
+                try:
+                    h = {
+                        "Authorization":token
+                    }
+                    d = {
+                        "id":uid,
+                    }
+                    running[index] = ["Sending view", url, f"{maxx_view_per_thread} views"]
+                    count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                    view_count = count["data"]["view_count"]
+                    if view_count> maxx_view_per_thread:
+                        maxx_view_per_thread = view_count
+                        running[index] = ["Sent view successfully", url, f"{maxx_view_per_thread} views"]
+                        time.sleep(1)
+                    if maxx_view_per_thread>=target_view:
+                        break
+                except Exception as e:
+                    pass
+        threads = []
+        for i in range(thread_per_link):
+            threads.append(threading.Thread(target=runn, args=(target_view,)))
+        for i in threads:
+            i.start()
+        for i in threads:
+            i.join()
+def run_time(url, index, delay, percent):
+    uid = url.split("/")[-1].split("?")[0]
+    if percent>99:
+        percent = 99
+    if percent<=0:
+        percent = 1
+    
+    token = ""
+    pr = "KfsWpR3SLoa1:daT4LSoli3JR@ipv6.proxiware.com:8080"
+    p = {
+        "http":f"http://{pr}",
+        "https":f"http://{pr}"
+    }
+    dem = 0
+    while True:
+        try:
+            running[index] = ["Sending time", url, f""]
+            s = cloudscraper.create_scraper()
+            id_view = uid
+            try:
+                d = {"en":"impressions","extra":"[{\"en\":\"video_start\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"source\":\"\",\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
+                a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content",json=d, headers={"Authorization":token}, proxies=p).json()
+                d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"view_time\":"+delay+",\"view_pct\":"+str(percent)+",\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"source\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
+                a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies=p).json()
+                dem +=1
+            except Exception as e:
+                pass
+            running[index] = ["Sent time successfully", url, f""]
+            time.sleep(1)
+        except Exception as e:
+            running[index] = ["Sent time unsuccessfully", url, f""]
+            open("error.txt", "a").write(f"{e}\n")
+        if dem>=10:
+            break
+
+def buff_view(index, thread_per_link, func, lock):
     global running, url_complete, view, list_uid, list_login_token, current_url_index
     while True:
         with lock:
@@ -91,61 +165,25 @@ def buff_view(index, lock):
                 }
                 count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                 target_view = count["data"]["view_count"]+int(view*random.uniform(1.9, 1.5))
-                current_view = count["data"]["view_count"]
                 break
             except Exception as e:
                 pass
-        while True:
-            pr = "KfsWpR3SLoa1:daT4LSoli3JR@ipv6.proxiware.com:8080"
-            p = {
-                "http":f"http://{pr}",
-                "https":f"http://{pr}"
-            }
-            try:
-                h = {
-                    "Authorization":token
-                }
-                d = {
-                    "id":uid,
-                }
-                running[index] = ["Sending view", url, f"{current_view} views"]
-                try:
-                    count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
-                    count["data"]["view_count"]
-                except Exception as e:
-                    continue
-                if count["data"]["view_count"]>current_view:
-                    running[index] = ["Sending time", url, f"{current_view} views"]
-                    s = cloudscraper.create_scraper()
-                    id_view = uid
-                    try:
-                        d = {"en":"impressions","extra":"[{\"en\":\"video_start\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"source\":\"\",\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
-                        a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content",json=d, headers={"Authorization":token}, proxies=p).json()
-                        d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"view_time\":"+delay+",\"view_pct\":50,\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"source\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
-                        a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies=p).json()
-                    except Exception as e:
-                        pass
-                    current_view = count["data"]["view_count"]
-                    running[index] = ["Sent view successfully", url, f"{count['data']['view_count']} views"]
-                    time.sleep(1)
-                else:
-                    running[index] = ["Sending view", url, f"{current_view} views"]
-
-                if target_view<=current_view:
-                    running[index]=["Send view complete", url, f"{current_view} views"]
-                    break
-            except Exception as e:
-                running[index] = ["Sent view unsuccessfully", url, f"{current_view} views"]
-                open("error.txt", "a").write(f"{e}\n")
+        if func == "1":
+            run_view(url, index, target_view, thread_per_link)
+        else:
+            run_time(url, index, delay, thread_per_link)
         running[index] = ["", "", ""]
         url_complete+=1
-    running[index] = [f"Hoàn thành buff view tại luồng {index+1}", "", ""]
+    if func == "1":
+        running[index] = [f"Hoàn thành buff view tại luồng {index+1}", "", ""]
+    else:
+        running[index] = [f"Hoàn thành buff time tại luồng {index+1}", "", ""]
 
 def checking():
     global running, success, custom, slg_acc, start_time, status, current_url_index, url_complete
     while status:
         for j in range(len(running)):
-            if running[j][0]=="Sent view successfully":
+            if running[j][0]=="Sent view successfully" or running[j][0]=="Sent time successfully":
                 print(f"\033[32mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
                 print("")
             elif running[j][0]=="Sending view":
@@ -366,10 +404,24 @@ while True:
             break
     except:
         os.system("cls")
-print(f"Đã tìm thấy {len(list_url)} video")
-view = int(input("Enter the number of views: "))
-delay = int(input("Enter the delay time (s): "))
-luong = int(input("Enter the number of threads: "))
+while True:
+    print(f"Đã tìm thấy {len(list_url)} video")
+    print("1. Buff view")
+    print("2. Buff time")
+    print("")
+    func = input("Enter your choice: ")
+    if func == "1":
+        view = int(input("Enter the number of views: "))
+        delay = 1
+        luong = int(input("Enter the number of threads: "))
+        luong_per_link = int(input("Enter the number of threads per link: "))
+        break
+    elif func == "2":
+        view = 0
+        delay = int(input("Enter the watch time (s): "))
+        luong = int(input("Enter the number of threads: "))
+        luong_per_link = int(input("Enter percent watch time (0<percent<=99): "))
+        break
 os.system("cls")
 running = [['','',''] for _ in range(luong)]
 status = True
@@ -379,7 +431,7 @@ t.start()
 lock = threading.Lock()
 threads = []
 for i in range(luong):
-    threads.append(threading.Thread(target=buff_view, args=(i,lock)))
+    threads.append(threading.Thread(target=buff_view, args=(i, luong_per_link, func,lock)))
 for j in threads:
     j.start()
 for j in threads:
