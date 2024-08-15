@@ -72,7 +72,7 @@ def run_view(url, index, target_view, thread_per_link):
             global running
             while True:
                 uid = url.split("/")[-1].split("?")[0]
-                pr = "KfsWpR3SLoa1:daT4LSoli3JR@ipv6.proxiware.com:8080"
+                pr = "IJteg9PjC5Qj:7nxIDbh2ZsEV@ipv6.proxiware.com:8080"
                 p = {
                     "http":f"http://{pr}",
                     "https":f"http://{pr}"
@@ -110,7 +110,7 @@ def run_time(url, index, delay, percent):
         percent = 1
     
     token = ""
-    pr = "KfsWpR3SLoa1:daT4LSoli3JR@ipv6.proxiware.com:8080"
+    pr = "IJteg9PjC5Qj:7nxIDbh2ZsEV@ipv6.proxiware.com:8080"
     p = {
         "http":f"http://{pr}",
         "https":f"http://{pr}"
@@ -127,10 +127,10 @@ def run_time(url, index, delay, percent):
                 d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"view_time\":"+str(delay)+",\"view_pct\":"+str(percent)+",\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"source\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
                 a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies=p).json()
                 dem +=1
+                running[index] = ["Sent time successfully", url, f""]
+                time.sleep(1)
             except Exception as e:
                 pass
-            running[index] = ["Sent time successfully", url, f""]
-            time.sleep(1)
         except Exception as e:
             running[index] = ["Sent time unsuccessfully", url, f""]
             open("error.txt", "a").write(f"{e}\n")
@@ -151,7 +151,7 @@ def buff_view(index, thread_per_link, func, lock):
         current_view = 0
         token = ""
         while True:
-            pr = "KfsWpR3SLoa1:daT4LSoli3JR@ipv6.proxiware.com:8080"
+            pr = "IJteg9PjC5Qj:7nxIDbh2ZsEV@ipv6.proxiware.com:8080"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
