@@ -1,11 +1,3 @@
-pytube.innertube._default_clients[ "ANDROID"][ "context"]["client"]["clientVersion"] = "19.08.35"
-pytube.innertube._default_clients["IOS"]["context"]["client"]["clientVersion"] = "19.08.35"
-pytube.innertube._default_clients[ "ANDROID_EMBED"][ "context"][ "client"]["clientVersion"] = "19.08.35"
-pytube.innertube._default_clients[ "IOS_EMBED"][ "context"]["client"]["clientVersion"] = "19.08.35"
-pytube.innertube._default_clients["IOS_MUSIC"][ "context"]["client"]["clientVersion"] = "6.41"
-pytube.innertube._default_clients[ "ANDROID_MUSIC"] = pytube.innertube._default_clients[ "ANDROID_CREATOR"]
-
-
 app = customtkinter.CTk()
 app.title("GanJingWorld Reup Video")
 app.geometry("350x420")
@@ -51,35 +43,55 @@ global_proxy = {
 
 def save_video(url, email, password):
     try:
+        def extract_between(text, sub1, sub2):
+            return [t.split(sub2)[0] for t in text.split(sub1)[1:]]
+
+        d = {
+            'url': url,
+            'ajax': '1',
+            'lang': 'en'
+        }
+
+        b = requests.post("https://yt6d.com/mates/en/analyze/ajax?retry=undefined&platform=youtube", data=d)
+        quality = extract_between(b.text, '<td>  ', ' (.mp4)')[0]
+        print(quality)
+
+        h = {
+            'accept-language':'vi,en-US;q=0.9,en;q=0.8',
+        'content-length':'185',
+        'content-type':'application/x-www-form-urlencoded; charset=UTF-8'
+        }
+
+        d = {
+            'platform': 'youtube',
+            'url': url,
+            'title': 'W/n - id Thang Máy ft. 267',
+            'id': url.split('v=')[-1],
+            'ext': 'mp4',
+            'note': quality,
+            'format': '137'
+        }
+        while True:
+            try:
+                a = requests.post(f"https://yt6d.com/mates/en/convert?id={url.split("v=")[-1]}", headers=h, data=d).json()
+                break
+            except: pass
+        check = requests.post(f"https://yt6d.com/mates/en/convert/status?id={url.split('v=')[-1]}", headers=h, data=d)
+        check = check.json()
+        while check["status"] == "processing":
+            check = requests.post(f"https://yt6d.com/mates/en/convert/status?id={url.split('v=')[-1]}", headers=h, data=d).json()
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Convert video thành công {check["percent"]}\n')
+            frame_text_box.configure(state = "disabled")
         aaa = f'VideoData'
-        name_file = f'{time.time()}'
-        name_audio = f'{name_file}_audio'
-        name_video_temp = f'{name_file}_video'
-        yt = YouTube(url)
-        video_stream = yt.streams.filter(only_video=True).order_by('resolution').desc().first()
-        video_path = video_stream.download(filename=name_video_temp, output_path=aaa)
-        audio_stream = yt.streams.filter(only_audio=True).first()
-        audio_path = audio_stream.download(filename=name_audio, output_path=aaa)
-        open("path.txt", "a", encoding="utf-8").write(f"{email}:{password}|{video_path}|{audio_path}\n")
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Đang ghép audio vào video\n')
-        frame_text_box.configure(state = "disabled")
-        output_file = f"{aaa}/{name_file}.mp4" 
-        input_audio = ffmpeg.input(audio_path)
-        input_video = ffmpeg.input(video_path)
-        input_video.output(input_audio, output_file, vcodec='libx264', acodec='aac', strict='experimental', threads = "10", preset = 'ultrafast').run()
-        frame_text_box.configure(state = "normal")
-        frame_text_box.insert(customtkinter.END, f'[{email}:{password}]Ghép audio vào video thành công\n')
-        frame_text_box.configure(state = "disabled")
-        os.remove(video_path)
-        os.remove(audio_path)
-        return f'./{aaa}/{name_file}.mp4'
+        name_file = f'{time.time()}.mp4'
+        if check["status"] == "success":
+            with open(f"{aaa}/{name_file}", "wb") as f:
+                f.write(requests.get(check["downloadUrlX"]).content)
+        return f"{aaa}/{name_file}"
     except Exception as e:
-        if "streaming live and cannot be loaded" in str(e):
-            return False
-        aaa = f'{time.time()}.mp4'
         tb = e.__traceback__
-        error_message = f" {url}| Exception: {e} | "
+        error_message = f"Exception: {e} | "
         while tb is not None:
             filename = tb.tb_frame.f_code.co_filename
             lineno = tb.tb_lineno
@@ -87,26 +99,7 @@ def save_video(url, email, password):
             error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
             tb = tb.tb_next
         save_error_to_file(error_message)
-
-        try:
-            ydl_opts = {
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            'outtmpl': os.path.join("./VideoData", f'{aaa}.mp4'),
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([url])
-        except Exception as e:
-            tb = e.__traceback__
-            error_message = f" {url}| Exception: {e} | "
-            while tb is not None:
-                filename = tb.tb_frame.f_code.co_filename
-                lineno = tb.tb_lineno
-                function_name = tb.tb_frame.f_code.co_name
-                error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
-                tb = tb.tb_next
-            save_error_to_file(error_message)
-            return None
+        return None
 
 def remove_hashtags(text):
     return re.sub(r'#\S+', '', text)
@@ -551,30 +544,18 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đang tải video\n')
             frame_text_box.configure(state = "disabled")
             video = save_video(url_video, email, password)
-            if video==None:
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Tải video không thành công\n')
-                frame_text_box.configure(state = "disabled")
-                open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password}|Lỗi video {url_video}\n")
-                try:
-                    os.remove(img)
-                except: pass
-                dem-=1
-                time.sleep(3)
-            elif video==False:
-                dem-=1
-                time.sleep(3)
-            else:
-                frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
-                frame_text_box.configure(state = "disabled")
-                check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
-                os.remove(video)
-                os.remove(img)
-                if check==None:
-                    break
-                dem-=1
-                time.sleep(int(delay.get()))
+            while video==None:
+                video = save_video(url_video, email, password)
+            frame_text_box.configure(state = "normal")
+            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
+            frame_text_box.configure(state = "disabled")
+            check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
+            os.remove(video)
+            os.remove(img)
+            if check==None:
+                break
+            dem-=1
+            time.sleep(int(delay.get()))
         except Exception as e:
             tb = e.__traceback__
             error_message = f"Exception: {e} | "
