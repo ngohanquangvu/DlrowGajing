@@ -43,52 +43,46 @@ global_proxy = {
 
 def save_video(url, email, password):
     try:
-        def extract_between(text, sub1, sub2):
-            return [t.split(sub2)[0] for t in text.split(sub1)[1:]]
-
         d = {
-            'url': url,
-            'ajax': '1',
-            'lang': 'en'
+            'k_query': url,
+            'k_page': 'Youtube Downloader',
+            'hl': 'en',
+            'q_auto': '0'
         }
-
-        b = requests.post("https://yt6d.com/mates/en/analyze/ajax?retry=undefined&platform=youtube", data=d)
-        quality = extract_between(b.text, '<td>  ', ' (.mp4)')[0]
-        print(quality)
-
         h = {
-            'accept-language':'vi,en-US;q=0.9,en;q=0.8',
-        'content-length':'185',
-        'content-type':'application/x-www-form-urlencoded; charset=UTF-8'
+            'cookie':'_ga=GA1.1.372168204.1720269950',
+            'content-type':'application/x-www-form-urlencoded; charset=UTF-8',
+            'accept-encoding':'gzip, deflate, br, zstd'
+        }
+        a = requests.post("https://www.y2mate.com/mates/en858/analyzeV2/ajax",data=d, headers=h).json()
+        if a['status'] == 'ok':
+            i = a["links"]["mp4"]
+            for j in i:
+                quality = i[j]['k']
+                print(i[j]['q'])
+                break
+        print(quality)
+        d = {
+            'vid': a['vid'],
+            'k': quality,
         }
 
-        d = {
-            'platform': 'youtube',
-            'url': url,
-            'title': 'W/n - id Thang Máy ft. 267',
-            'id': url.split('v=')[-1],
-            'ext': 'mp4',
-            'note': quality,
-            'format': '137'
-        }
         while True:
-            try:
-                a = requests.post(f"https://yt6d.com/mates/en/convert?id={url.split("v=")[-1]}", headers=h, data=d).json()
+            download = requests.post("https://www.y2mate.com/mates/convertV2/index", data=d, headers=h).json()
+            if download['status'] == 'ok':
                 break
-            except: pass
-        check = requests.post(f"https://yt6d.com/mates/en/convert/status?id={url.split('v=')[-1]}", headers=h, data=d)
-        check = check.json()
-        while check["status"] == "processing":
-            check = requests.post(f"https://yt6d.com/mates/en/convert/status?id={url.split('v=')[-1]}", headers=h, data=d).json()
-            frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Convert video thành công {check["percent"]}\n')
-            frame_text_box.configure(state = "disabled")
-        aaa = f'VideoData'
-        name_file = f'{time.time()}.mp4'
-        if check["status"] == "success":
-            with open(f"{aaa}/{name_file}", "wb") as f:
-                f.write(requests.get(check["downloadUrlX"]).content)
-        return f"{aaa}/{name_file}"
+            print(download)
+            print("converting...")
+            time.sleep(10)
+        download = requests.post("https://www.y2mate.com/mates/convertV2/index", data=d, headers=h).json()
+        print(download)
+        url_download = download['dlink']
+        a = requests.get(url_download)
+        print(url_download)
+        aaa = f'./VideoData/{time.time()}.mp4'
+        with open(aaa, "wb") as f:
+            f.write(a.content)
+        return aaa
     except Exception as e:
         tb = e.__traceback__
         error_message = f"Exception: {e} | "
