@@ -69,12 +69,12 @@ def create_ldplayer_profile(num_profiles, path, index):
             option.set_memory(1024)
             option.set_cpu(2)
             ld.set_ADB_debugging(em, True)
-            em.rename(f"Thread-{index}")
             em.setting(option)
             em.start(wait=False)
             em.wait_to_started(timeout=20)
+            em.rename(f"Thread-{index}")
         else:
-            ld.new(f"Thread-{index}")
+            em = ld.new(f"Thread-{index}")
             emulators = ld.emulators
             available_emulators = [em for em in emulators if not em.is_running()]
             em = random.choice(available_emulators)
