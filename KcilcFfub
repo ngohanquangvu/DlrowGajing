@@ -267,11 +267,10 @@ running = [['','',''] for _ in range(luong)]
 url_complete = 0
 status = True
 os.system("cls")
-create_ldplayer_profile(luong, ldplayer_PATH, 1)
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
-for i in range(1,luong):
+for i in range(luong):
     try:
         running[i] = ["Create new device", "", ""]
         create_ldplayer_profile(luong, ldplayer_PATH, i+1)
