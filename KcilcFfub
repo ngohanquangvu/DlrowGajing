@@ -100,8 +100,6 @@ def create_ldplayer_profile(num_profiles, path, index):
         create_ldplayer_profile(num_profiles, path, index)
 
 # Ví dụ sử dụng hàm
-create_ldplayer_profile(5, r"D:\LDPlayer\LDPlayer3.0", 1)
-device_using = []
 
 def connect_to_ldplayer(profile_name, index):
     global device_using, luong, ldplayer_PATH, running
@@ -241,7 +239,6 @@ os.system("cls")
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
-
 for i in range(luong):
     try:
         running[i] = ["Create new device", "", ""]
