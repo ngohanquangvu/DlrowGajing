@@ -93,7 +93,6 @@ def create_ldplayer_profile(num_profiles, path, index):
                 em.setting(option)
                 em.start(wait=False)
                 em.wait_to_started(timeout=10)
-                em.rename(f"thread{index}")
     except Exception as e:
         tb = e.__traceback__
         error_message = f"Exception: {e} | "
