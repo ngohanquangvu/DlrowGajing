@@ -59,20 +59,8 @@ def create_ldplayer_profile(num_profiles, path):
     ld = emulator.LDPlayer(path)
     current_profiles = len(ld.emulators)
     running_profiles = len([em for em in ld.emulators if em.is_running()])
-    if running_profiles < current_profiles:
-        emulators = ld.emulators
-        available_emulators = [em for em in emulators if not em.is_running()]
-        em = random.choice(available_emulators)
-        option = EmulatorOptions()
-        option.set_resolution(350, 500, 240)
-        option.set_memory(1024)
-        option.set_cpu(2)
-        em.setting(option)
-        em.start(wait=False)
-    else:
-        if running_profiles < num_profiles:
-            ld.new("Ldplayer")
-            running_profiles += 1
+    try:
+        if running_profiles < current_profiles:
             emulators = ld.emulators
             available_emulators = [em for em in emulators if not em.is_running()]
             em = random.choice(available_emulators)
@@ -82,7 +70,30 @@ def create_ldplayer_profile(num_profiles, path):
             option.set_cpu(2)
             em.setting(option)
             em.start(wait=False)
-
+        else:
+            if running_profiles < num_profiles:
+                ld.new("Ldplayer")
+                running_profiles += 1
+                emulators = ld.emulators
+                available_emulators = [em for em in emulators if not em.is_running()]
+                em = random.choice(available_emulators)
+                option = EmulatorOptions()
+                option.set_resolution(350, 500, 240)
+                option.set_memory(1024)
+                option.set_cpu(2)
+                em.setting(option)
+                em.start(wait=False)
+    except Exception as e:
+        tb = e.__traceback__
+        error_message = f"Exception: {e} | "
+        while tb is not None:
+            filename = tb.tb_frame.f_code.co_filename
+            lineno = tb.tb_lineno
+            function_name = tb.tb_frame.f_code.co_name
+            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+            tb = tb.tb_next
+        open("error.txt", "a").write(error_message+"\n")
+        create_ldplayer_profile(num_profiles, path)
 device_using = []
 
 def connect_to_ldplayer(profile_name):
