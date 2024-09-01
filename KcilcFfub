@@ -185,7 +185,6 @@ def close_ldplayer(device):
 def buff_click(profile_name, index, lock):
     global url_complete, status, running, dem, list_url, luong, ldplayer_PATH
     with lock:
-        create_ldplayer_profile(luong, ldplayer_PATH, index)
         running[index] = ["Connecting to adb", "", ""]
         device = connect_to_ldplayer(profile_name, index)
     proxy_host = "ipv6.proxiware.com"
@@ -274,6 +273,11 @@ os.system("cls")
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
+
+for i in range(luong):
+    running[i] = ["Create new device", "", ""]
+    create_ldplayer_profile(luong, ldplayer_PATH, i+1)
+    time.sleep(1)
 
 lock = threading.Lock()
 threads = []
