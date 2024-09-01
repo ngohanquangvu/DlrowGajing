@@ -62,10 +62,23 @@ from emulator.option import EmulatorOptions
 def create_ldplayer_profile(num_profiles, path, index):
     ld = emulator.LDPlayer(path)
     current_profiles = len(ld.emulators)
-    running_profiles = len([em for em in ld.emulators if em.is_running()])
-    
     try:
-        if running_profiles < current_profiles:
+        if current_profiles >= num_profiles:
+            emulators = ld.emulators
+            available_emulators = [em for em in emulators if not em.is_running()]
+            em = random.choice(available_emulators)
+            option = EmulatorOptions()
+            option.set_resolution(350, 500, 240)
+            option.set_memory(1024)
+            option.set_cpu(2)
+            ld.set_ADB_debugging(em, True)
+            em.rename(f"Thread-{index}")
+            em.setting(option)
+            em.start(wait=False)
+            em.wait_to_started(timeout=20)
+        else:
+            ld.new(f"Thread-{index}")
+            running_profiles += 1
             emulators = ld.emulators
             available_emulators = [em for em in emulators if not em.is_running()]
             em = random.choice(available_emulators)
@@ -76,23 +89,7 @@ def create_ldplayer_profile(num_profiles, path, index):
             ld.set_ADB_debugging(em, True)
             em.setting(option)
             em.start(wait=False)
-            em.wait_to_started(timeout=10)
-            em.rename(f"Thread-{index}")
-        else:
-            if running_profiles < num_profiles:
-                ld.new(f"Thread-{index}")
-                running_profiles += 1
-                emulators = ld.emulators
-                available_emulators = [em for em in emulators if not em.is_running()]
-                em = random.choice(available_emulators)
-                option = EmulatorOptions()
-                option.set_resolution(350, 500, 240)
-                option.set_memory(1024)
-                option.set_cpu(2)
-                ld.set_ADB_debugging(em, True)
-                em.setting(option)
-                em.start(wait=False)
-                em.wait_to_started(timeout=10)
+            em.wait_to_started(timeout=20)
     except Exception as e:
         tb = e.__traceback__
         error_message = f"Exception: {e} | "
@@ -201,6 +198,19 @@ def buff_click(profile_name, index, lock):
                     running[index] = ["Restart device", url, click_success]
                     device = connect_to_ldplayer(profile_name, index)
         url_complete += 1
+def end_task_if_thread_exists(name):
+    for proc in psutil.process_iter(['pid', 'name']):
+        if proc.info['name'] == 'dnplayer.exe':
+            try:
+                children = proc.children(recursive=True)
+                for child in children:
+                    if name in child.name():
+                        proc.terminate()
+                        proc.wait(timeout=5)  
+                        return
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
+                pass
+
 def checking():
     while status:
         for j in range(len(running)):
@@ -235,8 +245,8 @@ start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
 for i in range(luong):
+    running[i] = ["Create new device", "", ""]
     create_ldplayer_profile(luong, ldplayer_PATH, i+1)
-    running[i+1] = ["Create new device", "", ""]
 
 lock = threading.Lock()
 threads = []
