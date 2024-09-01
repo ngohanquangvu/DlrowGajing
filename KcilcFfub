@@ -140,6 +140,7 @@ def connect_to_ldplayer(profile_name, index):
             devices = client.devices()
 
             if len(devices) == 0:
+                running[index] = ["Cant find devices", "", ""]
                 time.sleep(5)
                 continue
             for device in devices:
@@ -147,6 +148,8 @@ def connect_to_ldplayer(profile_name, index):
                     device_using.append(device.serial)
                     running[index] = ["Connect success to ADB server", "", ""]
                     return device
+                else:
+                    running[index] = ["Device is using", "", ""]
         except:
             time.sleep(5)
 
