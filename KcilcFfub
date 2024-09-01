@@ -70,9 +70,6 @@ def create_ldplayer_profile(num_profiles, path, index):
             option.set_cpu(2)
             ld.set_ADB_debugging(em, True)
             em.setting(option)
-            em.start(wait=False)
-            em.wait_to_started(timeout=20)
-            em.rename(f"Thread-{index}")
         else:
             em = ld.new(f"Thread-{index}")
             emulators = ld.emulators
@@ -99,6 +96,8 @@ def create_ldplayer_profile(num_profiles, path, index):
         create_ldplayer_profile(num_profiles, path, index)
 
 # Ví dụ sử dụng hàm
+
+device_using = []
 
 def connect_to_ldplayer(profile_name, index):
     global device_using, luong, ldplayer_PATH, running
@@ -235,10 +234,11 @@ running = [['','',''] for _ in range(luong)]
 url_complete = 0
 status = True
 os.system("cls")
+create_ldplayer_profile(luong, ldplayer_PATH, 0)
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
-for i in range(luong):
+for i in range(1,luong):
     try:
         running[i] = ["Create new device", "", ""]
         create_ldplayer_profile(luong, ldplayer_PATH, i+1)
