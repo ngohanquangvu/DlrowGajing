@@ -69,7 +69,7 @@ def create_ldplayer_profile(num_profiles, path):
             option.set_memory(1024)
             option.set_cpu(2)
             em.setting(option)
-            em.start(wait=False)
+            em.start(wait=True)
         else:
             if running_profiles < num_profiles:
                 ld.new("Ldplayer")
@@ -82,7 +82,7 @@ def create_ldplayer_profile(num_profiles, path):
                 option.set_memory(1024)
                 option.set_cpu(2)
                 em.setting(option)
-                em.start(wait=False)
+                em.start(wait=True)
     except Exception as e:
         tb = e.__traceback__
         error_message = f"Exception: {e} | "
