@@ -75,7 +75,6 @@ def create_ldplayer_profile(num_profiles, path, index):
             em.wait_to_started(timeout=20)
         else:
             ld.new(f"Thread-{index}")
-            running_profiles += 1
             emulators = ld.emulators
             available_emulators = [em for em in emulators if not em.is_running()]
             em = random.choice(available_emulators)
