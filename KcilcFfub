@@ -175,7 +175,7 @@ def open_browser_and_navigate(device, url, proxy_user, proxy_pass, title):
             output = str(device.shell("uiautomator dump /dev/tty"))
             if title in output:
                 break
-            elif "ERR_TUNNEL_CONNECTION_FAILED" in output:
+            elif "ERR_CONNECTION" in output:
                 close_ldplayer(device)
                 open_browser_and_navigate(device, url, proxy_user, proxy_pass, title)
     else:
