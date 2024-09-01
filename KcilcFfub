@@ -187,6 +187,9 @@ def buff_click(profile_name, index, lock):
                     error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
                     tb = tb.tb_next
                 open("error.txt", "a").write(error_message+"\n")
+                with lock:
+                    running[index] = ["Restart device", url, click_success]
+                    device = connect_to_ldplayer(profile_name, index)
         url_complete += 1
 def checking():
     while status:
