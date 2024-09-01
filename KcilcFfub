@@ -183,7 +183,7 @@ def open_browser_and_navigate(device, url, proxy_user, proxy_pass, title):
 def close_ldplayer(device):
     device.shell('am force-stop com.android.browser')
 def buff_click(profile_name, index, lock):
-    global url_complete, status, running, dem, list_url, luong, ldplayer_PATH
+    global url_complete, status, running, dem, list_url, luong, ldplayer_PATH, device_using
     with lock:
         running[index] = ["Connecting to adb", "", ""]
         device = connect_to_ldplayer(profile_name, index)
@@ -223,6 +223,7 @@ def buff_click(profile_name, index, lock):
                     error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
                     tb = tb.tb_next
                 open("error.txt", "a").write(error_message+"\n")
+                device_using.remove(device.serial)
                 with lock:
                     running[index] = ["Restart device", url, click_success]
                     device = connect_to_ldplayer(profile_name, index)
