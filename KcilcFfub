@@ -55,10 +55,15 @@ os.system("cls")
 print(f"Data: {len(list_url)} url")
 print(f"Luồng: {luong}")
 print(f"Số lần truy cập: {dem}")
-def create_ldplayer_profile(num_profiles, path):
+import random
+import emulator
+from emulator.option import EmulatorOptions
+
+def create_ldplayer_profile(num_profiles, path, index):
     ld = emulator.LDPlayer(path)
     current_profiles = len(ld.emulators)
     running_profiles = len([em for em in ld.emulators if em.is_running()])
+    
     try:
         if running_profiles < current_profiles:
             emulators = ld.emulators
@@ -72,9 +77,10 @@ def create_ldplayer_profile(num_profiles, path):
             em.setting(option)
             em.start(wait=False)
             em.wait_to_started(timeout=10)
+            em.rename(f"Thread-{index}")
         else:
             if running_profiles < num_profiles:
-                ld.new(f"Ldplayer-{running_profiles+1}")
+                ld.new(f"Thread-{index}")
                 running_profiles += 1
                 emulators = ld.emulators
                 available_emulators = [em for em in emulators if not em.is_running()]
@@ -87,6 +93,7 @@ def create_ldplayer_profile(num_profiles, path):
                 em.setting(option)
                 em.start(wait=False)
                 em.wait_to_started(timeout=10)
+                em.rename(f"thread{index}")
     except Exception as e:
         tb = e.__traceback__
         error_message = f"Exception: {e} | "
@@ -96,14 +103,15 @@ def create_ldplayer_profile(num_profiles, path):
             function_name = tb.tb_frame.f_code.co_name
             error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
             tb = tb.tb_next
-        open("error.txt", "a").write(error_message+"\n")
-        create_ldplayer_profile(num_profiles, path)
+        open("error.txt", "a").write(error_message + "\n")
+        create_ldplayer_profile(num_profiles, path, index)
+
+# Ví dụ sử dụng hàm
+create_ldplayer_profile(5, r"D:\LDPlayer\LDPlayer3.0", 1)
 device_using = []
 
 def connect_to_ldplayer(profile_name, index):
     global device_using, luong, ldplayer_PATH, running
-    create_ldplayer_profile(luong, ldplayer_PATH)
-    running[index] = ["Connecting to adb", "", ""]
     while True:
         try:
             client = AdbClient(host="127.0.0.1", port=5037)
@@ -150,9 +158,9 @@ def open_browser_and_navigate(device, url, proxy_user, proxy_pass, title):
 def close_ldplayer(device):
     device.shell('am force-stop com.android.browser')
 def buff_click(profile_name, index, lock):
-    global url_complete, status, running, dem, list_url
+    global url_complete, status, running, dem, list_url, luong, ldplayer_PATH
     with lock:
-        running[index] = ["Create new device", "", ""]
+        running[index] = ["Connecting to adb", "", ""]
         device = connect_to_ldplayer(profile_name, index)
     proxy_host = "ipv6.proxiware.com"
     proxy_port =   8080
@@ -223,9 +231,14 @@ def checking():
 running = [['','',''] for _ in range(luong)]
 url_complete = 0
 status = True
+os.system("cls")
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
+for i in range(luong):
+    create_ldplayer_profile(luong, ldplayer_PATH, i+1)
+    running[i+1] = ["Create new device", "", ""]
+
 lock = threading.Lock()
 threads = []
 for i in range(luong):
