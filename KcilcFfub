@@ -55,9 +55,6 @@ os.system("cls")
 print(f"Data: {len(list_url)} url")
 print(f"Luồng: {luong}")
 print(f"Số lần truy cập: {dem}")
-import random
-import emulator
-from emulator.option import EmulatorOptions
 
 def create_ldplayer_profile(num_profiles, path, index):
     ld = emulator.LDPlayer(path)
@@ -244,9 +241,21 @@ os.system("cls")
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
+
 for i in range(luong):
-    running[i] = ["Create new device", "", ""]
-    create_ldplayer_profile(luong, ldplayer_PATH, i+1)
+    try:
+        running[i] = ["Create new device", "", ""]
+        create_ldplayer_profile(luong, ldplayer_PATH, i+1)
+    except Exception as e:
+        tb = e.__traceback__
+        error_message = f"Exception: {e} | "
+        while tb is not None:
+            filename = tb.tb_frame.f_code.co_filename
+            lineno = tb.tb_lineno
+            function_name = tb.tb_frame.f_code.co_name
+            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+            tb = tb.tb_next
+        open("error.txt", "a").write(error_message + "\n")
 
 lock = threading.Lock()
 threads = []
