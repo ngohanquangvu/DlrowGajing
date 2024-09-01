@@ -234,7 +234,7 @@ running = [['','',''] for _ in range(luong)]
 url_complete = 0
 status = True
 os.system("cls")
-create_ldplayer_profile(luong, ldplayer_PATH, 0)
+create_ldplayer_profile(luong, ldplayer_PATH, 1)
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
