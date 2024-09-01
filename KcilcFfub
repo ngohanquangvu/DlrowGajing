@@ -63,29 +63,59 @@ def create_ldplayer_profile(num_profiles, path, index):
         if current_profiles >= num_profiles:
             emulators = ld.emulators
             available_emulators = [em for em in emulators if not em.is_running()]
-            em = random.choice(available_emulators)
-            option = EmulatorOptions()
-            option.set_resolution(350, 500, 240)
-            option.set_memory(1024)
-            option.set_cpu(2)
-            ld.set_ADB_debugging(em, True)
-            em.setting(option)
-            em.start(wait=False)
-            em.wait_to_started(timeout=20)
-            em.rename(f"Thread-{index}")
+            if len(available_emulators) == 0:
+                em = ld.new(f"Thread-{index}")
+                option = EmulatorOptions()
+                option.set_resolution(350, 500, 240)
+                option.set_memory(1024)
+                option.set_cpu(2)
+                ld.set_ADB_debugging(em, True)
+                em.setting(option)
+                try:
+                    em.start(wait=False)
+                except: pass
+                em.wait_to_started(timeout=20)
+            else:
+                em = random.choice(available_emulators)
+                option = EmulatorOptions()
+                option.set_resolution(350, 500, 240)
+                option.set_memory(1024)
+                option.set_cpu(2)
+                ld.set_ADB_debugging(em, True)
+                em.setting(option)
+                try:
+                    em.start(wait=False)
+                except: pass
+                em.wait_to_started(timeout=20)
+                em.rename(f"Thread-{index}")
         else:
             em = ld.new(f"Thread-{index}")
             emulators = ld.emulators
             available_emulators = [em for em in emulators if not em.is_running()]
-            em = random.choice(available_emulators)
-            option = EmulatorOptions()
-            option.set_resolution(350, 500, 240)
-            option.set_memory(1024)
-            option.set_cpu(2)
-            ld.set_ADB_debugging(em, True)
-            em.setting(option)
-            em.start(wait=False)
-            em.wait_to_started(timeout=20)
+            if len(available_emulators) == 0:
+                em = ld.new(f"Thread-{index}")
+                option = EmulatorOptions()
+                option.set_resolution(350, 500, 240)
+                option.set_memory(1024)
+                option.set_cpu(2)
+                ld.set_ADB_debugging(em, True)
+                em.setting(option)
+                try:
+                    em.start(wait=False)
+                except: pass
+                em.wait_to_started(timeout=20)
+            else:
+                em = random.choice(available_emulators)
+                option = EmulatorOptions()
+                option.set_resolution(350, 500, 240)
+                option.set_memory(1024)
+                option.set_cpu(2)
+                ld.set_ADB_debugging(em, True)
+                em.setting(option)
+                try:
+                    em.start(wait=False)
+                except: pass
+                em.wait_to_started(timeout=20)
     except Exception as e:
         tb = e.__traceback__
         error_message = f"Exception: {e} | "
