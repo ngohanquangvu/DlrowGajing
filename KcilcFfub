@@ -175,7 +175,7 @@ def open_browser_and_navigate(device, url, proxy_user, proxy_pass, title):
             output = str(device.shell("uiautomator dump /dev/tty"))
             if title in output:
                 break
-            elif "ERR_CONNECTION" in output:
+            elif "ERR_TUNNEL_CONNECTION_FAILED" in output:
                 close_ldplayer(device)
                 open_browser_and_navigate(device, url, proxy_user, proxy_pass, title)
     else:
@@ -205,14 +205,15 @@ def buff_click(profile_name, index, lock):
         configure_proxy(device, proxy_host, proxy_port)
         running[index] = ["Configure proxy success", url, ""]
         click_success = 0
-        while dem > 0:
+        dem_click = dem
+        while dem_click > 0:
             try:
                 running[index] = ["Clicking", url, click_success]
                 open_browser_and_navigate(device, url,proxy_user, proxy_pass, title)
                 click_success += 1
                 running[index] = ["Click Success", url, click_success]
                 close_ldplayer(device)
-                dem = dem - 1
+                dem_click -=1
             except Exception as e:
                 tb = e.__traceback__
                 error_message = f"Exception: {e} | "
@@ -223,10 +224,22 @@ def buff_click(profile_name, index, lock):
                     error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
                     tb = tb.tb_next
                 open("error.txt", "a").write(error_message+"\n")
-                device_using.remove(device.serial)
-                with lock:
-                    running[index] = ["Restart device", url, click_success]
-                    device = connect_to_ldplayer(profile_name, index)
+                while True:
+                    try:
+                        device_using.remove(device.serial)
+                        with lock:
+                            running[index] = ["Restart device", url, click_success]
+                            device = connect_to_ldplayer(profile_name, index)
+                    except Exception as ee:
+                        tb = ee.__traceback__
+                        error_messages = f"Exception: {ee} | "
+                        while tb is not None:
+                            filename = tb.tb_frame.f_code.co_filename
+                            lineno = tb.tb_lineno
+                            function_name = tb.tb_frame.f_code.co_name
+                            error_messages += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+                            tb = tb.tb_next
+                        open("error.txt", "a").write(error_messages+"\n")
         url_complete += 1
 def end_task_if_thread_exists(name):
     for proc in psutil.process_iter(['pid', 'name']):
