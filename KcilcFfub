@@ -230,6 +230,7 @@ def buff_click(profile_name, index, lock):
                         with lock:
                             running[index] = ["Restart device", url, click_success]
                             device = connect_to_ldplayer(profile_name, index)
+                        break
                     except Exception as ee:
                         tb = ee.__traceback__
                         error_messages = f"Exception: {ee} | "
