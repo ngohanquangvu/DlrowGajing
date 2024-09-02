@@ -235,6 +235,7 @@ def buff_click(profile_name, index, lock):
                         with lock:
                             device_using.remove(device.serial)
                             em.quit()
+                            em = create_ldplayer_profile(luong, ldplayer_PATH, index)
                             running[index] = ["Restart device", url, click_success]
                             device = connect_to_ldplayer(profile_name, index)
                         break
