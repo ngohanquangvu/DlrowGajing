@@ -75,6 +75,7 @@ def create_ldplayer_profile(num_profiles, path, index):
                     em.start(wait=False)
                 except: pass
                 em.wait_to_started(timeout=20)
+                return em
             else:
                 em = random.choice(available_emulators)
                 option = EmulatorOptions()
@@ -88,6 +89,7 @@ def create_ldplayer_profile(num_profiles, path, index):
                 except: pass
                 em.wait_to_started(timeout=20)
                 em.rename(f"Thread-{index}")
+                return em
         else:
             em = ld.new(f"Thread-{index}")
             emulators = ld.emulators
@@ -104,6 +106,7 @@ def create_ldplayer_profile(num_profiles, path, index):
                     em.start(wait=False)
                 except: pass
                 em.wait_to_started(timeout=20)
+                return em
             else:
                 em = random.choice(available_emulators)
                 option = EmulatorOptions()
@@ -116,6 +119,7 @@ def create_ldplayer_profile(num_profiles, path, index):
                     em.start(wait=False)
                 except: pass
                 em.wait_to_started(timeout=20)
+                return em
     except Exception as e:
         tb = e.__traceback__
         error_message = f"Exception: {e} | "
@@ -126,7 +130,7 @@ def create_ldplayer_profile(num_profiles, path, index):
             error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
             tb = tb.tb_next
         open("error.txt", "a").write(error_message + "\n")
-        create_ldplayer_profile(num_profiles, path, index)
+        return create_ldplayer_profile(num_profiles, path, index)
 
 # Ví dụ sử dụng hàm
 
@@ -186,6 +190,7 @@ def close_ldplayer(device):
 def buff_click(profile_name, index, lock):
     global url_complete, status, running, dem, list_url, luong, ldplayer_PATH, device_using
     with lock:
+        em = create_ldplayer_profile(luong, ldplayer_PATH, index)
         running[index] = ["Connecting to adb", "", ""]
         device = connect_to_ldplayer(profile_name, index)
     proxy_host = "ipv6.proxiware.com"
@@ -227,8 +232,9 @@ def buff_click(profile_name, index, lock):
                 open("error.txt", "a").write(error_message+"\n")
                 while True:
                     try:
-                        device_using.remove(device.serial)
                         with lock:
+                            device_using.remove(device.serial)
+                            em.quit()
                             running[index] = ["Restart device", url, click_success]
                             device = connect_to_ldplayer(profile_name, index)
                         break
@@ -290,10 +296,10 @@ start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
 
-for i in range(luong):
-    running[i] = ["Create new device", "", ""]
-    create_ldplayer_profile(luong, ldplayer_PATH, i+1)
-    time.sleep(1)
+# for i in range(luong):
+#     running[i] = ["Create new device", "", ""]
+#     create_ldplayer_profile(luong, ldplayer_PATH, i+1)
+#     time.sleep(1)
 
 lock = threading.Lock()
 threads = []
