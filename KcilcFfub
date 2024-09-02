@@ -171,13 +171,14 @@ def open_browser_and_navigate(device, url, proxy_user, proxy_pass, title):
         device.shell("input keyevent 66")  # Enter
         device.shell("input keyevent 66")  # Enter
     if title is not None:
+        dem_check = 3
         while True:
             output = str(device.shell("uiautomator dump /dev/tty"))
-            if title in output:
+            if title in output or "net::ERR_TUNNEL_CONNECTION_FAILED" in output or url.split("?")[0] in output:
                 break
-            elif "ERR_TUNNEL_CONNECTION_FAILED" in output:
-                close_ldplayer(device)
-                open_browser_and_navigate(device, url, proxy_user, proxy_pass, title)
+            else:
+                dem_check-=1
+                if dem_check <=0: break
     else:
         time.sleep(5)
 def close_ldplayer(device):
