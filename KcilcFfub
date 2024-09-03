@@ -11,7 +11,7 @@ def run(playwright, dem, index, lock):
         "server": proxy_server,
         "username": username,
         "password": password
-    },)
+    })
     while True:
         click = 0
         with lock:
@@ -32,6 +32,11 @@ def run(playwright, dem, index, lock):
             except:
                 page.close()
                 context.close()
+                browser = playwright.firefox.launch(proxy={
+                    "server": proxy_server,
+                    "username": username,
+                    "password": password
+                })
                 running[index] = ["Reload", url, click]
         
     browser.close()
