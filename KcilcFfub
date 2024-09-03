@@ -33,6 +33,7 @@ def run(playwright, dem, index, lock):
             except:
                 page.close()
                 context.close()
+                browser.close()
                 browser = playwright.firefox.launch(proxy={
                     "server": proxy_server,
                     "username": username,
