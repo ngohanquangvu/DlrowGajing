@@ -8,6 +8,7 @@ password = '7nxIDbh2ZsEV'
 def run(playwright, dem, index, lock):
     global list_url, running, url_complete, timeout
     headless = True
+    mp4 = True
     browser = playwright.firefox.launch(proxy={
         "server": proxy_server,
         "username": username,
@@ -25,8 +26,14 @@ def run(playwright, dem, index, lock):
             page = context.new_page()
             try:
                 page.goto(url, timeout=timeout*1000)
-                if "video" in url or "shorts" in url:
-                    page.wait_for_event('request', lambda request: request.url.endswith('.mp4'), timeout=timeout*1000)
+                if mp4==True:
+                    try:
+                        if "video" in url or "shorts" in url:
+                            page.wait_for_event('request', lambda request: request.url.endswith('.mp4'), timeout=timeout*1000)
+                    except: 
+                        mp4 = False
+                else:
+                    time.sleep(5)
                 page.close()
                 context.close()
                 running[index] = ["Click Success", url, click]
