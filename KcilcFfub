@@ -25,7 +25,7 @@ def run(playwright, dem, index, lock):
             context = browser.new_context()
             page = context.new_page()
             try:
-                page.goto(url, timeout=timeout*1000)
+                page.goto(url, timeout=timeout*1000, wait_until="domcontentloaded")
                 if mp4==True:
                     try:
                         if "video" in url or "shorts" in url:
