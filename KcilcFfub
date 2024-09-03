@@ -7,11 +7,6 @@ password = '7nxIDbh2ZsEV'
 
 def run(playwright, dem, index, lock):
     global list_url, running, url_complete, timeout
-    browser = playwright.firefox.launch(proxy={
-        "server": proxy_server,
-        "username": username,
-        "password": password
-    })
     while True:
         click = 0
         with lock:
@@ -19,6 +14,11 @@ def run(playwright, dem, index, lock):
                 break
             url = list_url.pop(0)
         while click < dem:  # Số lần truy cập lại URL
+            browser = playwright.firefox.launch(proxy={
+                "server": proxy_server,
+                "username": username,
+                "password": password
+            })
             running[index] = ["Clicking", url, click]
             context = browser.new_context()
             page = context.new_page()
@@ -28,20 +28,14 @@ def run(playwright, dem, index, lock):
                     page.wait_for_event('request', lambda request: request.url.endswith('.mp4'), timeout=timeout*1000)
                 page.close()
                 context.close()
+                browser.close()
                 running[index] = ["Click Success", url, click]
                 click += 1
             except:
                 page.close()
                 context.close()
                 browser.close()
-                browser = playwright.firefox.launch(proxy={
-                    "server": proxy_server,
-                    "username": username,
-                    "password": password
-                })
                 running[index] = ["Reload", url, click]
-        
-    browser.close()
 
 def process_url(dem, index, lock):
         with sync_playwright() as playwright:
