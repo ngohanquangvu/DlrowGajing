@@ -7,7 +7,7 @@ password = '7nxIDbh2ZsEV'
 
 def run(playwright, dem, index, lock):
     global list_url, running, url_complete, timeout
-    headless = False
+    headless = True
     browser = playwright.firefox.launch(proxy={
         "server": proxy_server,
         "username": username,
