@@ -1,269 +1,42 @@
-ldplayer_PATH = open("ldplayer_path.txt", "r").read().strip()
-def check_ldplayer_path(path):
-    try:
-        ld = emulator.LDPlayer(path)
-        return True
-    except:
-        return False
-while True:
-    print(f"*Đường dẫn tới giả lập ldplayerPlayer được lưu tại {ldplayer_PATH}")
-    print("1. Sửa đường dẫn")
-    print("2. Check đường dẫn")
-    print("3. Tiếp tục")
-    choice = input("Chọn: ")
-    if choice == "1":
-        ldplayer_PATH = input("Nhập đường dẫn tới giả lập LDPlayer: ")
-        with open("ldplayer_path.txt", "w") as f:
-            f.write(ldplayer_PATH)
-    elif choice == "2":
-        if check_ldplayer_path(ldplayer_PATH):
-            print("Đường dẫn hợp lệ")
-            out = input("Nhấn Enter để quay lại menu")
-        else:
-            print("Đường dẫn không hợp lệ")
-            ldplayer_PATH = input("Nhập đường dẫn tới giả lập LDPlayer: ")
-            with open("ldplayer_path.txt", "w") as f:
-                f.write(ldplayer_PATH)
-    elif choice == "3":
-        break
-    os.system("cls")
-list_url = askopenfilename(title="Chọn file chứa danh sách URL cần truy cập", filetypes=[("Text files", "*.txt")])
-list_url = [line.strip() for line in open(list_url, "r").readlines()]
-print(f"Data: {len(list_url)} url")
-while True:
-    try:
-        luong = int(input("Nhập số lượng luồng: "))
-        if luong > len(list_url) or luong < 1:
-            print("Số lượng luồng không hợp lệ")
-        else:
-            break
-    except:
-        print("Số lượng luồng không hợp lệ")
-os.system("cls")
-print(f"Data: {len(list_url)} url")
-print(f"Luồng: {luong}")
-while True:
-    try:
-        dem = int(input("Nhập số lần truy cập mỗi url: "))
-        if dem < 1:
-            print("Số lần truy cập không hợp lệ")
-        else:
-            break
-    except:
-        print("Số lần truy cập không hợp lệ")
-os.system("cls")
-print(f"Data: {len(list_url)} url")
-print(f"Luồng: {luong}")
-print(f"Số lần truy cập: {dem}")
+os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
 
-def create_ldplayer_profile(num_profiles, path, index):
-    ld = emulator.LDPlayer(path)
-    current_profiles = len(ld.emulators)
-    try:
-        if current_profiles >= num_profiles:
-            emulators = ld.emulators
-            available_emulators = [em for em in emulators if not em.is_running()]
-            if len(available_emulators) == 0:
-                em = ld.new(f"Thread-{index}")
-                option = EmulatorOptions()
-                option.set_resolution(350, 500, 240)
-                option.set_memory(1024)
-                option.set_cpu(2)
-                ld.set_ADB_debugging(em, True)
-                em.setting(option)
-                try:
-                    em.start(wait=False)
-                except: pass
-                em.wait_to_started(timeout=20)
-                return em
-            else:
-                em = random.choice(available_emulators)
-                option = EmulatorOptions()
-                option.set_resolution(350, 500, 240)
-                option.set_memory(1024)
-                option.set_cpu(2)
-                ld.set_ADB_debugging(em, True)
-                em.setting(option)
-                try:
-                    em.start(wait=False)
-                except: pass
-                em.wait_to_started(timeout=20)
-                em.rename(f"Thread-{index}")
-                return em
-        else:
-            em = ld.new(f"Thread-{index}")
-            emulators = ld.emulators
-            available_emulators = [em for em in emulators if not em.is_running()]
-            if len(available_emulators) == 0:
-                em = ld.new(f"Thread-{index}")
-                option = EmulatorOptions()
-                option.set_resolution(350, 500, 240)
-                option.set_memory(1024)
-                option.set_cpu(2)
-                ld.set_ADB_debugging(em, True)
-                em.setting(option)
-                try:
-                    em.start(wait=False)
-                except: pass
-                em.wait_to_started(timeout=20)
-                return em
-            else:
-                em = random.choice(available_emulators)
-                option = EmulatorOptions()
-                option.set_resolution(350, 500, 240)
-                option.set_memory(1024)
-                option.set_cpu(2)
-                ld.set_ADB_debugging(em, True)
-                em.setting(option)
-                try:
-                    em.start(wait=False)
-                except: pass
-                em.wait_to_started(timeout=20)
-                return em
-    except Exception as e:
-        tb = e.__traceback__
-        error_message = f"Exception: {e} | "
-        while tb is not None:
-            filename = tb.tb_frame.f_code.co_filename
-            lineno = tb.tb_lineno
-            function_name = tb.tb_frame.f_code.co_name
-            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
-            tb = tb.tb_next
-        open("error.txt", "a").write(error_message + "\n")
-        return create_ldplayer_profile(num_profiles, path, index)
+# Thông tin proxy
+proxy_server = 'http://ipv6.proxiware.com:8080'
+username = 'IJteg9PjC5Qj'
+password = '7nxIDbh2ZsEV'
 
-# Ví dụ sử dụng hàm
-
-device_using = []
-
-def connect_to_ldplayer(profile_name, index):
-    global device_using, luong, ldplayer_PATH, running
+def run(playwright, dem, index, lock):
+    global list_url, running, url_complete
+    browser = playwright.firefox.launch(proxy={
+        "server": proxy_server,
+        "username": username,
+        "password": password
+    },)
     while True:
-        try:
-            client = AdbClient(host="127.0.0.1", port=5037)
-            devices = client.devices()
-
-            if len(devices) == 0:
-                running[index] = ["Cant find devices", "", ""]
-                time.sleep(5)
-                continue
-            for device in devices:
-                if device.serial not in device_using:
-                    device_using.append(device.serial)
-                    running[index] = ["Connect success to ADB server", "", ""]
-                    return device
-                else:
-                    running[index] = ["Device is using", "", ""]
-        except:
-            time.sleep(5)
-
-def configure_proxy(device, proxy_host, proxy_port):
-    device.shell(f"settings put global http_proxy {proxy_host}:{proxy_port}")
-
-def open_browser_and_navigate(device, url, proxy_user, proxy_pass, title):
-    device.shell(f'am start -a android.intent.action.VIEW -d "{url}"')
-    while True:
-        output = str(device.shell("uiautomator dump /dev/tty"))
-        if "Đăng nhập vào " in output or url.split("?")[0] in output or "ERROR: could not get idle state." in output:
-            break
-    output = str(device.shell("uiautomator dump /dev/tty"))
-    if url not in output and "Đăng nhập vào " in output:
-        device.shell(f"input text '{proxy_user}'")
-        device.shell("input keyevent 66")  # Enter
-        device.shell(f"input text '{proxy_pass}'")
-        device.shell("input keyevent 22")  # Enter
-        device.shell("input keyevent 66")  # Enter
-        device.shell("input keyevent 66")  # Enter
-    if title is not None:
-        dem_check = 3
-        while True:
-            output = str(device.shell("uiautomator dump /dev/tty"))
-            if title in output or "net::ERR_TUNNEL_CONNECTION_FAILED" in output or url.split("?")[0] in output:
-                break
-            else:
-                dem_check-=1
-                if dem_check <=0: break
-    else:
-        time.sleep(5)
-def close_ldplayer(device):
-    device.shell('am force-stop com.android.browser')
-def buff_click(profile_name, index, lock):
-    global url_complete, status, running, dem, list_url, luong, ldplayer_PATH, device_using
-    with lock:
-        em = create_ldplayer_profile(luong, ldplayer_PATH, index)
-        running[index] = ["Connecting to adb", "", ""]
-        device = connect_to_ldplayer(profile_name, index)
-    proxy_host = "ipv6.proxiware.com"
-    proxy_port =   8080
-    proxy_user = "IJteg9PjC5Qj"
-    proxy_pass = "7nxIDbh2ZsEV"
-    while status:
+        click = 0
         with lock:
             if len(list_url) == 0:
                 break
             url = list_url.pop(0)
-        running[index] = ["Clicking", url, None]
-        uid = url.split("/")[-1].split("?")[0]
-        try:
-            title = requests.get(f"https://gw.ganjingworld.com/v1.1/content/query?query=basic,full,translations,like,share,save,view,movie,tag_list&ids={uid}&with_desc=true&include_unlisted=true").json()["data"]["list"][0]["title"]
-        except:
-            title = None
-        configure_proxy(device, proxy_host, proxy_port)
-        running[index] = ["Configure proxy success", url, ""]
-        click_success = 0
-        dem_click = dem
-        while dem_click > 0:
-            try:
-                running[index] = ["Clicking", url, click_success]
-                open_browser_and_navigate(device, url,proxy_user, proxy_pass, title)
-                click_success += 1
-                running[index] = ["Click Success", url, click_success]
-                close_ldplayer(device)
-                dem_click -=1
-            except Exception as e:
-                tb = e.__traceback__
-                error_message = f"Exception: {e} | "
-                while tb is not None:
-                    filename = tb.tb_frame.f_code.co_filename
-                    lineno = tb.tb_lineno
-                    function_name = tb.tb_frame.f_code.co_name
-                    error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
-                    tb = tb.tb_next
-                open("error.txt", "a").write(error_message+"\n")
-                while True:
-                    try:
-                        with lock:
-                            device_using.remove(device.serial)
-                            em.quit()
-                            em = create_ldplayer_profile(luong, ldplayer_PATH, index)
-                            running[index] = ["Restart device", url, click_success]
-                            device = connect_to_ldplayer(profile_name, index)
-                        break
-                    except Exception as ee:
-                        tb = ee.__traceback__
-                        error_messages = f"Exception: {ee} | "
-                        while tb is not None:
-                            filename = tb.tb_frame.f_code.co_filename
-                            lineno = tb.tb_lineno
-                            function_name = tb.tb_frame.f_code.co_name
-                            error_messages += f"File: {filename}, Line: {lineno}, in {function_name}\n"
-                            tb = tb.tb_next
-                        open("error.txt", "a").write(error_messages+"\n")
-        url_complete += 1
-def end_task_if_thread_exists(name):
-    for proc in psutil.process_iter(['pid', 'name']):
-        if proc.info['name'] == 'dnplayer.exe':
-            try:
-                children = proc.children(recursive=True)
-                for child in children:
-                    if name in child.name():
-                        proc.terminate()
-                        proc.wait(timeout=5)  
-                        return
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
-                pass
+        while click < dem:  # Số lần truy cập lại URL
+            running[index] = ["Clicking", url, click]
+            context = browser.new_context()
+            page = context.new_page()
+            page.goto(url)
+            page.wait_for_event('request', lambda request: request.url.endswith('.mp4'))
+            page.close()
+            context.close()
+            running[index] = ["Click Success", url, click]
+            click += 1
+        
+    browser.close()
+
+def process_url(dem, index, lock):
+        with sync_playwright() as playwright:
+            run(playwright, dem, index, lock)
 
 def checking():
+    global url_complete, running, start_time, status
     while status:
         for j in range(len(running)):
             if running[j][0]=="Click Success":
@@ -271,9 +44,6 @@ def checking():
                 print("")
             elif running[j][0]=="Clicking":
                 print(f"\033[33mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
-                print("")
-            elif running[j][0]=="Restart device" or running[j][0]=="Create new device":
-                print(f"\033[96mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
                 print("")
             else:
                 print(f"\033[36mThread {j+1}: {running[j][0]} | {running[j][1]} | {running[j][2]}\033[0m")
@@ -288,29 +58,42 @@ def checking():
         print(f"\033[33mProcess: {formatted_time} - Url complete: {url_complete}\033[0m")
         time.sleep(1)
         os.system('cls')
-                
-running = [['','',''] for _ in range(luong)]
+
+
+start_tool = input("Enter để băt đầu...")
+list_url = askopenfilename(title="Chọn file chứa danh sách URL cần truy cập", filetypes=[("Text files", "*.txt")])
+list_url = [line.strip() for line in open(list_url, "r").readlines()]
+print(f"Data: {len(list_url)} urls")
+while True:
+    try:
+        dem = int(input("Nhập số lần truy cập: "))
+        break
+    except ValueError:
+        print("Số lần truy cập phải là số nguyên")
+        continue
+while True:
+    try:
+        luong = int(input("Nhập số luồng: "))
+        break
+    except ValueError:
+        print("Số luồng phải là số nguyên")
+        continue
+
+
 url_complete = 0
+running = [['','',''] for _ in range(luong)]
+lock = threading.Lock()
 status = True
-os.system("cls")
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
-
-# for i in range(luong):
-#     running[i] = ["Create new device", "", ""]
-#     create_ldplayer_profile(luong, ldplayer_PATH, i+1)
-#     time.sleep(1)
-
-lock = threading.Lock()
 threads = []
 for i in range(luong):
-    threads.append(threading.Thread(target=buff_click, args=(f"ldplayer{i}", i, lock)))
-for j in threads:
-    j.start()
-for j in threads:
-    j.join()
-status = False
+    thread = threading.Thread(target=process_url, args=(dem, i, lock))
+    threads.append(thread)
+    thread.start()
+for thread in threads:
+    thread.join()
 t.join()
 end_time = time.time()
 
@@ -318,6 +101,7 @@ execution_time = end_time - start_time
 hours, rem = divmod(execution_time, 3600)
 minutes, seconds = divmod(rem, 60)
 formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
-print(f"\033[32mProcess: {formatted_time}\033[0m  | Sent view complete")
-end = input("Press Enter to exit")
 
+print(f"\033[33mProcess: {formatted_time}\033[0m")
+output = input("Nhấn Enter để thoát...")
+status = False
