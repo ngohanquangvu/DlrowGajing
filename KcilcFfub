@@ -6,7 +6,7 @@ username = 'IJteg9PjC5Qj'
 password = '7nxIDbh2ZsEV'
 
 def run(playwright, dem, index, lock):
-    global list_url, running, url_complete
+    global list_url, running, url_complete, timeout
     browser = playwright.firefox.launch(proxy={
         "server": proxy_server,
         "username": username,
@@ -22,12 +22,17 @@ def run(playwright, dem, index, lock):
             running[index] = ["Clicking", url, click]
             context = browser.new_context()
             page = context.new_page()
-            page.goto(url)
-            page.wait_for_event('request', lambda request: request.url.endswith('.mp4'))
-            page.close()
-            context.close()
-            running[index] = ["Click Success", url, click]
-            click += 1
+            try:
+                page.goto(url, timeout=timeout*1000)
+                page.wait_for_event('request', lambda request: request.url.endswith('.mp4'), timeout=timeout*1000)
+                page.close()
+                context.close()
+                running[index] = ["Click Success", url, click]
+                click += 1
+            except:
+                page.close()
+                context.close()
+                running[index] = ["Reload", url, click]
         
     browser.close()
 
@@ -77,6 +82,13 @@ while True:
         break
     except ValueError:
         print("Số luồng phải là số nguyên")
+        continue
+while True:
+    try:
+        timeout = int(input("Nhập timeout(s): "))
+        break
+    except ValueError:
+        print("Số timeout phải là số nguyên")
         continue
 
 
