@@ -24,7 +24,8 @@ def run(playwright, dem, index, lock):
             page = context.new_page()
             try:
                 page.goto(url, timeout=timeout*1000)
-                page.wait_for_event('request', lambda request: request.url.endswith('.mp4'), timeout=timeout*1000)
+                if "video" in url or "shorts" in url:
+                    page.wait_for_event('request', lambda request: request.url.endswith('.mp4'), timeout=timeout*1000)
                 page.close()
                 context.close()
                 running[index] = ["Click Success", url, click]
