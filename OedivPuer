@@ -80,13 +80,17 @@ def save_video(url, email, password):
             time.sleep(10)
         download = requests.post("https://www.y2mate.com/mates/convertV2/index", data=d, headers=h).json()
         print(download)
-        url_download = download['dlink']
-        a = requests.get(url_download)
-        print(url_download)
-        aaa = f'./VideoData/{time.time()}.mp4'
-        with open(aaa, "wb") as f:
-            f.write(a.content)
-        return aaa
+        try:
+            url_download = download['dlink']
+            a = requests.get(url_download)
+            print(url_download)
+            aaa = f'./VideoData/{time.time()}.mp4'
+            with open(aaa, "wb") as f:
+                f.write(a.content)
+            return aaa
+        except:
+            open("Result.txt", "a", encoding="utf-8").write(f"Lỗi không có url_download\n {download}\n")
+            return None
     except Exception as e:
         tb = e.__traceback__
         error_message = f"Exception: {e} | "
@@ -534,7 +538,7 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
                 frame_text_box.insert(customtkinter.END, f'IP bị block\n')
                 frame_text_box.configure(state = "disabled")
                 time.sleep(10)
-                login_and_post(email, password, data, None)
+                login_and_post(email, password, data, cat, None)
 
         try:
             img = save_image(img)
