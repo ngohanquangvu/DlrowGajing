@@ -535,8 +535,9 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
                         pass
             except Exception as e:
                 frame_text_box.configure(state = "normal")
-                frame_text_box.insert(customtkinter.END, f'IP bị block\n')
+                frame_text_box.insert(customtkinter.END, f'{email}:{password}: IP bị block, tiến hành login lại\n')
                 frame_text_box.configure(state = "disabled")
+                open("Result.txt", "a", encoding="utf-8").write(f"{email}:{password}|IP bị block|{str(e)}\n")
                 time.sleep(10)
                 login_and_post(email, password, data, cat, None)
 
