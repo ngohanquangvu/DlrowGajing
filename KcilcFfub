@@ -57,6 +57,7 @@ def run(playwright, dem, index, lock):
                     "password": password
                 }, headless=headless)
                 running[index] = ["Reload", url, click]
+        url_complete += 1
     browser.close()
     running[index] = ["Done", "", ""]
 
