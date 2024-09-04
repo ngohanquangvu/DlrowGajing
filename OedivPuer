@@ -56,11 +56,15 @@ def save_video(url, email, password):
         }
         a = requests.post("https://www.y2mate.com/mates/en858/analyzeV2/ajax",data=d, headers=h).json()
         if a['status'] == 'ok':
-            i = a["links"]["mp4"]
-            for j in i:
-                quality = i[j]['k']
-                print(i[j]['q'])
-                break
+            try:
+                i = a["links"]["mp4"]
+                for j in i:
+                    quality = i[j]['k']
+                    print(i[j]['q'])
+                    break
+            except: 
+                open("Result.txt", "a", encoding="utf-8").write(f"Lỗi không có quality\n {a}\n")
+                return None
         print(quality)
         d = {
             'vid': a['vid'],
