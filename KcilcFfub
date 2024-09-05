@@ -34,6 +34,7 @@ def run(playwright, dem, index, lock):
                         mp4 = False
                 else:
                     time.sleep(5)
+                time.sleep(random.randint(5, 20))
                 page.close()
                 context.close()
                 running[index] = ["Click Success", url, click]
