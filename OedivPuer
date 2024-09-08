@@ -233,11 +233,11 @@ def upload_video(token, title, description, video_path, url_poster, lang, cat, e
     }
     while True:
         try:
-            info = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers=h).json()
+            info = requests.post("https://gw.ganjingworld.com/v1.0c/getuserprofile", headers=h, proxies=global_proxy).json()
+            profile_id = info["data"]["user_profile"]["profileId"]
             break
         except Exception as e:
             pass
-    profile_id = info["data"]["user_profile"]["profileId"]
     try:
         d = {
             "id":"",
