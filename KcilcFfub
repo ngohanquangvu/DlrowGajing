@@ -35,6 +35,15 @@ def run(playwright, dem, index, lock):
                 else:
                     time.sleep(5)
                 time.sleep(delay+random.randint(5, 20))
+                scroll_height = page.evaluate("document.documentElement.scrollHeight")
+                for _ in range(5):
+                    page.evaluate(f"window.scrollTo(0, {scroll_height});")
+                    time.sleep(1)
+                elements = page.query_selector_all("a[href*='/video/']")
+                if elements:
+                    random_element = random.choice(elements)
+                    random_element.click()
+                time.sleep(5)
                 page.close()
                 context.close()
                 running[index] = ["Click Success", url, click]
