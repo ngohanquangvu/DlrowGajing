@@ -2,8 +2,8 @@ os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
 
 # Thông tin proxy
 proxy_server = 'http://ipv6.proxiware.com:8080'
-username = 'IJteg9PjC5Qj'
-password = '7nxIDbh2ZsEV'
+username = 'qIGEgRo2y4Me'
+password = 'iK9asQaKxTD0'
 
 def run(playwright, dem, index, lock):
     global list_url, running, url_complete, timeout, delay
