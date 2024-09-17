@@ -77,6 +77,12 @@ def run_view(url, index, target_view, thread_per_link):
                     "http":f"http://{pr}",
                     "https":f"http://{pr}"
                 }
+                # pr = random.choice(open("proxy.txt", "r").read().split("\n"))
+
+                # p = {
+                #     "http":pr,
+                #     "https":pr
+                # }
                 try:
                     h = {
                         "Authorization":token
