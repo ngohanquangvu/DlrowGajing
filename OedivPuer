@@ -63,7 +63,7 @@ def save_video(url, email, password):
                     print(i[j]['q'])
                     break
             except: 
-                open("Result.txt", "a", encoding="utf-8").write(f"Lỗi không có quality\n {a}\n")
+                open("Result.txt", "a", encoding="utf-8").write(f"Lỗi không có quality\n {a}\n{url}\n------\n")
                 return None
         print(quality)
         d = {
@@ -89,7 +89,7 @@ def save_video(url, email, password):
                 f.write(a.content)
             return aaa
         except:
-            open("Result.txt", "a", encoding="utf-8").write(f"Lỗi không có url_download\n {download}\n")
+            open("Result.txt", "a", encoding="utf-8").write(f"Lỗi không có url_download\n {download}\n{url}\n-------\n")
             return None
     except Exception as e:
         tb = e.__traceback__
