@@ -545,18 +545,20 @@ def login_and_post(email, password, data, lang, cat, access_token=None):
             frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đang tải video\n')
             frame_text_box.configure(state = "disabled")
             video = save_video(url_video, email, password)
-            while video==None:
-                video = save_video(url_video, email, password)
-            frame_text_box.configure(state = "normal")
-            frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
-            frame_text_box.configure(state = "disabled")
-            check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
-            os.remove(video)
-            os.remove(img)
-            if check==None:
-                break
-            dem-=1
-            time.sleep(int(delay.get()))
+            if video!=None:
+                frame_text_box.configure(state = "normal")
+                frame_text_box.insert(customtkinter.END, f'[{email}:{password}] Đã tải video\n')
+                frame_text_box.configure(state = "disabled")
+                check = upload_video(access_token, title, description, video, img, lang, cat, email, password)
+                os.remove(video)
+                os.remove(img)
+                if check==None:
+                    break
+                dem-=1
+                time.sleep(int(delay.get()))
+            else:
+                dem-=1
+                time.sleep(int(delay.get()))
         except Exception as e:
             tb = e.__traceback__
             error_message = f"Exception: {e} | "
