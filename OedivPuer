@@ -47,8 +47,7 @@ global_proxy = {
 
 
 def save_video(url, email, password):
-    title = YouTube(url).title
-    aaa = f'./VideoData/{title}.mp4'
+    aaa = f'./VideoData/{time.time()}.mp4'
     try:
         d = {
             'k_query': url,
