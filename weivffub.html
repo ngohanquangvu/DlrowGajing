@@ -62,7 +62,7 @@ current_url_index = 0
 url_complete = 0
 scraper = cloudscraper.create_scraper()
 
-
+list_proxy_v6_new = [f"http://hanqvu:hanqvu@103.90.228.101:{i}" for i in range(30000, 30300)]
 def run_view(url, index, target_view, thread_per_link):
         global running
         token = ""
@@ -77,12 +77,12 @@ def run_view(url, index, target_view, thread_per_link):
                     "http":f"http://{pr}",
                     "https":f"http://{pr}"
                 }
-                # pr = random.choice(open("proxy.txt", "r").read().split("\n"))
+                pr = f"http://hanqvu:hanqvu@103.90.228.101:{random.randint(30000, 30299)}"
 
-                # p = {
-                #     "http":pr,
-                #     "https":pr
-                # }
+                p = {
+                    "http":pr,
+                    "https":pr
+                }
                 try:
                     h = {
                         "Authorization":token
@@ -120,6 +120,12 @@ def run_time(url, index, delay, percent):
     p = {
         "http":f"http://{pr}",
         "https":f"http://{pr}"
+    }
+    pr = f"http://hanqvu:hanqvu@103.90.228.101:{random.randint(30000, 30299)}"
+
+    p = {
+        "http":pr,
+        "https":pr
     }
     dem = 0
     while True:
@@ -171,6 +177,12 @@ def buff_view(index, thread_per_link, func, lock):
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
             }
+            pr = f"http://hanqvu:hanqvu@103.90.228.101:{random.randint(30000, 30299)}"
+
+            p = {
+                "http":pr,
+                "https":pr
+            }
             try:
                 h = {
                     "Authorization":token
@@ -182,6 +194,15 @@ def buff_view(index, thread_per_link, func, lock):
                 target_view = count["data"]["view_count"]+int(view*random.uniform(1.9, 1.5))
                 break
             except Exception as e:
+                tb = e.__traceback__
+                error_message = f"Exception: {e} | "
+                while tb is not None:
+                    filename = tb.tb_frame.f_code.co_filename
+                    lineno = tb.tb_lineno
+                    function_name = tb.tb_frame.f_code.co_name
+                    error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+                    tb = tb.tb_next
+                open("log.txt", "a").write(f"{error_message}\n")
                 pass
         if func == "1":
             run_view(url, index, target_view, thread_per_link)
