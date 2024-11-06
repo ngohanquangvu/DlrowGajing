@@ -1,6 +1,6 @@
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
 
-proxy_server = f'http://usa.rotating.proxyrack.net:{random.randint(9000,9050)}'
+proxy_server = f'http://private.residential.proxyrack.net:{random.randint(10000,10004)}'
 username = 'tenica'
 password = 'MZ1Q5XU-QCJFZEO-LKSA1T2-RLBJWQQ-DY5OE8P-XPQTPYI-S1QXJW6'
 
