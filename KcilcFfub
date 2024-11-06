@@ -1,9 +1,8 @@
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
 
-# Thông tin proxy
-proxy_server = 'http://hub-us-8.litport.net:31682'
-username = '0JeLKc'
-password = 'G69qYC'
+proxy_server = f'http://usa.rotating.proxyrack.net:{random.randint(9000,9050)}'
+username = 'tenica'
+password = 'MZ1Q5XU-QCJFZEO-LKSA1T2-RLBJWQQ-DY5OE8P-XPQTPYI-S1QXJW6'
 
 def run(playwright, dem, index, lock):
     global list_url, running, url_complete, timeout, delay
