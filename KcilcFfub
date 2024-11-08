@@ -1,18 +1,13 @@
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
+proxy_server = ""
+username = ""
+password = ""
 
-proxy_server = f'http://usa.rotating.proxyrack.net:{random.randint(9000,9050)}'
-username = 'tenica'
-password = 'MZ1Q5XU-QCJFZEO-LKSA1T2-RLBJWQQ-DY5OE8P-XPQTPYI-S1QXJW6'
 
 def run(playwright, dem, index, lock):
-    global list_url, running, url_complete, timeout, delay
-    headless = True
+    global list_url, running, url_complete, timeout, delay, proxy_server, username, password
+    headless = False
     mp4 = True
-    browser = playwright.firefox.launch(proxy={
-        "server": proxy_server,
-        "username": username,
-        "password": password
-    }, headless=headless)
     while True:
         click = 0
         with lock:
@@ -20,6 +15,16 @@ def run(playwright, dem, index, lock):
                 break
             url = list_url.pop(0)
         while click < dem:  # Số lần truy cập lại URL
+            while True:
+                try:
+                    browser = playwright.firefox.launch(proxy={
+                        "server": proxy_server,
+                        "username": username,
+                        "password": password
+                    }, headless=headless)
+                    break
+                except:
+                    pass
             running[index] = ["Clicking", url, click]
             context = browser.new_context()
             page = context.new_page()
@@ -45,29 +50,13 @@ def run(playwright, dem, index, lock):
                 time.sleep(5)
                 page.close()
                 context.close()
+                browser.close()
                 running[index] = ["Click Success", url, click]
                 click += 1
-                if headless==False:
-                    headless = not headless
-                    browser.close()
-                    browser = playwright.firefox.launch(proxy={
-                        "server": proxy_server,
-                        "username": username,
-                        "password": password
-                    }, headless=headless)
             except:
-                page.close()
-                context.close()
-                browser.close()
-                headless = not headless
-                browser = playwright.firefox.launch(proxy={
-                    "server": proxy_server,
-                    "username": username,
-                    "password": password
-                }, headless=headless)
                 running[index] = ["Reload", url, click]
+                pass
         url_complete += 1
-    browser.close()
     running[index] = ["Done", "", ""]
 
 def process_url(dem, index, lock):
@@ -133,7 +122,17 @@ while True:
         print("Số thời gian treo tab phải là số nguyên")
         continue
 
-
+def get_proxy(key):
+    global status, proxy_server, username, password
+    while status:
+        try:
+            a = requests.get(f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey={key}&country=United+States&type=residential")
+            proxy_server = f'http://{a.json()["data"]["proxy"]}'
+            username = a.json()["data"]["username"]
+            password = a.json()["data"]["password"]
+        except:
+            pass
+        time.sleep(60)
 url_complete = 0
 running = [['','',''] for _ in range(luong)]
 lock = threading.Lock()
@@ -141,6 +140,8 @@ status = True
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
+tt = threading.Thread(target=get_proxy, args=("E7111978AEB60BB8294FC431CBCA85F4",))
+tt.start()
 threads = []
 for i in range(luong):
     thread = threading.Thread(target=process_url, args=(dem, i, lock))
@@ -149,6 +150,7 @@ for i in range(luong):
 for thread in threads:
     thread.join()
 t.join()
+tt.join()
 end_time = time.time()
 
 execution_time = end_time - start_time
