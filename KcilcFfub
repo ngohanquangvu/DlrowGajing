@@ -6,8 +6,7 @@ password = 'MZ1Q5XU-QCJFZEO-LKSA1T2-RLBJWQQ-DY5OE8P-XPQTPYI-S1QXJW6'
 
 def run(playwright, dem, index, lock):
     global list_url, running, url_complete, timeout, delay
-    headless = True
-    mp4 = True
+    headless = False
     browser = playwright.firefox.launch(proxy={
         "server": proxy_server,
         "username": username,
@@ -23,49 +22,72 @@ def run(playwright, dem, index, lock):
             running[index] = ["Clicking", url, click]
             context = browser.new_context()
             page = context.new_page()
-            try:
-                page.goto(url, timeout=timeout*1000, wait_until="domcontentloaded")
-                if mp4==True:
-                    try:
-                        if "video" in url or "shorts" in url:
-                            page.wait_for_event('request', lambda request: request.url.endswith('.mp4'), timeout=timeout*1000)
-                    except: 
-                        mp4 = False
-                else:
-                    time.sleep(5)
-                time.sleep(delay+random.randint(5, 20))
-                scroll_height = page.evaluate("document.documentElement.scrollHeight")
-                for _ in range(5):
-                    page.evaluate(f"window.scrollTo(0, {scroll_height});")
-                    time.sleep(1)
-                elements = page.query_selector_all("a[href*='/video/']")
-                if elements:
-                    random_element = random.choice(elements)
-                    random_element.click()
-                time.sleep(5)
-                page.close()
-                context.close()
-                running[index] = ["Click Success", url, click]
-                click += 1
-                if headless==False:
-                    headless = not headless
-                    browser.close()
-                    browser = playwright.firefox.launch(proxy={
-                        "server": proxy_server,
-                        "username": username,
-                        "password": password
-                    }, headless=headless)
-            except:
-                page.close()
-                context.close()
-                browser.close()
-                headless = not headless
-                browser = playwright.firefox.launch(proxy={
-                    "server": proxy_server,
-                    "username": username,
-                    "password": password
-                }, headless=headless)
-                running[index] = ["Reload", url, click]
+            refresh_count = 0
+            max_refresh = 5
+
+            while True:
+                try:
+                    page.goto(url, timeout=30000, wait_until="domcontentloaded")
+
+                    # Thời gian timeout để kiểm tra video
+                    check_timeout = timeout
+                    start_time = time.time()
+                    video_playing = False
+
+                    while time.time() - start_time < check_timeout:
+                        video_playing = page.evaluate("""
+                            (function() {
+                                var videos = document.querySelectorAll('video');
+                                for (var i = 0; i < videos.length; i++) {
+                                    if (!videos[i].paused) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            })();
+                        """)
+                        if video_playing:
+                            break
+                        time.sleep(1)  # Chờ một giây trước khi kiểm tra lại
+
+                        # Nếu trang đã load hoàn toàn mà video không phát, reload lại trang
+                        if page.evaluate("document.readyState") == "complete" and not video_playing:
+                            refresh_count += 1
+                            if refresh_count > max_refresh:
+                                print(f"Failed to load video after {max_refresh} refreshes, closing page.")
+                                page.close()
+                                context.close()
+                                break
+                            page.reload()
+                            start_time = time.time()  # Reset lại thời gian bắt đầu kiểm tra
+
+                    if refresh_count > max_refresh:
+                        continue
+
+                    # Cuộn xuống một độ cao ngẫu nhiên sau khi video đã phát
+                    if video_playing:
+                        scroll_height = page.evaluate("document.documentElement.scrollHeight")
+                        random_scroll_height = random.randint(0, scroll_height)
+                        page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
+                        time.sleep(1)
+
+                        # Bấm vào một URL bất kỳ trong trang
+                        elements = page.query_selector_all("a[href]")
+                        if elements:
+                            random_element = random.choice(elements)
+                            random_element.click()
+                        time.sleep(delay)
+
+                    page.close()
+                    context.close()
+                    running[index] = ["Click Success", url, click]
+                    click += 1
+                    break
+                except Exception as e:
+                    print(f"Error: {e}")
+                    page.close()
+                    context.close()
+                    break
         url_complete += 1
     browser.close()
     running[index] = ["Done", "", ""]
