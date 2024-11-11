@@ -76,7 +76,7 @@ def run(playwright, dem, index, lock):
                         if elements:
                             random_element = random.choice(elements)
                             random_element.click()
-                        time.sleep(delay)
+                        time.sleep(5) 
 
                     page.close()
                     context.close()
