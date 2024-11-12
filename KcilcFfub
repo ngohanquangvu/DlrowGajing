@@ -62,6 +62,8 @@ def run(playwright, dem, index, lock):
                             start_time = time.time()  # Reset lại thời gian bắt đầu kiểm tra
 
                     if refresh_count > max_refresh:
+                        page.close()
+                        context.close()
                         continue
 
                     # Cuộn xuống một độ cao ngẫu nhiên sau khi video đã phát
@@ -76,7 +78,7 @@ def run(playwright, dem, index, lock):
                         if elements:
                             random_element = random.choice(elements)
                             random_element.click()
-                        time.sleep(5) 
+                        time.sleep(5)
 
                     page.close()
                     context.close()
