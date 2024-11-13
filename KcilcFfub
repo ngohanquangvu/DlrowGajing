@@ -1,17 +1,20 @@
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
 
-proxy_server = f'http://usa.rotating.proxyrack.net:{random.randint(9000,9050)}'
-username = 'tenica'
-password = 'MZ1Q5XU-QCJFZEO-LKSA1T2-RLBJWQQ-DY5OE8P-XPQTPYI-S1QXJW6'
+def get_proxy():
+    return "http://s2.proxyxoay.net:8023", "nhqvu", "nhqvu"
+def change_proxy():
+    global status
+    while status:
+        try:
+            a = requests.get("https://proxyxoay.net/api/rotating-proxy/change-key-ip/51c77e0f-b4c3-4982-87f4-0d7b74f15879")
+        except:
+            time.sleep(5)
+            continue
+        time.sleep(60)
 
-def run(playwright, dem, index, lock):
-    global list_url, running, url_complete, timeout, delay
+def run(playwright, dem, index, proxy_type, lock):
+    global list_url, running, url_complete, timeout
     headless = False
-    browser = playwright.firefox.launch(proxy={
-        "server": proxy_server,
-        "username": username,
-        "password": password
-    }, headless=headless)
     while True:
         click = 0
         with lock:
@@ -19,6 +22,18 @@ def run(playwright, dem, index, lock):
                 break
             url = list_url.pop(0)
         while click < dem:  # Số lần truy cập lại URL
+            if proxy_type == 1:
+                proxy_server = f'http://usa.rotating.proxyrack.net:{random.randint(9000,9050)}'
+                username = 'tenica'
+                password = 'MZ1Q5XU-QCJFZEO-LKSA1T2-RLBJWQQ-DY5OE8P-XPQTPYI-S1QXJW6'
+            else:
+                proxy_server, username, password = get_proxy()
+
+            browser = playwright.firefox.launch(proxy={
+                "server": proxy_server,
+                "username": username,
+                "password": password
+            }, headless=headless)
             running[index] = ["Clicking", url, click]
             context = browser.new_context()
             page = context.new_page()
@@ -52,18 +67,35 @@ def run(playwright, dem, index, lock):
 
                         # Nếu trang đã load hoàn toàn mà video không phát, reload lại trang
                         if page.evaluate("document.readyState") == "complete" and not video_playing:
+                            time.sleep(7)
+                            video_playing = page.evaluate("""
+                                (function() {
+                                    var videos = document.querySelectorAll('video');
+                                    for (var i = 0; i < videos.length; i++) {
+                                        if (!videos[i].paused) {
+                                            return true;
+                                        }
+                                    }
+                                    return false;
+                                })();
+                            """)
+                            if video_playing:
+                                break
+
                             refresh_count += 1
                             if refresh_count > max_refresh:
                                 print(f"Failed to load video after {max_refresh} refreshes, closing page.")
                                 page.close()
                                 context.close()
+                                browser.close()
                                 break
                             page.reload()
-                            start_time = time.time()  # Reset lại thời gian bắt đầu kiểm tra
+                            start_time = time.time()  # Reset lại thời gian bắt đầu kiểm tra  # Reset lại thời gian bắt đầu kiểm tra
 
                     if refresh_count > max_refresh:
                         page.close()
                         context.close()
+                        browser.close()
                         continue
 
                     # Cuộn xuống một độ cao ngẫu nhiên sau khi video đã phát
@@ -82,6 +114,7 @@ def run(playwright, dem, index, lock):
 
                     page.close()
                     context.close()
+                    browser.close()
                     running[index] = ["Click Success", url, click]
                     click += 1
                     break
@@ -89,14 +122,14 @@ def run(playwright, dem, index, lock):
                     print(f"Error: {e}")
                     page.close()
                     context.close()
+                    browser.close()
                     break
         url_complete += 1
-    browser.close()
     running[index] = ["Done", "", ""]
 
-def process_url(dem, index, lock):
+def process_url(dem, index, lock, proxy_type):
         with sync_playwright() as playwright:
-            run(playwright, dem, index, lock)
+            run(playwright, dem, index, proxy_type, lock)
 
 def checking():
     global url_complete, running, start_time, status
@@ -151,10 +184,13 @@ while True:
 
 while True:
     try:
-        delay = int(input("Nhập thời gian treo tab(s): "))
+        proxy_type = int(input("Chọn loại proxy (1. Proxy us |2. Proxy Vn): "))
+        if proxy_type not in [1, 2]:
+            print("Loại proxy không hợp lệ")
+            continue
         break
     except ValueError:
-        print("Số thời gian treo tab phải là số nguyên")
+        print("Loại proxy phải là số nguyên")
         continue
 
 
@@ -165,14 +201,17 @@ status = True
 start_time = time.time()
 t = threading.Thread(target=checking)
 t.start()
+tt = threading.Thread(target=change_proxy)
+tt.start()
 threads = []
 for i in range(luong):
-    thread = threading.Thread(target=process_url, args=(dem, i, lock))
+    thread = threading.Thread(target=process_url, args=(dem, i, lock, proxy_type,))
     threads.append(thread)
     thread.start()
 for thread in threads:
     thread.join()
 t.join()
+tt.join()
 end_time = time.time()
 
 execution_time = end_time - start_time
