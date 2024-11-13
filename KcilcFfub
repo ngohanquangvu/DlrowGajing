@@ -119,7 +119,6 @@ def run(playwright, dem, index, proxy_type, lock):
                     click += 1
                     break
                 except Exception as e:
-                    print(f"Error: {e}")
                     page.close()
                     context.close()
                     browser.close()
