@@ -109,9 +109,9 @@ def run(playwright, dem, index, proxy_type, lock):
                             browser.close()
                             continue
                     else:
-                        while True:
+                        while time.time() - start_time < check_timeout:
                             try:
-                                time.sleep(5)
+                                time.sleep(1)
                                 if page.evaluate("document.readyState") == "complete":
                                     video_playing = True
                                     break
