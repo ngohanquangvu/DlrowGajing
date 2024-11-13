@@ -1,23 +1,15 @@
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
-proxy_server = ""
-username = ""
-password = ""
-
 def get_proxy():
-    return proxy_server, username, password
+    return "http://s2.proxyxoay.net:8023", "nhqvu", "nhqvu"
 def change_proxy():
-    global status, proxy_server, username, password
+    global status
     while status:
         try:
-            a = requests.get("https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=AC64C1FD94439FB81A5A9E1E348DE98D&country=Vietnam&type=residential").json()
-            proxy_server = f'http://{a["data"]["proxy"]}'
-            username = a["data"]["username"]
-            password = a["data"]["password"]
+            a = requests.get("https://proxyxoay.net/api/rotating-proxy/change-key-ip/51c77e0f-b4c3-4982-87f4-0d7b74f15879")
         except:
             time.sleep(5)
             continue
-        time.sleep(120)
-
+        time.sleep(60)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password
     headless = False
