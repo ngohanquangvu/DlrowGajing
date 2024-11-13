@@ -1,19 +1,25 @@
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
+proxy_server = ""
+username = ""
+password = ""
 
 def get_proxy():
-    return "http://s2.proxyxoay.net:8023", "nhqvu", "nhqvu"
+    return proxy_server, username, password
 def change_proxy():
-    global status
+    global status, proxy_server, username, password
     while status:
         try:
-            a = requests.get("https://proxyxoay.net/api/rotating-proxy/change-key-ip/51c77e0f-b4c3-4982-87f4-0d7b74f15879")
+            a = requests.get("https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=AC64C1FD94439FB81A5A9E1E348DE98D&country=Vietnam&type=residential").json()
+            proxy_server = a["data"]["proxy"]
+            username = a["data"]["username"]
+            password = a["data"]["password"]
         except:
             time.sleep(5)
             continue
-        time.sleep(60)
+        time.sleep(120)
 
 def run(playwright, dem, index, proxy_type, lock):
-    global list_url, running, url_complete, timeout
+    global list_url, running, url_complete, timeout, proxy_server, username, password
     headless = False
     while True:
         click = 0
@@ -28,12 +34,16 @@ def run(playwright, dem, index, proxy_type, lock):
                 password = 'MZ1Q5XU-QCJFZEO-LKSA1T2-RLBJWQQ-DY5OE8P-XPQTPYI-S1QXJW6'
             else:
                 proxy_server, username, password = get_proxy()
-
-            browser = playwright.firefox.launch(proxy={
-                "server": proxy_server,
-                "username": username,
-                "password": password
-            }, headless=headless)
+            while True:
+                try:
+                    browser = playwright.firefox.launch(proxy={
+                        "server": proxy_server,
+                        "username": username,
+                        "password": password
+                    }, headless=headless)
+                    break
+                except:
+                    continue
             running[index] = ["Clicking", url, click]
             context = browser.new_context()
             page = context.new_page()
@@ -119,6 +129,7 @@ def run(playwright, dem, index, proxy_type, lock):
                     click += 1
                     break
                 except Exception as e:
+                    print(f"Error: {e}")
                     page.close()
                     context.close()
                     browser.close()
