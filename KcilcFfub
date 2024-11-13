@@ -1,18 +1,23 @@
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
+proxy_server = ""
+username = ""
+password = ""
 def get_proxy():
-    return "http://s2.proxyxoay.net:8023", "nhqvu", "nhqvu"
+    return proxy_server, username, password
 def change_proxy():
-    global status
+    global status, proxy_server, username, password
     while status:
         try:
-            a = requests.get("https://proxyxoay.net/api/rotating-proxy/change-key-ip/51c77e0f-b4c3-4982-87f4-0d7b74f15879")
+            a = requests.get("https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=AC64C1FD94439FB81A5A9E1E348DE98D&country=Vietnam&type=datacenter")
+            proxy_server = f'http://{a.json()["data"]["proxy"]}'
+            username = a.json()["data"]["username"] 
+            password = a.json()["data"]["password"]
         except:
             time.sleep(5)
             continue
-        time.sleep(60)
+        time.sleep(120)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password
-    headless = False
+    headless = True
     while True:
         click = 0
         with lock:
@@ -66,7 +71,7 @@ def run(playwright, dem, index, proxy_type, lock):
                             """)
                             if video_playing:
                                 break
-                            time.sleep(1)  # Chờ một giây trước khi kiểm tra lại
+                            time.sleep(0.5)  # Chờ một giây trước khi kiểm tra lại
 
                             # Nếu trang đã load hoàn toàn mà video không phát, reload lại trang
                             if page.evaluate("document.readyState") == "complete" and not video_playing:
@@ -87,7 +92,6 @@ def run(playwright, dem, index, proxy_type, lock):
 
                                 refresh_count += 1
                                 if refresh_count > max_refresh:
-                                    print(f"Failed to load video after {max_refresh} refreshes, closing page.")
                                     page.close()
                                     context.close()
                                     browser.close()
@@ -131,7 +135,6 @@ def run(playwright, dem, index, proxy_type, lock):
                     click += 1
                     break
                 except Exception as e:
-                    print(f"Error: {e}")
                     page.close()
                     context.close()
                     browser.close()
