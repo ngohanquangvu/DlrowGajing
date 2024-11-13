@@ -57,27 +57,10 @@ def run(playwright, dem, index, proxy_type, lock):
                     # Thời gian timeout để kiểm tra video
                     check_timeout = timeout
                     start_time = time.time()
-                    video_playing = False
+                    if "/video/" in url or "shorts" in url or "live" in url:
+                        video_playing = False
 
-                    while time.time() - start_time < check_timeout:
-                        video_playing = page.evaluate("""
-                            (function() {
-                                var videos = document.querySelectorAll('video');
-                                for (var i = 0; i < videos.length; i++) {
-                                    if (!videos[i].paused) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            })();
-                        """)
-                        if video_playing:
-                            break
-                        time.sleep(1)  # Chờ một giây trước khi kiểm tra lại
-
-                        # Nếu trang đã load hoàn toàn mà video không phát, reload lại trang
-                        if page.evaluate("document.readyState") == "complete" and not video_playing:
-                            time.sleep(7)
+                        while time.time() - start_time < check_timeout:
                             video_playing = page.evaluate("""
                                 (function() {
                                     var videos = document.querySelectorAll('video');
@@ -91,22 +74,49 @@ def run(playwright, dem, index, proxy_type, lock):
                             """)
                             if video_playing:
                                 break
+                            time.sleep(1)  # Chờ một giây trước khi kiểm tra lại
 
-                            refresh_count += 1
-                            if refresh_count > max_refresh:
-                                print(f"Failed to load video after {max_refresh} refreshes, closing page.")
-                                page.close()
-                                context.close()
-                                browser.close()
-                                break
-                            page.reload()
-                            start_time = time.time()  # Reset lại thời gian bắt đầu kiểm tra  # Reset lại thời gian bắt đầu kiểm tra
+                            # Nếu trang đã load hoàn toàn mà video không phát, reload lại trang
+                            if page.evaluate("document.readyState") == "complete" and not video_playing:
+                                time.sleep(7)
+                                video_playing = page.evaluate("""
+                                    (function() {
+                                        var videos = document.querySelectorAll('video');
+                                        for (var i = 0; i < videos.length; i++) {
+                                            if (!videos[i].paused) {
+                                                return true;
+                                            }
+                                        }
+                                        return false;
+                                    })();
+                                """)
+                                if video_playing:
+                                    break
 
-                    if refresh_count > max_refresh:
-                        page.close()
-                        context.close()
-                        browser.close()
-                        continue
+                                refresh_count += 1
+                                if refresh_count > max_refresh:
+                                    print(f"Failed to load video after {max_refresh} refreshes, closing page.")
+                                    page.close()
+                                    context.close()
+                                    browser.close()
+                                    break
+                                page.reload()
+                                start_time = time.time()  # Reset lại thời gian bắt đầu kiểm tra  # Reset lại thời gian bắt đầu kiểm tra
+
+                        if refresh_count > max_refresh:
+                            page.close()
+                            context.close()
+                            browser.close()
+                            continue
+                    else:
+                        while True:
+                            try:
+                                time.sleep(5)
+                                if page.evaluate("document.readyState") == "complete":
+                                    video_playing = True
+                                    break
+                            except:
+                                continue
 
                     # Cuộn xuống một độ cao ngẫu nhiên sau khi video đã phát
                     if video_playing:
