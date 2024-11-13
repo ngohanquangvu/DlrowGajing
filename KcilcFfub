@@ -10,7 +10,7 @@ def change_proxy():
     while status:
         try:
             a = requests.get("https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=AC64C1FD94439FB81A5A9E1E348DE98D&country=Vietnam&type=residential").json()
-            proxy_server = a["data"]["proxy"]
+            proxy_server = f'http://{a["data"]["proxy"]}'
             username = a["data"]["username"]
             password = a["data"]["password"]
         except:
