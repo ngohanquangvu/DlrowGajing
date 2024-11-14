@@ -41,7 +41,7 @@ def run_click(url, target, index):
                         "server": proxy_server,
                         "username": username,
                         "password": password
-                    }, headless=False)
+                    }, headless=True)
                     break
                 except Exception as e:
                     continue
