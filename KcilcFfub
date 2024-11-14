@@ -1,4 +1,3 @@
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
 proxy_server = ""
 username = ""
 password = ""
@@ -7,9 +6,9 @@ def get_proxy():
 def change_proxy(type):
     global status, proxy_server, username, password
     if type == 1:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=AC64C1FD94439FB81A5A9E1E348DE98D&country=Vietnam&type=datacenter"
-    else:
         url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=6A8167DC4986FF4568663B5A70B564D5&country=United+States&type=datacenter"
+    else:
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=AC64C1FD94439FB81A5A9E1E348DE98D&country=Vietnam&type=datacenter"
     while status:
         try:
             a = requests.get(url)
