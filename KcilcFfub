@@ -25,7 +25,10 @@ def change_proxy(type):
         except:
             time.sleep(5)
             continue
-        time.sleep(120)
+        if type == 1:
+            time.sleep(60)
+        else:
+            time.sleep(120)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password
     headless = True
