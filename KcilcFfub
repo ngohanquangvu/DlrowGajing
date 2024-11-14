@@ -29,13 +29,12 @@ def change_proxy(type):
             time.sleep(60)
         else:
             time.sleep(120)
-def run_click(url, target, index, playwright):
-    global running
+def run_click(url, target, index):
+    global running, proxy_server, username, password
     total_click = 0
-    def run(target):
+    def run_inside(target, playwright):
         nonlocal total_click
         while True:
-            proxy_server, username, password = get_proxy()
             while True:
                 try:
                     browser = playwright.firefox.launch(proxy={
@@ -44,7 +43,7 @@ def run_click(url, target, index, playwright):
                         "password": password
                     }, headless=False)
                     break
-                except:
+                except Exception as e:
                     continue
             running[index] = ["Clicking", url, total_click]
             context = browser.new_context()
@@ -55,8 +54,6 @@ def run_click(url, target, index, playwright):
             while True:
                 try:
                     page.goto(url, timeout=30000, wait_until="domcontentloaded")
-
-                    # Thời gian timeout để kiểm tra video
                     check_timeout = timeout
                     start_time = time.time()
                     if "/video/" in url or "shorts" in url or "live" in url:
@@ -100,7 +97,7 @@ def run_click(url, target, index, playwright):
                                     browser.close()
                                     break
                                 page.reload()
-                                start_time = time.time()  # Reset lại thời gian bắt đầu kiểm tra  # Reset lại thời gian bắt đầu kiểm tra
+                                start_time = time.time()
 
                         if refresh_count > max_refresh:
                             page.close()
@@ -141,16 +138,19 @@ def run_click(url, target, index, playwright):
             if total_click>=target:
                 running[index] = ["Done", url, total_click]
                 break
+    def process_run(target):
+        with sync_playwright() as playwright:
+            run_inside(target, playwright)
     threads = []
     for i in range(10):
-        thread = threading.Thread(target=run, args=(target,))
+        thread = threading.Thread(target=process_run, args=(target,))
         threads.append(thread)
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
 
-def run(playwright, dem, index, proxy_type, lock):
+def run(dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password
     headless = True
     while True:
@@ -158,11 +158,10 @@ def run(playwright, dem, index, proxy_type, lock):
             if len(list_url) == 0:
                 break
             url = list_url.pop(0)
-        run_click(url, dem, index, playwright)
+            run_click(url, dem, index)
         
 def process_url(dem, index, lock, proxy_type):
-        with sync_playwright() as playwright:
-            run(playwright, dem, index, proxy_type, lock)
+    run(dem, index, proxy_type, lock)
 
 def checking():
     global url_complete, running, start_time, status
