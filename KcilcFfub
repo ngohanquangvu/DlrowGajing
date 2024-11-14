@@ -121,32 +121,30 @@ def run_click(url, target, index):
                     page.close()
                     context.close()
                     break
-    def process_run(target):
-        nonlocal total_click
-        with sync_playwright() as playwright:
+    with sync_playwright() as playwright:
+        while True:
             while True:
-                while True:
-                    try:
-                        browser = playwright.firefox.launch(proxy={
-                            "server": proxy_server,
-                            "username": username,
-                            "password": password
-                        }, headless=True)
-                        break
-                    except Exception as e:
-                        continue
-                run_inside(browser)
-                if total_click >= target:
-                    running[index] = ["Done", url, total_click]
+                try:
+                    browser = playwright.firefox.launch(proxy={
+                        "server": proxy_server,
+                        "username": username,
+                        "password": password
+                    }, headless=True)
                     break
-    threads = []
-    for i in range(2):
-        thread = threading.Thread(target=process_run, args=(target,))
-        threads.append(thread)
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+                except Exception as e:
+                    continue
+            threads = []
+            for i in range(2):
+                thread = threading.Thread(target=run_inside, args=(browser,))
+                threads.append(thread)
+            for thread in threads:   
+                thread.start()
+            for thread in threads:
+                thread.join()
+            if total_click >= target:
+                running[index] = ["Done", url, total_click]
+                break
+
 
 def run(dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password
