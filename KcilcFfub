@@ -32,19 +32,8 @@ def change_proxy(type):
 def run_click(url, target, index):
     global running, proxy_server, username, password
     total_click = 0
-    def run_inside(target, playwright):
-        nonlocal total_click
-        while True:
-            while True:
-                try:
-                    browser = playwright.firefox.launch(proxy={
-                        "server": proxy_server,
-                        "username": username,
-                        "password": password
-                    }, headless=True)
-                    break
-                except Exception as e:
-                    continue
+    def run_inside(browser):    
+            nonlocal total_click
             running[index] = ["Clicking", url, total_click]
             context = browser.new_context()
             page = context.new_page()
@@ -102,7 +91,6 @@ def run_click(url, target, index):
                         if refresh_count > max_refresh:
                             page.close()
                             context.close()
-                            browser.close()
                             continue
                     else:
                         while time.time() - start_time_run < check_timeout:
@@ -126,21 +114,31 @@ def run_click(url, target, index):
 
                     page.close()
                     context.close()
-                    browser.close()
                     running[index] = ["Click Success", url, total_click]
                     total_click += 1
                     break
                 except Exception as e:
                     page.close()
                     context.close()
-                    browser.close()
                     break
-            if total_click>=target:
-                running[index] = ["Done", url, total_click]
-                break
     def process_run(target):
+        nonlocal total_click
         with sync_playwright() as playwright:
-            run_inside(target, playwright)
+            while True:
+                while True:
+                    try:
+                        browser = playwright.firefox.launch(proxy={
+                            "server": proxy_server,
+                            "username": username,
+                            "password": password
+                        }, headless=True)
+                        break
+                    except Exception as e:
+                        continue
+                run_inside(browser)
+                if total_click >= target:
+                    running[index] = ["Done", url, total_click]
+                    break
     threads = []
     for i in range(2):
         thread = threading.Thread(target=process_run, args=(target,))
