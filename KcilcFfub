@@ -142,7 +142,7 @@ def run_click(url, target, index):
         with sync_playwright() as playwright:
             run_inside(target, playwright)
     threads = []
-    for i in range(3):
+    for i in range(2):
         thread = threading.Thread(target=process_run, args=(target,))
         threads.append(thread)
     for thread in threads:
