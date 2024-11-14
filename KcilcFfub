@@ -30,12 +30,7 @@ def run(playwright, dem, index, proxy_type, lock):
                 break
             url = list_url.pop(0)
         while click < dem:  # Số lần truy cập lại URL
-            if proxy_type == 1:
-                proxy_server = f'http://usa.rotating.proxyrack.net:{random.randint(9000,9050)}'
-                username = 'tenica'
-                password = 'MZ1Q5XU-QCJFZEO-LKSA1T2-RLBJWQQ-DY5OE8P-XPQTPYI-S1QXJW6'
-            else:
-                proxy_server, username, password = get_proxy()
+            proxy_server, username, password = get_proxy()
             while True:
                 try:
                     browser = playwright.firefox.launch(proxy={
