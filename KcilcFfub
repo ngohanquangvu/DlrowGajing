@@ -44,7 +44,6 @@ def run(playwright, dem, index, proxy_type, lock):
         while click < dem:  # Số lần truy cập lại URL
             proxy_server, username, password = get_proxy()
             while True:
-                open("proxy.txt", "a").write(f"{proxy_server} | {username} | {password}\n")
                 try:
                     browser = playwright.firefox.launch(proxy={
                         "server": proxy_server,
@@ -53,7 +52,6 @@ def run(playwright, dem, index, proxy_type, lock):
                     }, headless=headless)
                     break
                 except Exception as e:
-                    open("error.txt", "a").write(f"{str(e)}\n")
                     continue
             running[index] = ["Clicking", url, click]
             context = browser.new_context()
