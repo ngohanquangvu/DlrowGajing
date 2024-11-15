@@ -7,9 +7,9 @@ def get_proxy():
 def change_proxy(type):
     global status, proxy_server, username, password
     if type == 1:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=311779A9FFBD367157EE2525F0975AF7&country=United+States&type=datacenter"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=311779A9FFBD367157EE2525F0975AF7&country=United+States"
     else:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=30AC4B7F206A29607F17316F44CF9267&country=Vietnam&type=datacenter"
+        url ="https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=30AC4B7F206A29607F17316F44CF9267&country=Vietnam"
     while status:
         try:
             a = requests.get(url)
