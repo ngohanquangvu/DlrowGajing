@@ -22,7 +22,6 @@ def change_proxy(type):
                 username = "hanqvu" 
                 password = "hanqvu"
         except Exception as e:
-            open("error.txt", "a").write(f"{str(e)}\n")
             time.sleep(5)
             continue
         time.sleep(120)
