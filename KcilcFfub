@@ -7,22 +7,22 @@ def get_proxy():
 def change_proxy(type):
     global status, proxy_server, username, password
     if type == 1:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=44D7EC97D660EC73A923128FF061A706&country=United+States"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=311779A9FFBD367157EE2525F0975AF7&country=United+States&type=datacenter"
     else:
-        url ="https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=624AE17EB0ECFA163C0D931C2BDE54D1&country=Vietnam"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=30AC4B7F206A29607F17316F44CF9267&country=Vietnam&type=datacenter"
     while status:
         try:
             a = requests.get(url)
             if type == 1:
-                    proxy_server = f'http://{a.json()["data"]["proxy"]}'
-                    username = a.json()["data"]["username"] 
-                    password = a.json()["data"]["password"]
-                
-            else:
                 proxy_server = f'http://{a.json()["data"]["proxy"]}'
                 username = a.json()["data"]["username"] 
                 password = a.json()["data"]["password"]
+            else:
+                proxy_server = f'http://103.116.39.192:{random.randint(30000, 30299)}'
+                username = "hanqvu" 
+                password = "hanqvu"
         except Exception as e:
+            open("error.txt", "a").write(f"{str(e)}\n")
             time.sleep(5)
             continue
         time.sleep(120)
@@ -38,6 +38,7 @@ def run(playwright, dem, index, proxy_type, lock):
         while click < dem:  # Số lần truy cập lại URL
             proxy_server, username, password = get_proxy()
             while True:
+                open("proxy.txt", "a").write(f"{proxy_server} | {username} | {password}\n")
                 try:
                     browser = playwright.firefox.launch(proxy={
                         "server": proxy_server,
@@ -46,6 +47,7 @@ def run(playwright, dem, index, proxy_type, lock):
                     }, headless=headless)
                     break
                 except Exception as e:
+                    open("error.txt", "a").write(f"{str(e)}\n")
                     continue
             running[index] = ["Clicking", url, click]
             context = browser.new_context()
