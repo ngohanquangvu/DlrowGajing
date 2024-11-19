@@ -7,9 +7,9 @@ def get_proxy():
 def change_proxy(type):
     global status, proxy_server, username, password
     if type == 1:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=624AE17EB0ECFA163C0D931C2BDE54D1&country=United+States"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=624AE17EB0ECFA163C0D931C2BDE54D1&country=United+States&type=datacenter"
     else:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=30AC4B7F206A29607F17316F44CF9267&country=Vietnam&type=datacenter"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=44D7EC97D660EC73A923128FF061A706&country=Vietnam&type=datacenter"
     while status:
         try:
             a = requests.get(url)
@@ -18,9 +18,12 @@ def change_proxy(type):
                     username = a.json()["data"]["username"] 
                     password = a.json()["data"]["password"]
             else:
-                proxy_server = f'http://103.116.39.192:{random.randint(30000, 30299)}'
-                username = "hanqvu" 
-                password = "hanqvu"
+                # proxy_server = f'http://103.116.39.192:{random.randint(30000, 30299)}'
+                # username = "hanqvu" 
+                # password = "hanqvu"
+                proxy_server = f'http://{a.json()["data"]["proxy"]}'
+                username = a.json()["data"]["username"] 
+                password = a.json()["data"]["password"]
         except Exception as e:
             time.sleep(5)
             continue
