@@ -7,27 +7,35 @@ def get_proxy():
 def change_proxy(type):
     global status, proxy_server, username, password
     if type == 1:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=624AE17EB0ECFA163C0D931C2BDE54D1&country=United+States&type=datacenter"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=624AE17EB0ECFA163C0D931C2BDE54D1&country=United+States"
     else:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=44D7EC97D660EC73A923128FF061A706&country=Vietnam&type=datacenter"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=44D7EC97D660EC73A923128FF061A706&country=Vietnam"
     while status:
         try:
-            # a = requests.get(url)
+            a = requests.get(url)
+            choice = random.choice([1, 2])
             if type == 1:
-                proxy_server = f'http://167.88.169.173:{random.randint(30000, 30099)}'
-                username = "hanqvu" 
-                password = "hanqvu"
+                if choice == 1:
+                    proxy_server = f'http://167.88.169.173:{random.randint(30000, 30099)}'
+                    username = "hanqvu" 
+                    password = "hanqvu"
+                else:
+                    proxy_server = f'http://{a.json()["data"]["proxy"]}'
+                    username = a.json()["data"]["username"] 
+                    password = a.json()["data"]["password"]
             else:
-                proxy_server = f'http://103.116.39.192:{random.randint(30000, 30099)}'
-                username = "hanqvu" 
-                password = "hanqvu"
-                # proxy_server = f'http://{a.json()["data"]["proxy"]}'
-                # username = a.json()["data"]["username"] 
-                # password = a.json()["data"]["password"]
+                if choice == 1:
+                    proxy_server = f'http://103.116.39.192:{random.randint(30000, 30099)}'
+                    username = "hanqvu" 
+                    password = "hanqvu"
+                else:
+                    proxy_server = f'http://{a.json()["data"]["proxy"]}'
+                    username = a.json()["data"]["username"] 
+                    password = a.json()["data"]["password"]
         except Exception as e:
             time.sleep(5)
             continue
-        time.sleep(30)
+        time.sleep(120)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password
     headless = True
