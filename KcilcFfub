@@ -10,7 +10,7 @@ def change_proxy(type):
         url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=624AE17EB0ECFA163C0D931C2BDE54D1&country=United+States"
     else:
         url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=44D7EC97D660EC73A923128FF061A706&country=Vietnam"
-    choice = 0
+    choice = 1
     while status:
         try:
             a = requests.get(url)
