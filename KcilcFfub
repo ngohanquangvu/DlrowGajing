@@ -36,7 +36,7 @@ def change_proxy(type):
         except Exception as e:
             time.sleep(5)
             continue
-        time.sleep(120)
+        choice+=1,time.sleep(120)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password
     headless = True
