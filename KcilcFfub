@@ -25,7 +25,7 @@ def change_proxy(type):
                     username = a.json()["data"]["username"] 
                     password = a.json()["data"]["password"]
             else:
-                if choice%5 != 0:
+                if choice%2 != 0:
                     proxy_server = f'http://103.116.39.192:{random.randint(30000, 30099)}'
                     username = "hanqvu" 
                     password = "hanqvu"
