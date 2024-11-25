@@ -1,41 +1,3 @@
-list_login_token = []
-
-def get_login_token():
-    global list_login_token
-    if len(list_login_token) != 0:
-        return random.choice(list_login_token)
-    else:
-        h = {
-            'Accept-Encoding':'gzip, deflate, br',
-            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
-            'Content-Length':'2',
-            'Content-Type':'application/json',
-            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
-            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
-            'Gjw-Ts':'1710510510579',
-            'Origin':'https://www.ganjingworld.com',
-            'Referer':'https://www.ganjingworld.com/',
-            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
-            'Sec-Ch-Ua-Mobile':'?0',
-            'Sec-Ch-Ua-Platform':'"Windows"',
-            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
-            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
-            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
-        }
-        pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
-        p = {
-            "http":f"http://{pr}",
-            "https":f"http://{pr}"
-        }
-        while True:
-            if len(list_login_token) != 0:
-                return random.choice(list_login_token)
-            try:
-                token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=p).json()["data"]["accessToken"]
-                list_login_token.append(token)
-                return token
-            except: pass
-
 list_uid = []
 list_duration = []
             
@@ -62,7 +24,6 @@ current_url_index = 0
 url_complete = 0
 scraper = cloudscraper.create_scraper()
 
-list_proxy_v6_new = [f"http://hanqvu:hanqvu@103.90.228.101:{i}" for i in range(30000, 30300)]
 def run_view(url, index, target_view, thread_per_link):
         global running
         token = ""
@@ -72,12 +33,7 @@ def run_view(url, index, target_view, thread_per_link):
             global running
             while True:
                 uid = url.split("/")[-1].split("?")[0]
-                pr = "qIGEgRo2y4Me:iK9asQaKxTD0@ipv6.proxiware.com:8080"
-                p = {
-                    "http":f"http://{pr}",
-                    "https":f"http://{pr}"
-                }
-                pr = f"http://hanqvu:hanqvu@103.116.39.192:{random.randint(30000, 30299)}"
+                pr = f"http://hanqvu:hanqvu@180.131.145.178:{random.randint(30000, 30099)}"
 
                 p = {
                     "http":pr,
@@ -100,6 +56,7 @@ def run_view(url, index, target_view, thread_per_link):
                     if maxx_view_per_thread>=target_view:
                         break
                 except Exception as e:
+                    open("error.txt", "a").write(f"{e}\n")
                     pass
         threads = []
         for i in range(thread_per_link):
@@ -114,14 +71,17 @@ def run_time(url, index, delay, percent):
         percent = 99
     if percent<=0:
         percent = 1
+
+    adjustment = random.randint(-20, 20)
+    new_percent = percent + adjustment
+    if new_percent > 99:
+        new_percent = random.randint(85, 92)
+    elif new_percent < 1:
+        new_percent = 1
+    percent = new_percent
     
     token = ""
-    pr = "qIGEgRo2y4Me:iK9asQaKxTD0@ipv6.proxiware.com:8080"
-    p = {
-        "http":f"http://{pr}",
-        "https":f"http://{pr}"
-    }
-    pr = f"http://hanqvu:hanqvu@103.116.39.192:{random.randint(30000, 30299)}"
+    pr = f"http://hanqvu:hanqvu@180.131.145.178:{random.randint(30000, 30099)}"
 
     p = {
         "http":pr,
@@ -172,12 +132,7 @@ def buff_view(index, thread_per_link, func, lock):
         current_view = 0
         token = ""
         while True:
-            pr = "qIGEgRo2y4Me:iK9asQaKxTD0@ipv6.proxiware.com:8080"
-            p = {
-                "http":f"http://{pr}",
-                "https":f"http://{pr}"
-            }
-            pr = f"http://hanqvu:hanqvu@103.116.39.192:{random.randint(30000, 30299)}"
+            pr = f"http://hanqvu:hanqvu@180.131.145.178:{random.randint(30000, 30099)}"
 
             p = {
                 "http":pr,
