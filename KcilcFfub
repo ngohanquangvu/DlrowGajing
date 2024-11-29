@@ -18,7 +18,7 @@ def change_proxy(type):
             a = requests.get(url)
             if type == 1:
                 if choice%5 != 0:
-                    proxy_server = f'http://167.88.169.173:{random.randint(30000, 30049)}'
+                    proxy_server = f'http://180.131.145.178:{random.randint(30000, 30099)}'
                     username = "hanqvu" 
                     password = "hanqvu"
                 else:
@@ -26,11 +26,6 @@ def change_proxy(type):
                     username = a.json()["data"]["username"] 
                     password = a.json()["data"]["password"]
             else:
-                if choice%5 != 0:
-                    proxy_server = f'http://103.116.39.192:{random.randint(30000, 30099)}'
-                    username = "hanqvu" 
-                    password = "hanqvu"
-                else:
                     proxy_server = f'http://{a.json()["data"]["proxy"]}'
                     username = a.json()["data"]["username"] 
                     password = a.json()["data"]["password"]
