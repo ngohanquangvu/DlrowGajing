@@ -9,15 +9,16 @@ def change_proxy(type):
     if type == 1:
         url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=624AE17EB0ECFA163C0D931C2BDE54D1&country=United+States"
     else:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=44D7EC97D660EC73A923128FF061A706&country=Vietnam"
-    choice = 0
+        list_country = ["Vietnam", "Singapore", "Japan"]
+        ct = random.choice(list_country)
+        url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=44D7EC97D660EC73A923128FF061A706&country={ct}"
+    choice = 1
     while status:
-        choice+=1
         try:
             a = requests.get(url)
             if type == 1:
                 if choice%5 != 0:
-                    proxy_server = f'http://180.131.145.178:{random.randint(30000, 30099)}'
+                    proxy_server = f'http://167.88.169.173:{random.randint(30000, 30049)}'
                     username = "hanqvu" 
                     password = "hanqvu"
                 else:
@@ -25,16 +26,45 @@ def change_proxy(type):
                     username = a.json()["data"]["username"] 
                     password = a.json()["data"]["password"]
             else:
+                if choice%5 != 0:
+                    proxy_server = f'http://103.116.39.192:{random.randint(30000, 30099)}'
+                    username = "hanqvu" 
+                    password = "hanqvu"
+                else:
                     proxy_server = f'http://{a.json()["data"]["proxy"]}'
                     username = a.json()["data"]["username"] 
                     password = a.json()["data"]["password"]
+            choice += 1
         except Exception as e:
+            open("error.txt", "a").write(f"{str(e)}\n")
             time.sleep(5)
             continue
         time.sleep(120)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password
     headless = True
+    user_agents = [
+    # User agent cho Chrome trên Windows
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    # User agent cho Safari trên macOS
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
+    # User agent cho Chrome trên Android 10
+    "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36",
+    # User agent cho Safari trên iOS
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
+    # User agent cho iPad
+    "Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
+    # User agent cho Samsung Galaxy Tab
+    "Mozilla/5.0 (Linux; Android 10; SM-T865) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    # User agent cho Chrome trên Android 9
+    "Mozilla/5.0 (Linux; Android 9; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36",
+    # User agent cho Chrome trên Android 8
+    "Mozilla/5.0 (Linux; Android 8.0.0; SM-G950F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36",
+    # User agent cho iPhone 12
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
+    # User agent cho Samsung Galaxy S20 Ultra
+    "Mozilla/5.0 (Linux; Android 10; SM-G988B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36"
+    ]
     while True:
         click = 0
         with lock:
@@ -55,7 +85,7 @@ def run(playwright, dem, index, proxy_type, lock):
 
                     continue
             running[index] = ["Clicking", url, click]
-            context = browser.new_context()
+            context = browser.new_context(user_agent=random.choice(user_agents))
             page = context.new_page()
             refresh_count = 0
             max_refresh = 5
@@ -212,7 +242,7 @@ while True:
 
 while True:
     try:
-        proxy_type = int(input("Chọn loại proxy (1. Proxy us |2. Proxy Vn): "))
+        proxy_type = int(input("Chọn loại proxy (1. Proxy us |2. Proxy Asia): "))
         if proxy_type not in [1, 2]:
             print("Loại proxy không hợp lệ")
             continue
