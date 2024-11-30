@@ -31,7 +31,6 @@ def change_proxy(type):
                     password = a.json()["data"]["password"]
             choice += 1
         except Exception as e:
-            open("error.txt", "a").write(f"{str(e)}\n")
             time.sleep(5)
             continue
         time.sleep(120)
