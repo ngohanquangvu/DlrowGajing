@@ -36,7 +36,7 @@ def change_proxy(type):
             continue
         time.sleep(120)
 def run(playwright, dem, index, proxy_type, lock):
-    global list_url, running, url_complete, timeout, proxy_server, username, password
+    global list_url, running, url_complete, timeout, proxy_server, username, password, version
     headless = True
     user_agents = [
      "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/537.36",
@@ -136,6 +136,7 @@ def run(playwright, dem, index, proxy_type, lock):
                                 })();
                             """)
                             if video_playing:
+                                time.sleep(3)
                                 break
                             time.sleep(0.5)  # Chờ một giây trước khi kiểm tra lại
 
@@ -170,6 +171,7 @@ def run(playwright, dem, index, proxy_type, lock):
                             context.close()
                             browser.close()
                             continue
+
                     else:
                         while time.time() - start_time_run < check_timeout:
                             try:
@@ -181,38 +183,51 @@ def run(playwright, dem, index, proxy_type, lock):
                                 continue
 
                     # Cuộn xuống một độ cao ngẫu nhiên sau khi video đã phát
-                    if timeout <= 20:
-                        if video_playing:
-                            scroll_height = page.evaluate("document.documentElement.scrollHeight")
-                            random_scroll_height = random.randint(0, scroll_height)
-                            page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
-                            time.sleep(1)
-
-                            # Bấm vào một URL bất kỳ trong trang
-                            elements = page.query_selector_all("a[href]")
-                            if elements:
-                                random_element = random.choice(elements)
-                                random_element.click()
-                            time.sleep(5)
-                    else:
-                        check_timeout_20 = timeout - 10
-                        page.click(f'img[src="/img/logo/gjw_logo_glow_v1.png"]')
-                        time.sleep(1)
-                        start_time_run_20 = time.time()
-                        while time.time() - start_time_run_20 < check_timeout_20:
-                            scroll_height = page.evaluate("document.documentElement.scrollHeight")
-                            random_scroll_height = random.randint(0, scroll_height)
-                            page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
-                            time.sleep(1)
-                            elements = page.query_selector_all('a[href*="/video/"]')
-                            if elements:
-                                random_element = random.choice(elements)
-                                random_element.click()
-                            time.sleep(random.randint(8, 13))
-                            click_logo = random.randint(0, 1)
-                            if click_logo==1:
-                                page.click(f'img[src="/img/logo/gjw_logo_glow_v1.png"]')
+                    if version == 2:
+                        if timeout <= 20:
+                            if video_playing:
+                                scroll_height = page.evaluate("document.documentElement.scrollHeight")
+                                random_scroll_height = random.randint(0, scroll_height)
+                                page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
                                 time.sleep(1)
+
+                                # Bấm vào một URL bất kỳ trong trang
+                                elements = page.query_selector_all("a[href]")
+                                if elements:
+                                    random_element = random.choice(elements)
+                                    random_element.click()
+                                time.sleep(5)
+                        else:
+                            check_timeout_20 = timeout - 10
+                            page.click(f'img[src="/img/logo/gjw_logo_glow_v1.png"]')
+                            time.sleep(1)
+                            start_time_run_20 = time.time()
+                            while time.time() - start_time_run_20 < check_timeout_20:
+                                scroll_height = page.evaluate("document.documentElement.scrollHeight")
+                                random_scroll_height = random.randint(0, scroll_height)
+                                page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
+                                time.sleep(1)
+                                elements = page.query_selector_all('a[href*="/video/"]')
+                                if elements:
+                                    random_element = random.choice(elements)
+                                    random_element.click()
+                                time.sleep(random.randint(8, 13))
+                                click_logo = random.randint(0, 1)
+                                if click_logo==1:
+                                    page.click(f'img[src="/img/logo/gjw_logo_glow_v1.png"]')
+                                    time.sleep(1)
+                    else:
+                        scroll_height = page.evaluate("document.documentElement.scrollHeight")
+                        random_scroll_height = random.randint(0, scroll_height)
+                        page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
+                        time.sleep(1)
+
+                        # Bấm vào một URL bất kỳ trong trang
+                        elements = page.query_selector_all("a[href]")
+                        if elements:
+                            random_element = random.choice(elements)
+                            random_element.click()
+                        time.sleep(5)
                     page.close()
                     context.close()
                     browser.close()
@@ -291,6 +306,16 @@ while True:
         break
     except ValueError:
         print("Loại proxy phải là số nguyên")
+        continue
+while True:
+    try:
+        version = int(input("Chọn version (1. 1.0 |2. 2.0): "))
+        if proxy_type not in [1, 2]:
+            print("Loại version")
+            continue
+        break
+    except ValueError:
+        print("Loại version phải là số nguyên")
         continue
 
 
