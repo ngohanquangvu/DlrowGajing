@@ -7,11 +7,11 @@ def get_proxy():
 def change_proxy(type):
     global status, proxy_server, username, password
     if type == 1:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=624AE17EB0ECFA163C0D931C2BDE54D1&country=United+States"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=874993BF5ECCD1383D1EBA36DCBD5A33&country=United+States"
     else:
         list_country = ["Vietnam", "Singapore", "Japan"]
         ct = random.choice(list_country)
-        url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=44D7EC97D660EC73A923128FF061A706&country={ct}"
+        url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=872BC20CE9A90670B3689070207448D1&country={ct}"
     choice = 1
     while status:
         try:
