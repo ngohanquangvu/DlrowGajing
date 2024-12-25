@@ -1,4 +1,3 @@
-import yt_dlp
 app = customtkinter.CTk()
 app.title("GanJingWorld Reup Video")
 app.geometry("350x420")
@@ -137,14 +136,12 @@ def get_content(data, dem):
     try:
         # Extract channel info
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            if '/videos' not in data:
+                channel_id = data.split('/')[-1].split('?')[0]
+                data = data + '/videos'
+            else:
+                channel_id = data.split('/')[-2]
             channel_info = ydl.extract_info(data, download=False)
-            
-            # Get channel ID
-            channel_id = channel_info.get('channel_id') or channel_info.get('uploader_id')
-            if not channel_id:
-                save_error_to_file("Could not extract channel ID")
-                return None
-                
             save_path = f"./SaveData/{channel_id}.txt"
             if not os.path.isfile(save_path):
                 open(save_path, 'a', encoding="utf-8").close()
