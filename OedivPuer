@@ -186,7 +186,15 @@ def get_content(data, dem):
             return video_links
             
     except Exception as e:
-        save_error_to_file(str(e))
+        tb = e.__traceback__
+        error_message = f"Exception: {e} | "
+        while tb is not None:
+            filename = tb.tb_frame.f_code.co_filename
+            lineno = tb.tb_lineno
+            function_name = tb.tb_frame.f_code.co_name
+            error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
+            tb = tb.tb_next
+        save_error_to_file(error_message)
         return None
 
 def get_webp_url(media_list):
