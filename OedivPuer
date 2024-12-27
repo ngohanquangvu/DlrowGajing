@@ -47,7 +47,7 @@ def download_video(url, email, password):
     
     try:
         ydl_opts = {
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'format': 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]',
             'outtmpl': aaa,
             'quiet': True,
             'no_warnings': True,
