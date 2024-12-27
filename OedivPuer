@@ -50,9 +50,15 @@ def download_video(url, email, password):
             'format': 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]',
             'outtmpl': aaa,
             'quiet': True,
-            'no_warnings': True,
+            'verbose': True,
             'ignoreerrors': True,
-            'merge_output_format': 'mp4'
+            'restrictfilenames': False,
+            'noplaylist': True,
+            'windows_filenames': True,
+            'updatetime': False,
+            'writeinfojson': False,
+            'postprocessors': [],
+            'overwrites': True
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
