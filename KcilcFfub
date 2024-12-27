@@ -7,11 +7,11 @@ def get_proxy():
 def change_proxy(type):
     global status, proxy_server, username, password
     if type == 1:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=872BC20CE9A90670B3689070207448D1&country=United+States"
+        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=874993BF5ECCD1383D1EBA36DCBD5A33&country=United+States"
     else:
         list_country = ["Vietnam", "Singapore", "Japan"]
         ct = random.choice(list_country)
-        url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=874993BF5ECCD1383D1EBA36DCBD5A33&country={ct}"
+        url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=872BC20CE9A90670B3689070207448D1&country={ct}"
     choice = 1
     while status:
         try:
@@ -61,14 +61,14 @@ def run(playwright, dem, index, proxy_type, lock):
             
             running[index] = ["Clicking", url, click]
             context = browser.new_context(
-                viewport={
-                    "width": device['viewport']['width'],
-                    "height": device['viewport']['height']
-                },
                 device_scale_factor=device.get('device_scale_factor', 1),
                 user_agent=device.get('userAgent')
             )
             page = context.new_page()
+            page.set_viewport_size({
+                "width": device["viewport"]["width"],
+                "height": device["viewport"]["height"]
+            })
             refresh_count = 0
             max_refresh = 5
 
