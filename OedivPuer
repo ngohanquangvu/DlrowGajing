@@ -43,7 +43,8 @@ global_proxy = {
 
 
 def download_video(url, email, password):
-    aaa = f'./VideoData/{time.time()}.mp4'
+    name_file = time.time()
+    aaa = f'./VideoData/{name_file}.mp4'
     
     try:
         ydl_opts = {
@@ -64,10 +65,12 @@ def download_video(url, email, password):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             filename = ydl.prepare_filename(ydl.extract_info(url, download=False))
             ydl.download([url])
-            return filename
+        download_path = "./VideoData"
+        for filename in os.listdir(download_path):
+            if name_file in filename and filename.endswith('.mp4'):
+                final_path = os.path.join(download_path, filename)
+                return final_path
             
-        if os.path.exists(filename):
-            return filename
         return None
             
     except Exception as e:
