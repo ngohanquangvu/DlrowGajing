@@ -151,7 +151,8 @@ def get_content(data, dem):
         'quiet': True,
         'extract_flat': True,
         'force_generic_extractor': False,
-        'ignoreerrors': True
+        'ignoreerrors': True,
+        'logger': YoutubeDLLogger(),
     }
     
     try:
