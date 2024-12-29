@@ -50,6 +50,7 @@ def download_video(url, email, password):
         ydl_opts = {
             'format': 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]',
             'outtmpl': aaa,
+            'ffmpeg_location': './ffmpeg/bin/ffmpeg.exe',
             'quiet': True,
             'verbose': True,
             'ignoreerrors': True,
