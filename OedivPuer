@@ -1,4 +1,11 @@
 class YoutubeDLLogger:
+    def debug(self, msg):
+        # For debug messages
+        pass
+
+    def info(self, msg):
+        # For information messages
+        pass
     def warning(self, msg):
         with open("yt_dl_errors.txt", "a", encoding="utf-8") as f:
             f.write(f"[WARNING] {msg}\n")
