@@ -1,3 +1,11 @@
+class YoutubeDLLogger:
+    def warning(self, msg):
+        with open("yt_dl_errors.txt", "a", encoding="utf-8") as f:
+            f.write(f"[WARNING] {msg}\n")
+    
+    def error(self, msg):
+        with open("yt_dl_errors.txt", "a", encoding="utf-8") as f:
+            f.write(f"[ERROR] {msg}\n")
 app = customtkinter.CTk()
 app.title("GanJingWorld Reup Video")
 app.geometry("350x420")
@@ -60,7 +68,8 @@ def download_video(url, email, password):
             'updatetime': False,
             'writeinfojson': False,
             'postprocessors': [],
-            'overwrites': True
+            'overwrites': True,
+            'logger': YoutubeDLLogger(),
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
