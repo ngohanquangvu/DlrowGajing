@@ -12,12 +12,12 @@ def change_proxy(type):
         list_country = ["Vietnam", "Singapore", "Japan"]
         ct = random.choice(list_country)
         url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=872BC20CE9A90670B3689070207448D1&country={ct}"
-    choice = 1
+    choice = 0
     while status:
         try:
             a = requests.get(url)
             if type == 1:
-                if choice%3 != 0:
+                if choice%5 != 0:
                     proxy_server = f'http://184.174.96.52:{random.randint(30000, 30099)}'
                     username = "hanqvu" 
                     password = "hanqvu"
@@ -29,7 +29,7 @@ def change_proxy(type):
                     proxy_server = f'http://{a.json()["data"]["proxy"]}'
                     username = a.json()["data"]["username"] 
                     password = a.json()["data"]["password"]
-            choice += 1
+            choice += 0
         except Exception as e:
             open("error.txt", "a").write(f"{str(e)}\n")
             time.sleep(5)
