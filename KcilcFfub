@@ -1,4 +1,3 @@
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
 proxy_server = ""
 username = ""
 password = ""
@@ -7,18 +6,20 @@ def get_proxy():
 def change_proxy(type):
     global status, proxy_server, username, password
     if type == 1:
-        url = "https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=874993BF5ECCD1383D1EBA36DCBD5A3&country=United+States"
+        proxy_server = f'http://hub-us-8.litport.net:31682'
+        username = "0JeLKc" 
+        password = "G69qYC"
     else:
         list_country = ["Vietnam", "Singapore", "Japan"]
         ct = random.choice(list_country)
-        url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=872BC20CE9A90670B368907020744D1&country={ct}"
+        url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=9F650FB025188C0316198467E0113E0F&country={ct}"
     choice = 0
     while status:
         try:
             a = requests.get(url)
             if type == 1:
-                if choice%5 != 0:
-                    proxy_server = f'http://184.174.96.52:{random.randint(30000, 30099)}'
+                if choice%2 != 0:
+                    proxy_server = f'http://180.131.145.172:{random.randint(30000, 30099)}'
                     username = "hanqvu" 
                     password = "hanqvu"
                 else:
@@ -29,12 +30,12 @@ def change_proxy(type):
                     proxy_server = f'http://{a.json()["data"]["proxy"]}'
                     username = a.json()["data"]["username"] 
                     password = a.json()["data"]["password"]
-            choice += 0
+            choice += 1
         except Exception as e:
-            
+            open("error.txt", "a").write(f"{str(e)}\n")
             time.sleep(5)
             continue
-        time.sleep(120)
+        time.sleep(600)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password, version
     headless = True
@@ -61,6 +62,7 @@ def run(playwright, dem, index, proxy_type, lock):
             
             running[index] = ["Clicking", url, click]
             context = browser.new_context(
+                device_scale_factor=device.get('device_scale_factor', 1),
                 user_agent=device.get('userAgent')
             )
             page = context.new_page()
