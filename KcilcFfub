@@ -1,3 +1,4 @@
+os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
 proxy_server = ""
 username = ""
 password = ""
@@ -177,17 +178,20 @@ def run(playwright, dem, index, proxy_type, lock):
                                     page.click(f'img[src="/img/logo/gjw_logo_glow_v1.png"]')
                                     time.sleep(1)
                     else:
-                        scroll_height = page.evaluate("document.documentElement.scrollHeight")
-                        random_scroll_height = random.randint(0, scroll_height)
-                        page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
-                        time.sleep(1)
-
-                        # Bấm vào một URL bất kỳ trong trang
-                        elements = page.query_selector_all("a[href]")
-                        if elements:
-                            random_element = random.choice(elements)
-                            random_element.click()
+                        page.click(f'img[src="/img/logo/gjw_logo_glow_v1.png"]')
                         time.sleep(5)
+                        # scroll_height = page.evaluate("document.documentElement.scrollHeight")
+                        # random_scroll_height = random.randint(0, scroll_height)
+                        # page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
+                        # time.sleep(1)
+
+                        # # Bấm vào một URL bất kỳ trong trang
+                        # elements = page.query_selector_all("a[href]")
+                        # if elements:
+                        #     random_element = random.choice(elements)
+                        #     random_element.click()
+                        # time.sleep(5)
+                        
                     page.close()
                     context.close()
                     browser.close()
