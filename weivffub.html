@@ -1,3 +1,49 @@
+
+import requests
+
+import random, os, json
+import threading, time
+from tkinter import filedialog
+import m3u8, cloudscraper
+
+list_login_token = []
+
+def get_login_token():
+    global list_login_token
+    if len(list_login_token) != 0:
+        return random.choice(list_login_token)
+    else:
+        h = {
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'vi,en-US;q=0.9,en;q=0.8',
+            'Content-Length':'2',
+            'Content-Type':'application/json',
+            'Gjw-Did':'1gjmbv5jtr91QJHTAAVmXmU5O12r0d',
+            'Gjw-Sign':'ca57245fae3b3a03d6eaadb1cef531b4',
+            'Gjw-Ts':'1710510510579',
+            'Origin':'https://www.ganjingworld.com',
+            'Referer':'https://www.ganjingworld.com/',
+            'Sec-Ch-Ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'Sec-Ch-Ua-Mobile':'?0',
+            'Sec-Ch-Ua-Platform':'"Windows"',
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0',
+            'X-Cdk-Dsid':'1b9be33b-2263-79b6-7da2-6fb5f24efc55',
+            'X-Cdk-Lrtm':'2024-03-15 20:48:30',
+        }
+        pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+        p = {
+            "http":f"http://{pr}",
+            "https":f"http://{pr}"
+        }
+        while True:
+            if len(list_login_token) != 0:
+                return random.choice(list_login_token)
+            try:
+                token = requests.post("https://gw.ganjingworld.com/v1.0c/auth/guest/registration", json={}, headers=h, proxies=p).json()["data"]["accessToken"]
+                list_login_token.append(token)
+                return token
+            except: pass
+
 list_uid = []
 list_duration = []
             
@@ -24,6 +70,7 @@ current_url_index = 0
 url_complete = 0
 scraper = cloudscraper.create_scraper()
 
+list_proxy_v6_new = [f"http://hanqvu:hanqvu@103.90.228.101:{i}" for i in range(30000, 30300)]
 def run_view(url, index, target_view, thread_per_link):
         global running
         token = ""
@@ -33,7 +80,7 @@ def run_view(url, index, target_view, thread_per_link):
             global running
             while True:
                 uid = url.split("/")[-1].split("?")[0]
-                pr = f"http://hanqvu:hanqvu@180.131.145.178:{random.randint(30000, 30099)}"
+                pr = f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
 
                 p = {
                     "http":pr,
@@ -47,7 +94,7 @@ def run_view(url, index, target_view, thread_per_link):
                         "id":uid,
                     }
                     running[index] = ["Sending view", url, f"{maxx_view_per_thread} views"]
-                    count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                    count = requests.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                     view_count = count["data"]["view_count"]
                     if view_count> maxx_view_per_thread:
                         maxx_view_per_thread = view_count
@@ -56,7 +103,6 @@ def run_view(url, index, target_view, thread_per_link):
                     if maxx_view_per_thread>=target_view:
                         break
                 except Exception as e:
-                    open("error.txt", "a").write(f"{e}\n")
                     pass
         threads = []
         for i in range(thread_per_link):
@@ -71,7 +117,6 @@ def run_time(url, index, delay, percent):
         percent = 99
     if percent<=0:
         percent = 1
-
     adjustment = random.randint(-20, 20)
     new_percent = percent + adjustment
     if new_percent > 99:
@@ -81,7 +126,7 @@ def run_time(url, index, delay, percent):
     percent = new_percent
     
     token = ""
-    pr = f"http://hanqvu:hanqvu@180.131.145.178:{random.randint(30000, 30099)}"
+    pr = f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
 
     p = {
         "http":pr,
@@ -94,10 +139,39 @@ def run_time(url, index, delay, percent):
             s = cloudscraper.create_scraper()
             id_view = uid
             try:
-                d = {"en":"impressions","extra":"[{\"en\":\"video_start\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"source\":\"\",\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
-                a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content",json=d, headers={"Authorization":token}, proxies=p).json()
-                d = {"en":"impressions","extra":"[{\"en\":\"video_progress\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"view_time\":"+str(delay)+",\"view_pct\":"+str(percent)+",\"channel_id\":\"1ght4t2ldqo2n7QiyBTI1B1IE1ij0c\",\"uid\":\"1ght4s0hj1k3lUPkfmRcyw1SR1360u\",\"cid\":\"1b9be33b-2263-79b6-7da2-6fb5f24efc55\",\"dl\":\"https://www.ganjingworld.com/video/"+id_view+"\",\"dr\":\"https://www.ganjingworld.com/sso\",\"ugrp\":\"\",\"source\":\"\",\"ga_cid\":\"b4f8a14a703bd160\",\"event_time\":"+str(round(time.time()*1000))+"}]","uid":"1ght4s0hj1k3lUPkfmRcyw1SR1360u","cid":"1b9be33b-2263-79b6-7da2-6fb5f24efc55"}
-                a = s.post("https://gw.ganjingworld.com/v1.0c/tracking-content", json=d, headers={"Authorization":token}, proxies=p).json()
+                d = {
+                "headers":{
+                    "Content-Type":"application/json",
+                    "X-Cdk-Dsid":"2f491bf5-c82e-dbc6-741a-8d225a72bf67",
+                    "X-Cdk-Lrtm":"2025-02-01 23:57:55",
+                    "Authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJkaWQiOiIxaGQydHJsYWQ2azRNam5ObW91amZXVTBXMWlwMGQiLCJleHAiOjE3MzkyOTI2NzAsImlhdCI6MTczODQyODY3MH0.2KWijnOFkAOAObJSICXaTC7dR0PyJrCJg74S-PqXOq4"
+                    },
+                "body":{
+                    "en":"impressions",
+                    "cid":"2f491bf5-c82e-dbc6-741a-8d225a72bf67",
+                    "dl":f"https://www.ganjingworld.com/video/{id_view}",
+                    "dr":"https://www.ganjingworld.com",
+                    "event_time":int(time.time()),
+                    "uid":"",
+                    "extra":"[{\"en\":\"video_start\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"channel_id\":\"1gjmbvmkdku4v1vRA8wpkpIxl1jf0c\",\"event_time\":"+str(int(time.time()))+"},{\"en\":\"ads_start\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"channel_id\":\"1gjmbvmkdku4v1vRA8wpkpIxl1jf0c\",\"event_time\":"+str(int(time.time()))+"},{\"en\":\"ads_end\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"channel_id\":\"1gjmbvmkdku4v1vRA8wpkpIxl1jf0c\",\"event_time\":"+str(int(time.time()))+"}]"}}
+                a = s.post("https://gw.ganjingworld.com/v1.1/tracking-content",json=d, proxies=p)
+                d = {
+                    "headers":{
+                        "Content-Type":"application/json",
+                        "X-Cdk-Dsid":"2f491bf5-c82e-dbc6-741a-8d225a72bf67",
+                        "X-Cdk-Lrtm":"2025-02-01 23:58:00",
+                        "Authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJkaWQiOiIxaGQydHJsYWQ2azRNam5ObW91amZXVTBXMWlwMGQiLCJleHAiOjE3MzkyOTI2NzAsImlhdCI6MTczODQyODY3MH0.2KWijnOFkAOAObJSICXaTC7dR0PyJrCJg74S-PqXOq4"},
+                    "body":{
+                        "en":"impressions",
+                        "cid":"2f491bf5-c82e-dbc6-741a-8d225a72bf67",
+                        "dl":f"https://www.ganjingworld.com/video/{id_view}",
+                        "dr":"https://www.ganjingworld.com",
+                        "event_time":int(time.time()),
+                        "uid":"",
+                        "extra":"[{\"en\":\"video_progress\",\"cnt_id\":\""+id_view+"\",\"cnt_type\":\"Video\",\"view_time\":"+delay+",\"view_pct\":"+percent+",\"channel_id\":\"1gjmbvmkdku4v1vRA8wpkpIxl1jf0c\",\"event_time\":"+str(int(time.time()))+"}]"
+                        }
+                    }
+                a = s.post("https://gw.ganjingworld.com/v1.1/tracking-content", json=d, proxies=p)
                 dem +=1
                 running[index] = ["Sent time successfully", url, f""]
                 time.sleep(1)
@@ -132,7 +206,12 @@ def buff_view(index, thread_per_link, func, lock):
         current_view = 0
         token = ""
         while True:
-            pr = f"http://hanqvu:hanqvu@180.131.145.178:{random.randint(30000, 30099)}"
+            pr = "qIGEgRo2y4Me:iK9asQaKxTD0@ipv6.proxiware.com:8080"
+            p = {
+                "http":f"http://{pr}",
+                "https":f"http://{pr}"
+            }
+            pr = f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
 
             p = {
                 "http":pr,
@@ -145,7 +224,8 @@ def buff_view(index, thread_per_link, func, lock):
                 d = {
                     "id":uid,
                 }
-                count = scraper.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
+                s = cloudscraper.create_scraper()
+                count = s.post("https://gw.ganjingworld.com/v1.0c/set-view-count", json=d, headers=h, proxies=p).json()
                 target_view = count["data"]["view_count"]+int(view*random.uniform(1.9, 1.5))
                 break
             except Exception as e:
@@ -366,7 +446,6 @@ for i in list_open:
         list_url.append(i)
     elif "/channel/" in i:
         list_channel.append(i)
-
 print("Đang tìm video, shorts...")
 threads = []
 for i in list_channel:
@@ -375,8 +454,8 @@ for i in threads:
     i.start()
 for i in threads:
     i.join()
-os.system("cls")
 
+os.system("cls")
 
 while True:
     try:
