@@ -1,11 +1,3 @@
-
-import requests
-
-import random, os, json
-import threading, time
-from tkinter import filedialog
-import m3u8, cloudscraper
-
 list_login_token = []
 
 def get_login_token():
@@ -80,7 +72,7 @@ def run_view(url, index, target_view, thread_per_link):
             global running
             while True:
                 uid = url.split("/")[-1].split("?")[0]
-                pr = f"http://0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+                pr = f"http://zone-7A98CFB7:1F494DFEA919414490839D1B4F877619@proxy.bytio.com:8080"
 
                 p = {
                     "http":pr,
@@ -144,7 +136,7 @@ def run_time(url, index, delay, percent):
                     "Content-Type":"application/json",
                     "X-Cdk-Dsid":"2f491bf5-c82e-dbc6-741a-8d225a72bf67",
                     "X-Cdk-Lrtm":"2025-02-01 23:57:55",
-                    "Authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJkaWQiOiIxaGQydHJsYWQ2azRNam5ObW91amZXVTBXMWlwMGQiLCJleHAiOjE3MzkyOTI2NzAsImlhdCI6MTczODQyODY3MH0.2KWijnOFkAOAObJSICXaTC7dR0PyJrCJg74S-PqXOq4"
+                    "Authorization":""
                     },
                 "body":{
                     "en":"impressions",
@@ -160,7 +152,7 @@ def run_time(url, index, delay, percent):
                         "Content-Type":"application/json",
                         "X-Cdk-Dsid":"2f491bf5-c82e-dbc6-741a-8d225a72bf67",
                         "X-Cdk-Lrtm":"2025-02-01 23:58:00",
-                        "Authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJkaWQiOiIxaGQydHJsYWQ2azRNam5ObW91amZXVTBXMWlwMGQiLCJleHAiOjE3MzkyOTI2NzAsImlhdCI6MTczODQyODY3MH0.2KWijnOFkAOAObJSICXaTC7dR0PyJrCJg74S-PqXOq4"},
+                        "Authorization":""},
                     "body":{
                         "en":"impressions",
                         "cid":"2f491bf5-c82e-dbc6-741a-8d225a72bf67",
@@ -184,7 +176,6 @@ def run_time(url, index, delay, percent):
                     function_name = tb.tb_frame.f_code.co_name
                     error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
                     tb = tb.tb_next
-                open("log.txt", "a").write(f"{error_message}\n")
                 pass
         except Exception as e:
             running[index] = ["Sent time unsuccessfully", url, f""]
@@ -237,7 +228,6 @@ def buff_view(index, thread_per_link, func, lock):
                     function_name = tb.tb_frame.f_code.co_name
                     error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
                     tb = tb.tb_next
-                open("log.txt", "a").write(f"{error_message}\n")
                 pass
         if func == "1":
             run_view(url, index, target_view, thread_per_link)
