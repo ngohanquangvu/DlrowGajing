@@ -95,15 +95,6 @@ def run_view(url, index, target_view, thread_per_link):
                     if maxx_view_per_thread>=target_view:
                         break
                 except Exception as e:
-                    tb = e.__traceback__
-                    error_message = f"Exception: {e} | "
-                    while tb is not None:
-                        filename = tb.tb_frame.f_code.co_filename
-                        lineno = tb.tb_lineno
-                        function_name = tb.tb_frame.f_code.co_name
-                        error_message += f"File: {filename}, Line: {lineno}, in {function_name}\n"
-                        tb = tb.tb_next
-                    open("error.txt", "a").write(f"{error_message}\n")  
                     pass
         threads = []
         for i in range(thread_per_link):
