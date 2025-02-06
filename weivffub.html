@@ -91,7 +91,6 @@ def run_view(url, index, target_view, thread_per_link):
                     if view_count> maxx_view_per_thread:
                         maxx_view_per_thread = view_count
                         running[index] = ["Sent view successfully", url, f"{maxx_view_per_thread} views"]
-                        time.sleep(1)
                     if maxx_view_per_thread>=target_view:
                         break
                 except Exception as e:
