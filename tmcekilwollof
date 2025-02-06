@@ -101,7 +101,7 @@ def buff_like(url, sl_like):
             time.sleep(3)
         except: pass
 
-
+list_proxy_v6_new = [f"hanqvu:hanqvu@180.131.145.172:{i}" for i in range(30000, 30099)]
 def buff_follow(url, list_acc, sl_follow, luong_per_link):
     uid = url.split("/")[-1].split("?")[0]
     def run_buff_fl(uid, lock):
@@ -120,27 +120,31 @@ def buff_follow(url, list_acc, sl_follow, luong_per_link):
                 "Content-Type": "application/json",
                 "Authorization": token
             }
-            pr = "0JeLKc:G69qYC@hub-us-8.litport.net:31682"
+            pr = random.choice(list_proxy_v6_new)
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
             }
+            s = cloudscraper.create_scraper()
             while True:
                 try:
-                    check = requests.get(f"https://gw.ganjingworld.com/v1.0c/get-channel-detail?id={uid}", headers=h, proxies=p).json()
+                    check = s.get(f"https://gw.ganjingworld.com/v1.0c/get-channel-detail?id={uid}", headers=h, proxies=p).json()
                     check["data"]["is_follow"]
                     break
                 except Exception as e: 
+                    print(f"\033[91m[-] Lỗi check data: {e}\033[0m")
                     pass
             if check["data"]["is_follow"] == False:
                 d = {"profile_id":uid}
                 while True:
                     try:
-                        fl = requests.post("https://gw.ganjingworld.com/v1.1/timeline/follow", json=d, headers=h, proxies=p).json()
+                        fl = s.post("https://gw.ganjingworld.com/v1.1/timeline/follow", json=d, headers=h, proxies=p).json()
                         if fl["result"]["message"] == "Ok":
                             print(f"\033[92m[+] Follow thành công cho {url}\033[0m")
                         break
-                    except: pass
+                    except Exception as e:
+                        print(f"\033[91m[-] Lỗi follow: {e}\033[0m")
+                        pass
                 dem_follow += 1
         print(f"\033[92mHOÀN THÀNH BUFF {dem_follow} FOLLOW CHO {url}\033[0m")
     if len(list_acc)<=sl_follow: sl_follow = len(list_acc)
