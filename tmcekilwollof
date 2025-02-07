@@ -120,7 +120,7 @@ def buff_follow(url, list_acc, sl_follow, luong_per_link):
                 "Content-Type": "application/json",
                 "Authorization": token
             }
-            pr = random.choice(list_proxy_v6_new)
+            pr = "zone-18CFF3BF:1F494DFEA919414490839D1B4F877619@proxy.bytio.com:8080"
             p = {
                 "http":f"http://{pr}",
                 "https":f"http://{pr}"
