@@ -41,7 +41,7 @@ def crawl_data(url):
     id_channel = url.split("https://www.ganjingworld.com/channel/")[1]
     while True:
         try:
-            token = get_token()
+            token = ""
             break
         except: pass
     
