@@ -1,42 +1,42 @@
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
-proxy_server = ""
-username = ""
-password = ""
+proxy_server = "http://s13.id.proxyxoay.net:8421"
+username = "izmo2k1i"
+password = "iZMO2k1I"
 def get_proxy():
     return proxy_server, username, password
 def change_proxy(type):
     global status, proxy_server, username, password
-    if type == 1:
-        proxy_server = f'http://hub-us-8.litport.net:31682'
-        username = "0JeLKc" 
-        password = "G69qYC"
-    else:
-        list_country = ["Vietnam", "Singapore", "Japan"]
-        ct = random.choice(list_country)
-        url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=9F650FB025188C0316198467E0113E0F&country={ct}"
-    choice = 0
-    while status:
-        try:
-            a = requests.get(url)
-            if type == 1:
-                if choice%2 != 0:
-                    proxy_server = f'http://180.131.145.172:{random.randint(30000, 30099)}'
-                    username = "hanqvu" 
-                    password = "hanqvu"
-                else:
-                    proxy_server = f'http://{a.json()["data"]["proxy"]}'
-                    username = a.json()["data"]["username"] 
-                    password = a.json()["data"]["password"]
-            else:
-                    proxy_server = f'http://{a.json()["data"]["proxy"]}'
-                    username = a.json()["data"]["username"] 
-                    password = a.json()["data"]["password"]
-            choice += 1
-        except Exception as e:
-            open("error.txt", "a").write(f"{str(e)}\n")
-            time.sleep(5)
-            continue
-        time.sleep(600)
+    # if type == 1:
+    #     proxy_server = f'http://hub-us-8.litport.net:31682'
+    #     username = "0JeLKc" 
+    #     password = "G69qYC"
+    # else:
+    #     list_country = ["Vietnam", "Singapore", "Japan"]
+    #     ct = random.choice(list_country)
+    #     url = f"https://api.zproxy.me/api/rotateProxy/getNewProxy?apiKey=9F650FB025188C0316198467E0113E0F&country={ct}"
+    # choice = 0
+    # while status:
+    #     try:
+    #         a = requests.get(url)
+    #         if type == 1:
+    #             if choice%2 != 0:
+    #                 proxy_server = f'http://180.131.145.172:{random.randint(30000, 30099)}'
+    #                 username = "hanqvu" 
+    #                 password = "hanqvu"
+    #             else:
+    #                 proxy_server = f'http://{a.json()["data"]["proxy"]}'
+    #                 username = a.json()["data"]["username"] 
+    #                 password = a.json()["data"]["password"]
+    #         else:
+    #                 proxy_server = f'http://{a.json()["data"]["proxy"]}'
+    #                 username = a.json()["data"]["username"] 
+    #                 password = a.json()["data"]["password"]
+    #         choice += 1
+    #     except Exception as e:
+    #         open("error.txt", "a").write(f"{str(e)}\n")
+    #         time.sleep(5)
+    #         continue
+    #     time.sleep(600)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password, version
     headless = True
@@ -77,6 +77,30 @@ def run(playwright, dem, index, proxy_type, lock):
             while True:
                 try:
                     page.goto(url, timeout=30000, wait_until="domcontentloaded")
+                    time.sleep(10)
+
+                    elements = page.query_selector_all("div.absolute.top-4.right-4 > span.inline-block > svg[data-testid='common-xmark']")
+                    print(f"Found {len(elements)} elements matching the selector.")
+                    if len(elements) == 1:
+                        elements[0].click()
+                        print("Clicked on the close button")
+                    else:
+                        print("Có nhiều phần tử khớp với bộ chọn hoặc không tìm thấy phần tử nào.")
+                    time.sleep(5)
+
+
+                    try:
+                        # Chờ đến khi nút "vast-skip-button" xuất hiện
+                        page.wait_for_selector(".vast-skip-button", timeout=10000)
+                        time.sleep(2)
+
+                        # Chờ đến khi nút "vast-skip-button enabled" có thể click
+                        skip_button = page.wait_for_selector("//div[contains(@class,'vast-skip-button skippable')]", timeout=20000)
+                        skip_button.click()
+                        print("Skip ads")
+                    except Exception as e:
+                        print("Chưa thể skip")
+                        pass
                     
                     # Thời gian timeout để kiểm tra video
                     check_timeout = timeout
@@ -311,3 +335,4 @@ formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds
 print(f"\033[33mProcess: {formatted_time}\033[0m")
 output = input("Nhấn Enter để thoát...")
 status = False
+
