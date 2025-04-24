@@ -1,11 +1,93 @@
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "./ms-playwright"
-proxy_server = "http://s13.id.proxyxoay.net:8421"
-username = "izmo2k1i"
-password = "iZMO2k1I"
+proxy_server = ""
+username = ""
+password = ""
 def get_proxy():
     return proxy_server, username, password
 def change_proxy(type):
     global status, proxy_server, username, password
+    proxies = [
+    {
+        "proxy_server": "http://103.170.246.181:49354",
+        "username": "proxy49354",
+        "password": "BNFnHJUk"
+    },
+    {
+        "proxy_server": "http://103.241.199.95:50866",
+        "username": "proxy50866",
+        "password": "YFhiKkax"
+    },
+    {
+        "proxy_server": "http://103.90.229.215:50420",
+        "username": "proxy50420",
+        "password": "RfdvNSjc"
+    },
+    {
+        "proxy_server": "http://23.142.84.205:50430",
+        "username": "proxy50430",
+        "password": "JfHbsTuc"
+    },
+    {
+        "proxy_server": "http://103.90.229.215:50463",
+        "username": "proxy50463",
+        "password": "wUFOHoWz"
+    },
+    {
+        "proxy_server": "http://103.241.199.95:49138",
+        "username": "proxy49138",
+        "password": "SaisuKSQ"
+    },
+    {
+        "proxy_server": "http://103.170.246.207:49716",
+        "username": "proxy49716",
+        "password": "EbcqZTTJ"
+    },
+    {
+        "proxy_server": "http://23.142.84.206:50075",
+        "username": "proxy50075",
+        "password": "ZOpMsVkg"
+    },
+    {
+        "proxy_server": "http://103.90.229.215:49928",
+        "username": "proxy49928",
+        "password": "OUnGMNZH"
+    },
+    {
+        "proxy_server": "http://103.90.229.215:49913",
+        "username": "proxy49913",
+        "password": "gMGPwQmD"
+    },
+    {
+        "proxy_server": "http://103.90.229.105:49203",
+        "username": "proxy49203",
+        "password": "GsmeTGWJ"
+    },
+    {
+        "proxy_server": "http://23.142.84.206:49883",
+        "username": "proxy49883",
+        "password": "RRXizHwZ"
+    },
+    {
+        "proxy_server": "http://103.90.229.105:49033",
+        "username": "proxy49033",
+        "password": "NLWXYKoy"
+    },
+    {
+        "proxy_server": "http://103.90.229.105:50479",
+        "username": "proxy50479",
+        "password": "CdkZeuTx"
+    },
+    {
+        "proxy_server": "http://103.241.199.95:51097",
+        "username": "proxy51097",
+        "password": "ggYXwUYs"
+    }
+    ]
+    data = random.choice(proxies)
+    proxy_server = data["proxy_server"]
+    username = data["username"]
+    password = data["password"]
+    
     # if type == 1:
     #     proxy_server = f'http://hub-us-8.litport.net:31682'
     #     username = "0JeLKc" 
@@ -335,4 +417,3 @@ formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds
 print(f"\033[33mProcess: {formatted_time}\033[0m")
 output = input("Nhấn Enter để thoát...")
 status = False
-
