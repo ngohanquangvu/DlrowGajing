@@ -16,11 +16,149 @@ def check_country(proxy_server, username, password):
 
 def change_proxy(type):
     global status, proxy_server, username, password
-    proxies = [{'proxy_server': 'http://103.241.199.37:49154', 'username': 'user49154', 'password': 'TN5096zL5i'}, {'proxy_server': 'http://103.162.31.234:49146', 'username': 'user49146', 'password': 'SEXmWOCgdk'}, {'proxy_server': 'http://42.96.12.229:49007', 'username': 'user49007', 'password': 'Qn9OzDJxp3'}, {'proxy_server': 'http://42.96.12.24:49311', 'username': 'user49311', 'password': 'fVbIMGs2yb'}, {'proxy_server': 'http://42.96.12.229:49062', 'username': 'user49062', 'password': '0eDLxVpZy7'}, {'proxy_server': 'http://42.96.12.229:49013', 'username': 'user49013', 'password': 'kNEwjTKpMT'}, {'proxy_server': 'http://42.96.12.24:49430', 'username': 'user49430', 'password': 'KXqQxiLlVp'}, {'proxy_server': 'http://42.96.12.24:49009', 'username': 'user49009', 'password': '4EwONJ9B2L'}, {'proxy_server': 'http://103.162.31.100:49197', 'username': 'user49197', 'password': 'JAGbw3LfAu'}, {'proxy_server': 'http://42.96.12.229:49473', 'username': 'user49473', 'password': 'BrELTkNNrU'}, {'proxy_server': 'http://42.96.12.24:49044', 'username': 'user49044', 'password': 'Gr3zIrIHQK'}, {'proxy_server': 'http://42.96.12.24:49405', 'username': 'user49405', 'password': 'CS0ShU3cWy'}, {'proxy_server': 'http://42.96.12.24:49250', 'username': 'user49250', 'password': '5UZxHDdFfa'}, {'proxy_server': 'http://42.96.12.24:49090', 'username': 'user49090', 'password': '4523IZ2AOc'}, {'proxy_server': 'http://42.96.12.24:49026', 'username': 'user49026', 'password': 'tTGcSPRlUS'}, {'proxy_server': 'http://103.162.31.234:49002', 'username': 'user49002', 'password': 'okkGuSd4Sx'}, {'proxy_server': 'http://42.96.12.24:49314', 'username': 'user49314', 'password': 'Lks7AtLQbY'}, {'proxy_server': 'http://42.96.12.229:49479', 'username': 'user49479', 'password': 'JgGldaamBM'}, {'proxy_server': 'http://42.96.12.24:49004', 'username': 'user49004', 'password': 's6VT5SHHeM'}, {'proxy_server': 'http://42.96.12.24:49003', 'username': 'user49003', 'password': 'VDPY2L3RIq'}, {'proxy_server': 'http://42.96.12.24:49163', 'username': 'user49163', 'password': 'W1UItwpr7b'}, {'proxy_server': 'http://42.96.12.24:49216', 'username': 'user49216', 'password': 'eOOiOaf2uJ'}, {'proxy_server': 'http://42.96.12.24:49004', 'username': 'user49004', 'password': 's6VT5SHHeM'}, {'proxy_server': 'http://42.96.12.24:49003', 'username': 'user49003', 'password': 'VDPY2L3RIq'}, {'proxy_server': 'http://42.96.12.24:49423', 'username': 'user49423', 'password': 'XrDE65PAoL'}, {'proxy_server': 'http://42.96.12.24:49220', 'username': 'user49220', 'password': 'yWTxw4fage'}, {'proxy_server': 'http://42.96.12.229:49431', 'username': 'user49431', 'password': 'VnzZak7Wr3'}, {'proxy_server': 'http://103.241.199.37:49430', 'username': 'user49430', 'password': 'mUomhoSAzI'}, {'proxy_server': 'http://103.241.199.37:49117', 'username': 'user49117', 'password': 'usWx4dSOdv'}, {'proxy_server': 'http://42.96.12.24:49260', 'username': 'user49260', 'password': 'xV83yMOx1H'}, {'proxy_server': 'http://103.162.31.234:49419', 'username': 'user49419', 'password': 'lzCn3KcAoS'}, {'proxy_server': 'http://42.96.12.24:49241', 'username': 'user49241', 'password': 'qHfS9i4Ouk'}, {'proxy_server': 'http://42.96.12.24:49148', 'username': 'user49148', 'password': '4dwZ8pbF3Z'}, {'proxy_server': 'http://103.241.199.37:49245', 'username': 'user49245', 'password': 'lntElktMLe'}, {'proxy_server': 'http://42.96.12.24:49272', 'username': 'user49272', 'password': 'VI8WPzQh84'}, {'proxy_server': 'http://42.96.12.229:49351', 'username': 'user49351', 'password': 'wgVn4gAvRm'}, {'proxy_server': 'http://42.96.12.24:49320', 'username': 'user49320', 'password': 'eHBgXjk4WG'}, {'proxy_server': 'http://42.96.12.24:49033', 'username': 'user49033', 'password': 'F5iNKfJZvF'}, {'proxy_server': 'http://42.96.12.24:49364', 'username': 'user49364', 'password': 'l7wZPmVGaW'}, {'proxy_server': 'http://42.96.12.24:49150', 'username': 'user49150', 'password': 'P7adiqWXqE'}, {'proxy_server': 'http://42.96.12.229:49329', 'username': 'user49329', 'password': 'SzCl2d2Nhr'}, {'proxy_server': 'http://42.96.12.24:49182', 'username': 'user49182', 'password': 'Ta1LFr0nEU'}, {'proxy_server': 'http://42.96.12.24:49468', 'username': 'user49468', 'password': 'n572URhpqJ'}, {'proxy_server': 'http://42.96.12.24:49030', 'username': 'user49030', 'password': 'wYIBVwltWr'}, {'proxy_server': 'http://103.241.199.37:49200', 'username': 'user49200', 'password': 'N2NLWxUgSx'}, {'proxy_server': 'http://103.241.199.37:49389', 'username': 'user49389', 'password': 'UbAXqsoUrE'}]
-    data = random.choice(proxies)
-    proxy_server = data["proxy_server"]
-    username = data["username"]
-    password = data["password"]
+    proxies = [
+    {
+        "proxy_server": "http://42.96.12.24:49468",
+        "username": "user49468",
+        "password": "n572URhpqJ"
+    },
+    {
+        "proxy_server": "http://154.197.73.67:49414",
+        "username": "user49414",
+        "password": "xNZoWZsryh"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49030",
+        "username": "user49030",
+        "password": "wYIBVwltWr"
+    },
+    {
+        "proxy_server": "http://103.241.199.37:49200",
+        "username": "user49200",
+        "password": "N2NLWxUgSx"
+    },
+    {
+        "proxy_server": "http://103.241.199.37:49389",
+        "username": "user49389",
+        "password": "UbAXqsoUrE"
+    },
+    {
+        "proxy_server": "http://103.162.31.234:49065",
+        "username": "user49065",
+        "password": "cC5WUSjb9V"
+    },
+    {
+        "proxy_server": "http://42.96.12.225:49004",
+        "username": "user49004",
+        "password": "6RJmw4ZdJj"
+    },
+    {
+        "proxy_server": "http://42.96.12.229:49495",
+        "username": "user49495",
+        "password": "XRhX2ISlYo"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49035",
+        "username": "user49035",
+        "password": "nS2yitZBg2"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49459",
+        "username": "user49459",
+        "password": "83BdKDtld5"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49389",
+        "username": "user49389",
+        "password": "aueijSSWfc"
+    },
+    {
+        "proxy_server": "http://103.241.199.37:49318",
+        "username": "user49318",
+        "password": "f0gSfg5cw9"
+    },
+    {
+        "proxy_server": "http://103.162.31.234:49146",
+        "username": "user49146",
+        "password": "bWJgga8tCP"
+    },
+    {
+        "proxy_server": "http://103.241.199.37:49425",
+        "username": "user49425",
+        "password": "cvYaR7Mf3l"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49463",
+        "username": "user49463",
+        "password": "4ZQ7K2iY0K"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49075",
+        "username": "user49075",
+        "password": "sERGFcl2Sr"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49382",
+        "username": "user49382",
+        "password": "mmnZMkwLNJ"
+    },
+    {
+        "proxy_server": "http://42.96.12.229:49107",
+        "username": "user49107",
+        "password": "QvxbvySw7g"
+    },
+    {
+        "proxy_server": "http://103.162.31.234:49349",
+        "username": "user49349",
+        "password": "0C0J8SX501"
+    },
+    {
+        "proxy_server": "http://42.96.12.229:49379",
+        "username": "user49379",
+        "password": "oebc64yGH0"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49500",
+        "username": "user49500",
+        "password": "B74q11hpWJ"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49476",
+        "username": "user49476",
+        "password": "ykonGoXehb"
+    },
+    {
+        "proxy_server": "http://103.162.31.234:49129",
+        "username": "user49129",
+        "password": "QYaLkzGVaU"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49143",
+        "username": "user49143",
+        "password": "wp9tdl2csJ"
+    },
+    {
+        "proxy_server": "http://42.96.12.229:49108",
+        "username": "user49108",
+        "password": "sNzBQwBvcm"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49281",
+        "username": "user49281",
+        "password": "gOHCFOBOKZ"
+    },
+    {
+        "proxy_server": "http://42.96.12.24:49192",
+        "username": "user49192",
+        "password": "bf7usOjkLM"
+    }
+]
+    while status:
+        data = random.choice(proxies)
+        proxy_server = data["proxy_server"]
+        username = data["username"]
+        password = data["password"]
+        time.sleep(1)
     
     
     # if type == 1:
