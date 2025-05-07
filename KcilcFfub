@@ -237,8 +237,17 @@ def run(playwright, dem, index, proxy_type, lock):
                     elements = page.query_selector_all("div.absolute.top-4.right-4 > span.inline-block > svg[data-testid='common-xmark']")
                     print(f"Found {len(elements)} elements matching the selector.")
                     if len(elements) == 1:
-                        elements[0].click()
-                        print("Clicked on the close button")
+                        page.evaluate("""
+                                const elements = document.querySelectorAll("div.absolute.top-4.right-4 > span.inline-block > svg[data-testid='common-xmark']");
+                                if (elements.length > 0) {
+                                    elements[0].dispatchEvent(new MouseEvent('click', {
+                                        bubbles: true,
+                                        cancelable: true,
+                                        view: window
+                                    }));
+                                }
+                            """)
+                        print("Clicked using JavaScript")
                     else:
                         print("Có nhiều phần tử khớp với bộ chọn hoặc không tìm thấy phần tử nào.")
                     time.sleep(5)
@@ -488,7 +497,5 @@ minutes, seconds = divmod(rem, 60)
 formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours),int(minutes),seconds)
 
 print(f"\033[33mProcess: {formatted_time}\033[0m")
-output = input("Nhấn Enter để thoát...")
-status = False
 output = input("Nhấn Enter để thoát...")
 status = False
