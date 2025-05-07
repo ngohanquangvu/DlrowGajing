@@ -192,6 +192,48 @@ def change_proxy(type):
     #         time.sleep(5)
     #         continue
     #     time.sleep(600)
+def handle_popups_and_ads(page):
+    try:
+        # Xử lý popup đóng
+        elements = page.query_selector_all("div.absolute.top-4.right-4 > span.inline-block > svg[data-testid='common-xmark']")
+        print(f"Found {len(elements)} elements matching the selector.")
+        if len(elements) == 1:
+            page.evaluate("""
+                    const elements = document.querySelectorAll("div.absolute.top-4.right-4 > span.inline-block > svg[data-testid='common-xmark']");
+                    if (elements.length > 0) {
+                        elements[0].dispatchEvent(new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        }));
+                    }
+                """)
+            print("Clicked using JavaScript")
+        else:
+            print("Có nhiều phần tử khớp với bộ chọn hoặc không tìm thấy phần tử nào.")
+    except Exception:
+        print("No popup found")
+    
+    try:
+        # Xử lý nút skip quảng cáo
+        skip_button = page.wait_for_selector("//div[contains(@class,'vast-skip-button skippable')]", timeout=20000)
+        skip_button.click()
+        print("Skipped ad")
+    except Exception:
+        print("No ad skip button found")
+
+# Hàm sleep thông minh - vừa sleep vừa xử lý popup/quảng cáo
+def smart_sleep(page, duration_seconds):
+    interval = 3  # Kiểm tra mỗi 5 giây
+    time_elapsed = 0
+    
+    while time_elapsed < duration_seconds:
+        sleep_time = min(interval, duration_seconds - time_elapsed)
+        time.sleep(sleep_time)
+        time_elapsed += sleep_time
+        
+        # Xử lý popup và quảng cáo có thể xuất hiện trong lúc sleep
+        handle_popups_and_ads(page)
 def run(playwright, dem, index, proxy_type, lock):
     global list_url, running, url_complete, timeout, proxy_server, username, password, version
     headless = True
@@ -232,39 +274,7 @@ def run(playwright, dem, index, proxy_type, lock):
             while True:
                 try:
                     page.goto(url, timeout=30000, wait_until="domcontentloaded")
-                    time.sleep(10)
-
-                    elements = page.query_selector_all("div.absolute.top-4.right-4 > span.inline-block > svg[data-testid='common-xmark']")
-                    print(f"Found {len(elements)} elements matching the selector.")
-                    if len(elements) == 1:
-                        page.evaluate("""
-                                const elements = document.querySelectorAll("div.absolute.top-4.right-4 > span.inline-block > svg[data-testid='common-xmark']");
-                                if (elements.length > 0) {
-                                    elements[0].dispatchEvent(new MouseEvent('click', {
-                                        bubbles: true,
-                                        cancelable: true,
-                                        view: window
-                                    }));
-                                }
-                            """)
-                        print("Clicked using JavaScript")
-                    else:
-                        print("Có nhiều phần tử khớp với bộ chọn hoặc không tìm thấy phần tử nào.")
-                    time.sleep(5)
-
-
-                    try:
-                        # Chờ đến khi nút "vast-skip-button" xuất hiện
-                        page.wait_for_selector(".vast-skip-button", timeout=10000)
-                        time.sleep(2)
-
-                        # Chờ đến khi nút "vast-skip-button enabled" có thể click
-                        skip_button = page.wait_for_selector("//div[contains(@class,'vast-skip-button skippable')]", timeout=20000)
-                        skip_button.click()
-                        print("Skip ads")
-                    except Exception as e:
-                        print("Chưa thể skip")
-                        pass
+                    time.sleep(random.randint(10, 15))
                     
                     # Thời gian timeout để kiểm tra video
                     check_timeout = timeout
@@ -314,7 +324,7 @@ def run(playwright, dem, index, proxy_type, lock):
                                     break
                                 page.reload()
                                 start_time_run = time.time()  # Reset lại thời gian bắt đầu kiểm tra  # Reset lại thời gian bắt đầu kiểm tra
-
+                        smart_sleep(page, timeout)
                         if refresh_count > max_refresh:
                             page.close()
                             context.close()
@@ -324,7 +334,7 @@ def run(playwright, dem, index, proxy_type, lock):
                     else:
                         while time.time() - start_time_run < check_timeout:
                             try:
-                                time.sleep(1)
+                                time.sleep(3)  # Chờ một giây trước khi kiểm tra lại
                                 if page.evaluate("document.readyState") == "complete":
                                     video_playing = True
                                     break
@@ -368,17 +378,17 @@ def run(playwright, dem, index, proxy_type, lock):
                     else:
                         page.click(f'img[src="/img/logo/gjw_logo_glow_v1.png"]')
                         time.sleep(5)
-                        # scroll_height = page.evaluate("document.documentElement.scrollHeight")
-                        # random_scroll_height = random.randint(0, scroll_height)
-                        # page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
-                        # time.sleep(1)
+                        scroll_height = page.evaluate("document.documentElement.scrollHeight")
+                        random_scroll_height = random.randint(0, scroll_height)
+                        page.evaluate(f"window.scrollTo(0, {random_scroll_height});")
+                        time.sleep(1)
 
-                        # # Bấm vào một URL bất kỳ trong trang
-                        # elements = page.query_selector_all("a[href]")
-                        # if elements:
-                        #     random_element = random.choice(elements)
-                        #     random_element.click()
-                        # time.sleep(5)
+                        # Bấm vào một URL bất kỳ trong trang
+                        elements = page.query_selector_all("a[href]")
+                        if elements:
+                            random_element = random.choice(elements)
+                            random_element.click()
+                        time.sleep(5)
                         
                     page.close()
                     context.close()
